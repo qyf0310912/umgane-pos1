@@ -1,736 +1,305 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>엄가네 현장 계산기</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>엄가네 현장 계산기</title>
 
-  <style>
-    :root{
-      --bg:#0b0b0b;
-      --panel:#151515;
-      --txt:#f2f2f2;
-      --muted:#bdbdbd;
-      --orange:#ff7a00;
-      --green:#2ecc71;
-      --red:#ff3b30;
-      --radius:16px;
-    }
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: radial-gradient(1200px 700px at 50% -200px, #222 0%, #0b0b0b 55%, #070707 100%);
-      color:var(--txt);
-    }
-    header{
-      background:var(--orange);
-      color:#111;
-      font-weight:1000;
-      text-align:center;
-      padding:12px;
-      font-size:20px;
-      position:sticky;
-      top:0;
-      z-index:50;
-    }
+<style>
+* { box-sizing: border-box; }
+body {
+  margin:0; background:#0f0f0f; color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+}
 
-    .page{ padding:12px; }
-    .layout{
-      display:grid;
-      grid-template-columns: 1.55fr 1fr; /* 결제창 1/3 정도 */
-      gap:12px;
-      align-items:start;
-    }
+/* 헤더 */
+header {
+  background:#ff9800;
+  color:#111;
+  font-weight:900;
+  padding:14px;
+  text-align:center;
+  font-size:20px;
+}
 
-    .card{
-      background:linear-gradient(180deg, #141414, #0f0f0f);
-      border:1px solid #111;
-      border-radius: var(--radius);
-      overflow:hidden;
-    }
-    .card-title{
-      padding:10px 12px;
-      font-weight:900;
-      color:#ddd;
-      border-bottom:1px solid #111;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .pill{
-      color:#9a9a9a;
-      font-size:12px;
-      font-weight:900;
-      white-space:nowrap;
-    }
+/* 전체 레이아웃 */
+.main {
+  display:grid;
+  grid-template-columns: 3fr 1fr;
+  height: calc(100vh - 56px);
+}
 
-    /* LEFT */
-    .left-inner{ padding:12px; }
-    .tabs{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-bottom:10px;
-    }
-    .tab{
-      border:1px solid #2a2a2a;
-      background:#1a1a1a;
-      color:#eee;
-      padding:8px 12px;
-      border-radius:12px;
-      font-weight:900;
-      cursor:pointer;
-      user-select:none;
-    }
-    .tab.active{
-      outline:2px solid rgba(255,122,0,.5);
-      border-color:#3a2a1a;
-    }
+/* ===== 좌측: 품목 ===== */
+.left {
+  padding:10px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
 
-    .search-row{
-      display:flex;
-      gap:10px;
-      margin:10px 0 12px;
-      align-items:center;
-    }
-    .search{
-      width:100%;
-      background:#121212;
-      border:1px solid #222;
-      color:#fff;
-      padding:12px 12px;
-      border-radius:14px;
-      font-size:16px;
-      font-weight:900;
-      outline:none;
-    }
-    .search::placeholder{ color:#777; }
+.categories {
+  display:flex;
+  gap:8px;
+  margin-bottom:10px;
+}
+.categories button {
+  flex:1;
+  padding:10px 0;
+  background:#222;
+  color:#fff;
+  border:0;
+  border-radius:8px;
+  font-weight:700;
+}
+.categories button.active {
+  background:#ff9800;
+  color:#111;
+}
 
-    /* ✅ 품목 타일형 5열(큰화면), 줄면 4/3열 */
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(5, minmax(0,1fr));
-      gap:10px;
-    }
-    @media (max-width: 1400px){
-      .grid{ grid-template-columns: repeat(4, minmax(0,1fr)); }
-    }
-    @media (max-width: 1100px){
-      .layout{ grid-template-columns: 1fr; }
-      .grid{ grid-template-columns: repeat(4, minmax(0,1fr)); }
-    }
-    @media (max-width: 820px){
-      .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
-    }
+.items {
+  flex:1;
+  overflow:auto;
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
+  gap:10px;
+}
+.item {
+  background:#1c1c1c;
+  border-radius:10px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+}
+.item-name { font-size:16px; font-weight:700; }
+.item-price { margin-top:6px; font-weight:900; }
 
-    .item{
-      background: linear-gradient(180deg,#1a1a1a,#121212);
-      border:1px solid #151515;
-      border-radius:18px;
-      padding:12px;
-      cursor:pointer;
-      user-select:none;
-      min-height:74px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      gap:8px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
-    }
-    .item:active{ transform: scale(.99); }
-    .item .name{
-      font-weight:1000;
-      font-size:18px;
-      line-height:1.05;
-    }
-    .item .meta{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap:10px;
-    }
-    .item .unit{
-      color:#9b9b9b;
-      font-weight:900;
-      font-size:13px;
-    }
-    .item .price{
-      font-weight:1100;
-      font-size:18px;
-      color:#fff;
-    }
+/* ===== 우측: 장바구니/결제 ===== */
+.right {
+  border-left:2px solid #222;
+  display:flex;
+  flex-direction:column;
+}
 
-    /* RIGHT */
-    .right-inner{
-      display:flex;
-      flex-direction:column;
-      height: calc(100vh - 56px); /* 헤더 제외 */
-      min-height:540px;
-    }
+/* 장바구니 */
+.cart {
+  flex:1;
+  overflow:auto;
+  padding:10px;
+}
+.cart h2 {
+  margin:0 0 8px 0;
+  font-size:18px;
+}
+.cart-item {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#1b1b1b;
+  padding:8px 10px;
+  border-radius:8px;
+  margin-bottom:6px;
+  font-size:14px;
+}
+.cart-item span.qty {
+  opacity:.8;
+  margin-left:4px;
+}
+.cart-item button {
+  background:#ff3b30;
+  border:0;
+  color:#fff;
+  font-weight:900;
+  border-radius:6px;
+  width:28px;
+  height:28px;
+}
 
-    /* ✅ 총합계 + 총갯수 */
-    .sum{
-      padding:12px;
-      font-size:24px;
-      font-weight:1100;
-      border-bottom:1px solid #111;
-      background:linear-gradient(180deg,#111,#0e0e0e);
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .sum .leftsum{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
-    .sum .badge{
-      background:#1b1b1b;
-      border:1px solid #222;
-      padding:6px 10px;
-      border-radius:999px;
-      font-weight:1000;
-      font-size:14px;
-      color:#ddd;
-    }
+/* 결제영역 */
+.pay {
+  border-top:2px solid #222;
+  padding:10px;
+  background:#111;
+}
+.total {
+  font-size:20px;
+  font-weight:900;
+  display:flex;
+  justify-content:space-between;
+}
+.total small {
+  font-size:14px;
+  opacity:.8;
+}
 
-    /* ✅ 장바구니만 스크롤 + 더 많이 보이게(컴팩트) */
-    .cart-scroll{
-      padding:8px;
-      overflow:auto;
-      flex: 1 1 auto;
-      border-bottom:1px solid #111;
-    }
-    .cart-row{
-      display:grid;
-      grid-template-columns: 1fr auto;
-      gap:8px;
-      align-items:center;
-      padding:8px 8px;                /* ✅ 줄임 */
-      border-radius:14px;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.04);
-      margin-bottom:6px;              /* ✅ 줄임 */
-    }
+.money {
+  margin-top:8px;
+  font-size:16px;
+  display:flex;
+  justify-content:space-between;
+}
 
-    .row-main{
-      display:flex;
-      flex-direction:column;
-      gap:2px;                        /* ✅ 줄임 */
-      min-width:0;
-    }
-    .row-top{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:center;
-      min-width:0;
-    }
-    .cart-name{
-      font-weight:1000;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width:100%;
-    }
-    .cart-total{
-      font-weight:1100;
-      white-space:nowrap;
-    }
+.money-buttons {
+  display:grid;
+  grid-template-columns: repeat(3,1fr);
+  gap:6px;
+  margin-top:8px;
+}
+.money-buttons button {
+  padding:12px 0;
+  font-size:16px;
+  font-weight:900;
+  border-radius:8px;
+  border:0;
+}
 
-    .row-bottom{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .row-bottom small{
-      color:#a8a8a8;
-      font-weight:900;
-      font-size:12px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .qtybox{
-      display:flex;
-      align-items:center;
-      gap:6px;
-      flex-shrink:0;
-    }
-    .qbtn{
-      width:34px;                     /* ✅ 조금 줄임 */
-      height:34px;
-      border:none;
-      border-radius:12px;
-      font-weight:1100;
-      cursor:pointer;
-      background:#2a2a2a;
-      color:#fff;
-    }
-    .qnum{
-      min-width:38px;
-      text-align:center;
-      font-weight:1100;
-      font-size:16px;
-      color:#fff;
-    }
-    .trash{
-      width:38px;
-      height:38px;
-      border:none;
-      border-radius:12px;
-      cursor:pointer;
-      background: var(--red);
-      color:#fff;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size:16px;
-      font-weight:1000;
-    }
-
-    /* ✅ 결제영역 아래 고정 */
-    .pay-sticky{
-      padding:10px 12px;
-      background:linear-gradient(180deg,#0f0f0f,#0b0b0b);
-    }
-
-    /* 받은돈/거스름 분리 카드 */
-    .paidbox{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .paidcard{
-      border-radius:16px;
-      padding:10px 10px;              /* ✅ 살짝 줄임 */
-      border:1px solid #111;
-    }
-    .paidcard .t{
-      font-size:13px;
-      font-weight:1000;
-      opacity:.9;
-      margin-bottom:6px;
-    }
-    .paidcard .v{
-      font-size:24px;
-      font-weight:1200;
-      letter-spacing:0.2px;
-    }
-    .paid-in{
-      background:linear-gradient(180deg,#10233a,#0f1b2b);
-      border-color:#0b2a4a;
-    }
-    .paid-in .t{ color:#9fd0ff; }
-    .paid-in .v{ color:#d7ecff; }
-    .paid-change{
-      background:linear-gradient(180deg,#0f2f1e,#0f241a);
-      border-color:#144b2b;
-    }
-    .paid-change .t{ color:#9dffb5; }
-    .paid-change .v{ color:#d8ffe5; }
-
-    /* 돈버튼 (✅ 10만 삭제 + 간격 정리) */
-    .money{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .mbtn{
-      border:none;
-      border-radius:14px;
-      padding:14px 10px;
-      background:#f1f1f1;
-      color:#111;
-      font-weight:1100;
-      font-size:18px;
-      cursor:pointer;
-    }
-    .mbtn:active{ transform: scale(.99); }
-
-    /* ✅ 버튼 2개만: 초기화(현금만) / 결제완료(전체) */
-    .actions{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-    }
-    .btn-reset{
-      background: var(--red);
-      color:#fff;
-      border:none;
-      border-radius:16px;
-      padding:16px 12px;
-      font-weight:1200;
-      font-size:18px;
-      cursor:pointer;
-    }
-    .btn-done{
-      background: var(--green);
-      color:#111;
-      border:none;
-      border-radius:18px;
-      padding:18px 12px;
-      font-weight:1300;
-      font-size:22px;
-      cursor:pointer;
-    }
-    .btn-reset:active, .btn-done:active{ transform: scale(.99); }
-
-    .hint{
-      color:#777;
-      font-size:12px;
-      font-weight:800;
-      margin-top:8px;
-      text-align:center;
-    }
-  </style>
+.complete {
+  margin-top:8px;
+  background:#34c759;
+  color:#111;
+  font-size:20px;
+  font-weight:900;
+  padding:14px;
+  border:0;
+  border-radius:10px;
+}
+.reset {
+  background:#ff3b30;
+  color:#fff;
+}
+</style>
 </head>
 
 <body>
 <header>엄가네 현장 계산기</header>
 
-<div class="page">
-  <div class="layout">
+<div class="main">
+  <!-- 좌측 -->
+  <div class="left">
+    <div class="categories" id="categories"></div>
+    <div class="items" id="items"></div>
+  </div>
 
-    <!-- LEFT: 품목 -->
-    <div class="card">
-      <div class="card-title">
-        <div>품목 선택</div>
-        <div class="pill">검색(초성) · 타일형</div>
-      </div>
-
-      <div class="left-inner">
-        <div class="tabs" id="tabs"></div>
-
-        <div class="search-row">
-          <input id="q" class="search" placeholder="검색: 고구마 / ㄱ / 사과 / 단감(3개) ..." autocomplete="off" />
-        </div>
-
-        <div class="grid" id="grid"></div>
-      </div>
+  <!-- 우측 -->
+  <div class="right">
+    <div class="cart">
+      <h2>장바구니</h2>
+      <div id="cartList"></div>
     </div>
 
-    <!-- RIGHT: 결제 -->
-    <div class="card">
-      <div class="card-title">
-        <div>결제</div>
-        <div class="pill">장바구니만 스크롤</div>
+    <div class="pay">
+      <div class="total">
+        <div>총합계 ₩<span id="total">0</span></div>
+        <small>총 <span id="totalQty">0</span>개</small>
       </div>
 
-      <div class="right-inner">
-        <div class="sum">
-          <div class="leftsum">
-            <div>총합계 <span id="total">₩0</span></div>
-            <div class="badge">총 <span id="count">0</span>개</div>
-          </div>
-        </div>
-
-        <div class="cart-scroll" id="cart"></div>
-
-        <div class="pay-sticky">
-          <div class="paidbox">
-            <div class="paidcard paid-in">
-              <div class="t">받은돈</div>
-              <div class="v">₩<span id="paid">0</span></div>
-            </div>
-            <div class="paidcard paid-change">
-              <div class="t">거스름</div>
-              <div class="v">₩<span id="change">0</span></div>
-            </div>
-          </div>
-
-          <!-- ✅ 10만 제거 -->
-          <div class="money">
-            <button class="mbtn" onclick="addMoney(1000)">1천</button>
-            <button class="mbtn" onclick="addMoney(5000)">5천</button>
-            <button class="mbtn" onclick="addMoney(10000)">1만</button>
-            <button class="mbtn" onclick="addMoney(30000)">3만</button>
-            <button class="mbtn" onclick="addMoney(50000)">5만</button>
-            <button class="mbtn" onclick="addMoney(0)">0</button>
-          </div>
-
-          <div class="actions">
-            <!-- ✅ 초기화: 받은돈/거스름만 -->
-            <button class="btn-reset" onclick="resetCashOnly()">초기화(현금만)</button>
-            <!-- ✅ 결제완료: 전체 초기화 -->
-            <button class="btn-done" onclick="complete()">결제 완료</button>
-          </div>
-
-          <div class="hint">F5 새로고침하면 전부 사라짐 / 초기화는 현금만 0</div>
-        </div>
+      <div class="money">
+        <div>받은돈 ₩<span id="paid">0</span></div>
+        <div>거스름 ₩<span id="change">0</span></div>
       </div>
+
+      <div class="money-buttons">
+        <button onclick="addMoney(1000)">1천</button>
+        <button onclick="addMoney(5000)">5천</button>
+        <button onclick="addMoney(10000)">1만</button>
+        <button onclick="addMoney(30000)">3만</button>
+        <button onclick="addMoney(50000)">5만</button>
+        <button class="reset" onclick="resetMoney()">초기화</button>
+      </div>
+
+      <button class="complete" onclick="complete()">결제 완료</button>
     </div>
-
   </div>
 </div>
 
 <script src="items.js"></script>
-
 <script>
-  // ---------- 유틸 ----------
-  const fmt = (n)=> "₩" + (n||0).toLocaleString("ko-KR");
+const cats = ["과일","야채","잎채소","생선"];
+let activeCat = "과일";
+let cart = {};
+let total = 0;
+let totalQty = 0;
+let paid = 0;
 
-  // 초성 테이블
-  const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
-  function getChosung(str){
-    let out = "";
-    for (const ch of str){
-      const code = ch.charCodeAt(0);
-      if (code >= 0xAC00 && code <= 0xD7A3){
-        const idx = Math.floor((code - 0xAC00) / 588);
-        out += CHO[idx] || "";
-      } else if (/[a-z0-9]/i.test(ch)){
-        out += ch.toLowerCase();
-      } else {
-        out += ch;
-      }
-    }
-    return out;
-  }
-  function norm(s){ return (s||"").toString().trim().toLowerCase(); }
+const catEl = document.getElementById("categories");
+cats.forEach(c=>{
+  const b=document.createElement("button");
+  b.textContent=c;
+  if(c===activeCat) b.classList.add("active");
+  b.onclick=()=>{activeCat=c;render();};
+  catEl.appendChild(b);
+});
 
-  // ---------- 데이터 ----------
-  const ITEMS = Array.isArray(window.ITEMS) ? window.ITEMS : [];
-  const CATS = ["과일","야채","잎채소","생선","기타","묶음"];
-
-  // ---------- 상태 ----------
-  let activeCat = "과일";
-  let query = "";
-  const cart = {};
-  let total = 0;
-  let paid = 0;
-
-  // ---------- DOM ----------
-  const $tabs = document.getElementById("tabs");
-  const $grid = document.getElementById("grid");
-  const $cart = document.getElementById("cart");
-  const $total = document.getElementById("total");
-  const $count = document.getElementById("count");
-  const $paid = document.getElementById("paid");
-  const $change = document.getElementById("change");
-  const $q = document.getElementById("q");
-
-  function buildTabs(){
-    $tabs.innerHTML = "";
-    for (const c of CATS){
-      const b = document.createElement("div");
-      b.className = "tab" + (c===activeCat ? " active" : "");
-      b.textContent = c;
-      b.onclick = ()=>{ activeCat = c; buildTabs(); renderItems(); };
-      $tabs.appendChild(b);
-    }
-  }
-
-  function itemMatches(it){
-    const catOk = (activeCat==="묶음") ? (it.unit === "묶음") : (it.cat === activeCat);
-    if (!catOk) return false;
-    if (!query) return true;
-
-    const q = norm(query);
-    const n = norm(it.name);
-    const u = norm(it.unit);
-    const ch = getChosung(it.name);
-
-    return n.includes(q) || u.includes(q) || ch.includes(q);
-  }
-
-  function makeItemTile(it){
-    const d = document.createElement("div");
-    d.className = "item";
-    d.onclick = ()=> addItem(it.id);
-
-    const name = document.createElement("div");
-    name.className = "name";
-    name.textContent = it.name;
-
-    const meta = document.createElement("div");
-    meta.className = "meta";
-
-    const unit = document.createElement("div");
-    unit.className = "unit";
-    unit.textContent = it.unit;
-
-    const price = document.createElement("div");
-    price.className = "price";
-    price.textContent = fmt(it.price);
-
-    meta.appendChild(unit);
-    meta.appendChild(price);
-
-    d.appendChild(name);
-    d.appendChild(meta);
-    return d;
-  }
-
-  function renderItems(){
-    $grid.innerHTML = "";
-    const list = ITEMS.filter(itemMatches);
-    for (const it of list) $grid.appendChild(makeItemTile(it));
-  }
-
-  function calcTotal(){
-    let t = 0;
-    let c = 0;
-    for (const k in cart){
-      t += cart[k].price * cart[k].qty;
-      c += cart[k].qty; // ✅ 총갯수
-    }
-    total = t;
-    $total.textContent = fmt(total);
-    $count.textContent = c.toLocaleString("ko-KR");
-    updateChange();
-  }
-
-  function renderCart(){
-    $cart.innerHTML = "";
-    const keys = Object.keys(cart);
-    if (!keys.length){
-      const empty = document.createElement("div");
-      empty.style.color = "#777";
-      empty.style.fontWeight = "900";
-      empty.style.padding = "14px 10px";
-      empty.textContent = "장바구니 비어있음";
-      $cart.appendChild(empty);
-      return;
-    }
-
-    for (const id of keys){
-      const row = cart[id];
-
-      const wrap = document.createElement("div");
-      wrap.className = "cart-row";
-
-      const main = document.createElement("div");
-      main.className = "row-main";
-
-      const top = document.createElement("div");
-      top.className = "row-top";
-
-      const nm = document.createElement("div");
-      nm.className = "cart-name";
-      nm.textContent = `${row.name} x${row.qty}`;
-
-      const tot = document.createElement("div");
-      tot.className = "cart-total";
-      tot.textContent = fmt(row.price * row.qty);
-
-      top.appendChild(nm);
-      top.appendChild(tot);
-
-      const bottom = document.createElement("div");
-      bottom.className = "row-bottom";
-
-      const sm = document.createElement("small");
-      sm.textContent = `${row.unit} · ${fmt(row.price)} (개당)`;
-
-      const controls = document.createElement("div");
-      controls.className = "qtybox";
-      controls.innerHTML = `
-        <button class="qbtn" title="1개 빼기">-</button>
-        <div class="qnum">${row.qty}</div>
-        <button class="qbtn" title="1개 추가">+</button>
-        <button class="trash" title="항목 삭제">🗑</button>
-      `;
-      const [minus, , plus, trash] = controls.children;
-      minus.onclick = ()=> decItem(id);
-      plus.onclick  = ()=> incItem(id);
-      trash.onclick = ()=> delItem(id);
-
-      bottom.appendChild(sm);
-      bottom.appendChild(controls);
-
-      main.appendChild(top);
-      main.appendChild(bottom);
-
-      wrap.appendChild(main);
-      $cart.appendChild(wrap);
-    }
-  }
-
-  // ---------- 동작 ----------
-  function addItem(id){
-    const it = ITEMS.find(x=>x.id===id);
-    if (!it) return;
-    if (!cart[id]){
-      cart[id] = { id:it.id, name:it.name, unit:it.unit, price:it.price, qty:1 };
-    } else {
-      cart[id].qty += 1;
-    }
-    calcTotal();
-    renderCart();
-  }
-  function incItem(id){
-    if (!cart[id]) return;
-    cart[id].qty += 1;
-    calcTotal();
-    renderCart();
-  }
-  function decItem(id){
-    if (!cart[id]) return;
-    cart[id].qty -= 1;
-    if (cart[id].qty <= 0) delete cart[id];
-    calcTotal();
-    renderCart();
-  }
-  function delItem(id){
-    if (!cart[id]) return;
-    delete cart[id];
-    calcTotal();
-    renderCart();
-  }
-
-  function addMoney(amount){
-    // 0 버튼은 실수 방지용(원하면 나중에 다른 걸로 바꿔도 됨)
-    if (amount <= 0) return;
-    paid += amount;
-    $paid.textContent = paid.toLocaleString("ko-KR");
-    updateChange();
-  }
-
-  function updateChange(){
-    const ch = Math.max(paid - total, 0);
-    $change.textContent = ch.toLocaleString("ko-KR");
-  }
-
-  // ✅ 초기화: 받은돈/거스름만 0
-  function resetCashOnly(){
-    paid = 0;
-    $paid.textContent = "0";
-    $change.textContent = "0";
-  }
-
-  // ✅ 결제완료: 전체 초기화
-  function complete(){
-    if (total <= 0){
-      alert("장바구니가 비어있음");
-      return;
-    }
-    alert("결제 완료!");
-    for (const k in cart) delete cart[k];
-    total = 0;
-    paid = 0;
-    $paid.textContent = "0";
-    $change.textContent = "0";
-    $total.textContent = fmt(0);
-    $count.textContent = "0";
-    renderCart();
-  }
-
-  // 검색
-  $q.addEventListener("input", ()=>{
-    query = $q.value || "";
-    renderItems();
+function render(){
+  document.querySelectorAll(".categories button").forEach(b=>{
+    b.classList.toggle("active", b.textContent===activeCat);
   });
 
-  // 시작
-  buildTabs();
-  renderItems();
-  renderCart();
-  calcTotal();
-</script>
+  const itemsEl=document.getElementById("items");
+  itemsEl.innerHTML="";
+  ITEMS.filter(i=>i.cat===activeCat).forEach(i=>{
+    const d=document.createElement("div");
+    d.className="item";
+    d.innerHTML=`<div class="item-name">${i.name}</div>
+                 <div class="item-price">₩${i.price.toLocaleString()}</div>`;
+    d.onclick=()=>addItem(i);
+    itemsEl.appendChild(d);
+  });
 
+  updateCart();
+}
+
+function addItem(i){
+  if(!cart[i.id]) cart[i.id]={...i,qty:0};
+  cart[i.id].qty++;
+  updateCart();
+}
+
+function updateCart(){
+  const list=document.getElementById("cartList");
+  list.innerHTML="";
+  total=0; totalQty=0;
+  Object.values(cart).forEach(i=>{
+    total+=i.price*i.qty;
+    totalQty+=i.qty;
+    const d=document.createElement("div");
+    d.className="cart-item";
+    d.innerHTML=`<div>${i.name} <span class="qty">x${i.qty}</span></div>
+                 <div>₩${(i.price*i.qty).toLocaleString()}</div>
+                 <button onclick="removeItem('${i.id}')">✕</button>`;
+    list.appendChild(d);
+  });
+  document.getElementById("total").innerText=total.toLocaleString();
+  document.getElementById("totalQty").innerText=totalQty;
+  updateMoney();
+}
+
+function removeItem(id){
+  delete cart[id];
+  updateCart();
+}
+
+function addMoney(v){
+  paid+=v;
+  updateMoney();
+}
+function resetMoney(){
+  paid=0;
+  updateMoney();
+}
+function updateMoney(){
+  document.getElementById("paid").innerText=paid.toLocaleString();
+  document.getElementById("change").innerText=Math.max(paid-total,0).toLocaleString();
+}
+function complete(){
+  alert("결제 완료");
+  cart={};
+  resetMoney();
+  updateCart();
+}
+
+render();
+</script>
 </body>
 </html>
