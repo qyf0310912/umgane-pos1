@@ -1,3 +1,142 @@
-https://github.com/qyf0310912/umgane-pos1/new/main/
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>엄가네 현장 POS</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0e0e0e;
+  color: #fff;
+}
+header {
+  padding: 14px;
+  background: #ff7a00;
+  font-size: 20px;
+  font-weight: 900;
+  text-align: center;
+}
+.container {
+  padding: 12px;
+}
+.total {
+  font-size: 26px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+.cart {
+  background: #1c1c1c;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 12px;
+}
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+}
+.pay-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+  font-size: 18px;
+}
+.money-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.money-buttons button {
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 800;
+  border-radius: 10px;
+  border: none;
+}
+.pay-btn {
+  width: 100%;
+  padding: 18px;
+  background: #2ee06a;
+  font-size: 20px;
+  font-weight: 900;
+  border-radius: 12px;
+  border: none;
+}
+.reset {
+  background: #ff3b30;
+  color: #fff;
+}
+</style>
+</head>
+
+<body>
+
+<header>엄가네 현장 계산기</header>
+
+<div class="container">
+
+  <div class="total">총합계 ₩<span id="total">0</span></div>
+
+  <div class="cart" id="cart">
+    <div class="cart-item">
+      <span>사과 3개</span><span>₩9,000</span>
+    </div>
+    <div class="cart-item">
+      <span>양파 1망</span><span>₩8,000</span>
+    </div>
+    <div class="cart-item">
+      <span>깻잎 1봉</span><span>₩6,000</span>
+    </div>
+  </div>
+
+  <div class="pay-row">
+    <div>받은돈 ₩<span id="paid">0</span></div>
+    <div>거스름 ₩<span id="change">0</span></div>
+  </div>
+
+  <div class="money-buttons">
+    <button onclick="addMoney(1000)">1천</button>
+    <button onclick="addMoney(5000)">5천</button>
+    <button onclick="addMoney(10000)">1만</button>
+    <button onclick="addMoney(30000)">3만</button>
+    <button onclick="addMoney(50000)">5만</button>
+    <button class="reset" onclick="resetAll()">초기화</button>
+  </div>
+
+  <button class="pay-btn" onclick="complete()">결제 완료</button>
+
+</div>
+
+<script>
+let total = 23000;
+let paid = 0;
+
+document.getElementById("total").innerText = total.toLocaleString();
+
+function addMoney(amount) {
+  paid += amount;
+  document.getElementById("paid").innerText = paid.toLocaleString();
+  document.getElementById("change").innerText =
+    Math.max(paid - total, 0).toLocaleString();
+}
+
+function resetAll() {
+  paid = 0;
+  document.getElementById("paid").innerText = "0";
+  document.getElementById("change").innerText = "0";
+}
+
+function complete() {
+  alert("결제 완료!");
+  resetAll();
+}
+</script>
+
+</body>
+</html>
 
 
