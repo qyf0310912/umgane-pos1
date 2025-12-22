@@ -1,588 +1,353 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>엄가네 현장 계산기</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>엄가네 현장 계산기</title>
 
-  <style>
-    :root{
-      --bg:#0b0b0b;
-      --panel:#151515;
-      --panel2:#101010;
-      --line:#242424;
-      --text:#ffffff;
-      --muted:#bfbfbf;
-      --accent:#ff9f00;
-      --danger:#ff3b30;
-      --ok:#2ecc71;
-    }
+<style>
+:root{
+  --bg:#0e0e0e;
+  --panel:#1a1a1a;
+  --card:#222;
+  --accent:#ffae00;
+  --text:#fff;
+  --sub:#aaa;
+  --green:#2ecc71;
+  --red:#ff3b30;
+}
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
-      overflow:hidden; /* 전체 스크롤 막고, 필요한 곳만 스크롤 */
-    }
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
 
-    header{
-      height:58px;
-      background:var(--accent);
-      color:#111;
-      font-weight:900;
-      letter-spacing:-0.3px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:20px;
-    }
+/* ===== HEADER ===== */
+header{
+  background:var(--accent);
+  color:#111;
+  padding:12px;
+  text-align:center;
+  font-weight:700;
+  font-size:18px;
+}
 
-    .app{
-      height:calc(100vh - 58px);
-      display:grid;
-      grid-template-columns: 2.35fr 1fr; /* 왼쪽 넓게, 오른쪽 결제 */
-      gap:12px;
-      padding:12px;
-    }
+/* ===== LAYOUT ===== */
+main{
+  display:flex;
+  height:calc(100vh - 48px);
+}
 
-    /* ===== 왼쪽(품목) ===== */
-    .left{
-      min-width:0;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
+.left{
+  width:70%;
+  padding:12px;
+  overflow:auto;
+}
 
-    .topbar{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
+.right{
+  width:30%;
+  padding:12px;
+  background:#111;
+  display:flex;
+  flex-direction:column;
+}
 
-    .cats{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .cat-btn{
-      border:1px solid var(--line);
-      background: #1c1c1c;
-      color:#fff;
-      padding:10px 14px;
-      border-radius:12px;
-      font-weight:800;
-      min-width:110px;
-      text-align:center;
-      cursor:pointer;
-      user-select:none;
-    }
-    .cat-btn.active{
-      border-color:var(--accent);
-      box-shadow: inset 0 0 0 2px rgba(255,159,0,0.25);
-      background:#221600;
-    }
+/* ===== CATEGORY ===== */
+.categories{
+  display:flex;
+  gap:8px;
+  margin-bottom:10px;
+}
+.cat{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  background:#222;
+  text-align:center;
+  cursor:pointer;
+}
+.cat.active{
+  background:var(--accent);
+  color:#111;
+  font-weight:700;
+}
 
-    .search{
-      flex:1;
-      min-width:260px;
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-    .search input{
-      width:100%;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#0f0f0f;
-      color:#fff;
-      font-size:16px;
-      font-weight:700;
-      outline:none;
-    }
-    .search input::placeholder{ color:#7f7f7f; }
+/* ===== SEARCH ===== */
+.search{
+  margin-bottom:10px;
+}
+.search input{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+}
 
-    .items-wrap{
-      flex:1;
-      min-height:0;
-      border:1px solid var(--line);
-      border-radius:14px;
-      background:linear-gradient(180deg,#121212,#0b0b0b);
-      padding:10px;
-      overflow:auto; /* 품목만 스크롤 */
-    }
+/* ===== ITEMS GRID ===== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+}
 
-    /* 타일형 4~5열: 화면 넓이에 따라 자동 */
-    .items-grid{
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-      gap:10px;
-    }
+.item{
+  background:var(--card);
+  border-radius:14px;
+  padding:14px 10px;
+  text-align:center;
+  cursor:pointer;
+}
+.item-name{
+  font-size:18px;
+  font-weight:700;
+}
+.item-unit{
+  font-size:11px;
+  color:var(--sub);
+}
+.item-price{
+  margin-top:6px;
+  font-size:13px;
+  color:#ddd;
+}
 
-    .tile{
-      height:92px; /* ✅ 세로 긴 사각형 방지 */
-      border:1px solid var(--line);
-      border-radius:14px;
-      background: #171717;
-      padding:12px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      cursor:pointer;
-      user-select:none;
-    }
-    .tile:active{ transform: translateY(1px); }
+/* ===== CART ===== */
+.cart-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:8px;
+}
 
-    .tile .name{
-      font-size:18px;
-      font-weight:900;
-      letter-spacing:-0.3px;
-      line-height:1.1;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .tile .price{
-      font-size:18px;
-      font-weight:900;
-      color:#fff;
-      text-align:right;
-    }
+.cart-list{
+  flex:1;
+  background:var(--panel);
+  border-radius:12px;
+  padding:8px;
+  overflow:auto;
+}
 
-    /* ===== 오른쪽(장바구니/결제) ===== */
-    .right{
-      min-width:0;
-      border:1px solid var(--line);
-      border-radius:14px;
-      background: var(--panel2);
-      display:flex;
-      flex-direction:column;
-      overflow:hidden; /* 내부만 스크롤 */
-    }
+.cart-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 4px;
+  border-bottom:1px solid #333;
+  font-size:14px;
+}
+.cart-item span.qty{
+  color:var(--accent);
+  margin-left:6px;
+}
+.cart-item button{
+  background:none;
+  border:none;
+  color:var(--red);
+  font-size:16px;
+  cursor:pointer;
+}
 
-    .right-header{
-      padding:12px 12px 10px;
-      border-bottom:1px solid var(--line);
-      background:#0f0f0f;
-    }
+/* ===== PAYMENT ===== */
+.pay-info{
+  margin-top:10px;
+  background:var(--panel);
+  border-radius:12px;
+  padding:10px;
+  display:flex;
+  justify-content:space-between;
+  font-size:16px;
+}
 
-    .title-row{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:10px;
-    }
+.money-buttons{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+.money-buttons button{
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+  cursor:pointer;
+}
 
-    .right-title{
-      font-size:20px;
-      font-weight:1000;
-      letter-spacing:-0.3px;
-    }
+.reset{
+  background:var(--red);
+  color:#fff;
+}
 
-    .sum{
-      display:flex;
-      align-items:baseline;
-      gap:10px;
-      justify-content:flex-end;
-      font-weight:1000;
-    }
-    .sum .total{
-      font-size:24px;
-    }
-    .sum .count{
-      font-size:16px;
-      color:var(--muted);
-      font-weight:900;
-      white-space:nowrap;
-    }
-
-    .cart{
-      flex:1;
-      min-height:0;
-      overflow:auto; /* ✅ 장바구니만 스크롤 */
-      padding:10px 10px 6px;
-    }
-
-    /* ✅ 한 화면에 최소 7개 이상 보이게 줄임 */
-    .cart-item{
-      display:grid;
-      grid-template-columns: 1fr auto auto auto;
-      gap:8px;
-      align-items:center;
-      padding:8px 8px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#151515;
-      margin-bottom:8px;
-    }
-
-    .cart-item .label{
-      font-weight:900;
-      font-size:14px;
-      letter-spacing:-0.2px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .cart-item .amt{
-      font-weight:1000;
-      font-size:14px;
-      min-width:86px;
-      text-align:right;
-    }
-
-    .mini-btn{
-      width:36px;
-      height:34px;
-      border:none;
-      border-radius:10px;
-      font-weight:1000;
-      cursor:pointer;
-      background:#2a2a2a;
-      color:#fff;
-    }
-    .mini-btn.danger{ background:var(--danger); }
-
-    .paybox{
-      border-top:1px solid var(--line);
-      background:#0f0f0f;
-      padding:12px;
-    }
-
-    /* 받은돈/거스름: 색 분리 + 폰트 크게 */
-    .money-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:baseline;
-      gap:12px;
-      margin-bottom:10px;
-      padding:10px 10px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#141414;
-    }
-    .money-row .m-label{
-      font-weight:1000;
-      font-size:16px;
-      color:#d7d7d7;
-    }
-    .money-row .m-value{
-      font-weight:1100;
-      font-size:22px;
-      letter-spacing:-0.3px;
-    }
-    .money-row .m-value.paid{ color:#7dd3fc; }    /* 받은돈 */
-    .money-row .m-value.change{ color:#fca5a5; }  /* 거스름 */
-
-    .money-btns{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .money-btns button{
-      height:52px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#f1f1f1;
-      color:#111;
-      font-weight:1000;
-      font-size:18px;
-      cursor:pointer;
-    }
-
-    .bottom-row{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-    }
-    .reset{
-      height:56px;
-      border-radius:12px;
-      border:none;
-      background:var(--danger);
-      color:#fff;
-      font-weight:1100;
-      font-size:20px;
-      cursor:pointer;
-    }
-    .pay{
-      height:62px; /* ✅ 결제완료 크게 */
-      border-radius:12px;
-      border:none;
-      background:var(--ok);
-      color:#111;
-      font-weight:1200;
-      font-size:22px;
-      cursor:pointer;
-    }
-
-    /* 큰 화면에서 결제창 조금 더 오른쪽으로 밀어도 OK: 이미 3/1 비율 느낌 */
-    @media (max-width: 1100px){
-      .app{ grid-template-columns: 1.7fr 1fr; }
-      .tile{ height:98px; }
-    }
-    @media (max-width: 820px){
-      body{ overflow:auto; }
-      .app{
-        height:auto;
-        grid-template-columns: 1fr;
-      }
-      .right{ height:520px; }
-    }
-  </style>
+.pay{
+  margin-top:10px;
+  padding:16px;
+  border:none;
+  border-radius:14px;
+  font-size:20px;
+  font-weight:700;
+  background:var(--green);
+  cursor:pointer;
+}
+</style>
 </head>
 
 <body>
-  <header>엄가네 현장 계산기</header>
+<header>엄가네 현장 계산기</header>
 
-  <div class="app">
-    <!-- LEFT -->
-    <section class="left">
-      <div class="topbar">
-        <div class="cats" id="cats"></div>
-        <div class="search">
-          <input id="search" placeholder="검색 (예: ㄱ, 고구마, 감자…)" />
-        </div>
-      </div>
+<main>
+  <!-- LEFT -->
+  <div class="left">
+    <div class="categories">
+      <div class="cat active" onclick="setCat('과일')">과일</div>
+      <div class="cat" onclick="setCat('야채')">야채</div>
+      <div class="cat" onclick="setCat('잎채소')">잎채소</div>
+      <div class="cat" onclick="setCat('생선')">생선</div>
+    </div>
 
-      <div class="items-wrap">
-        <div class="items-grid" id="grid"></div>
-      </div>
-    </section>
+    <div class="search">
+      <input placeholder="검색 (예: ㄱ, 고구마, 감자)" oninput="searchItem(this.value)">
+    </div>
 
-    <!-- RIGHT -->
-    <aside class="right">
-      <div class="right-header">
-        <div class="title-row">
-          <div class="right-title">장바구니</div>
-          <div class="sum">
-            <div class="total" id="totalText">₩0</div>
-            <div class="count" id="countText">총 0개</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="cart" id="cart"></div>
-
-      <div class="paybox">
-        <div class="money-row">
-          <div class="m-label">받은돈</div>
-          <div class="m-value paid" id="paidText">₩0</div>
-        </div>
-        <div class="money-row" style="margin-top:-6px;">
-          <div class="m-label">거스름</div>
-          <div class="m-value change" id="changeText">₩0</div>
-        </div>
-
-        <div class="money-btns">
-          <button onclick="addMoney(1000)">1천</button>
-          <button onclick="addMoney(5000)">5천</button>
-          <button onclick="addMoney(10000)">1만</button>
-          <button onclick="addMoney(30000)">3만</button>
-          <button onclick="addMoney(50000)">5만</button>
-          <button onclick="addMoney(100000)">10만</button>
-        </div>
-
-        <div class="bottom-row">
-          <button class="reset" onclick="resetMoneyOnly()">초기화(받은돈만)</button>
-          <button class="pay" onclick="complete()">결제 완료</button>
-        </div>
-      </div>
-    </aside>
+    <div class="grid" id="items"></div>
   </div>
 
-  <!-- ✅ items.js 먼저 로드 -->
-  <script src="items.js"></script>
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="cart-header">
+      <div>총합계</div>
+      <div>₩<span id="total">0</span> / 총 <span id="count">0</span>개</div>
+    </div>
 
-  <script>
-    // ===== 상태 =====
-    const CATS = ["과일","야채","잎채소","생선"]; // 필요하면 "기타" 추가 가능
-    let activeCat = "과일";
-    let keyword = "";
+    <div class="cart-list" id="cart"></div>
 
-    // cartCounts: { [id]: qty }
-    const cartCounts = {};
-    let paid = 0;
+    <div class="pay-info">
+      <div>받은돈 ₩<span id="paid">0</span></div>
+      <div>거스름 ₩<span id="change">0</span></div>
+    </div>
 
-    function money(n){
-      return "₩" + (n||0).toLocaleString();
-    }
+    <div class="money-buttons">
+      <button onclick="addMoney(1000)">1천</button>
+      <button onclick="addMoney(5000)">5천</button>
+      <button onclick="addMoney(10000)">1만</button>
+      <button onclick="addMoney(30000)">3만</button>
+      <button onclick="addMoney(50000)">5만</button>
+      <button class="reset" onclick="resetMoney()">초기화</button>
+    </div>
 
-    function getFilteredItems(){
-      const items = (window.ITEMS || []).filter(x => x.cat === activeCat);
-      if(!keyword.trim()) return items;
-      const k = keyword.trim().toLowerCase();
-      return items.filter(x => (x.name||"").toLowerCase().includes(k));
-    }
+    <button class="pay" onclick="complete()">결제 완료</button>
+  </div>
+</main>
 
-    function calcTotal(){
-      let total = 0;
-      let count = 0;
-      for(const id in cartCounts){
-        const qty = cartCounts[id];
-        if(!qty) continue;
-        const item = (window.ITEMS||[]).find(x => x.id === id);
-        if(!item) continue;
-        total += item.price * qty;
-        count += qty;
-      }
-      return { total, count };
-    }
+<script>
+const items=[
+  {cat:"야채",name:"감자",price:3000},
+  {cat:"야채",name:"고구마",price:3000},
+  {cat:"야채",name:"양파",price:2500},
+  {cat:"야채",name:"애호박 3개",price:3500},
+  {cat:"과일",name:"사과 3개",price:5000},
+  {cat:"과일",name:"사과 7개",price:10000},
+  {cat:"과일",name:"단감 3개",price:5000},
+  {cat:"과일",name:"단감 7개",price:10000},
+];
 
-    function updateMoneyUI(){
-      const { total } = calcTotal();
-      document.getElementById("paidText").innerText = money(paid);
-      document.getElementById("changeText").innerText = money(Math.max(paid - total, 0));
-    }
+let currentCat="과일";
+let cart={};
+let paid=0;
 
-    function renderCats(){
-      const el = document.getElementById("cats");
-      el.innerHTML = "";
-      CATS.forEach(cat => {
-        const b = document.createElement("button");
-        b.className = "cat-btn" + (cat === activeCat ? " active" : "");
-        b.textContent = cat;
-        b.onclick = () => {
-          activeCat = cat;
-          renderCats();
-          renderItems();
-        };
-        el.appendChild(b);
-      });
-    }
+function render(){
+  const grid=document.getElementById("items");
+  grid.innerHTML="";
+  items.filter(i=>i.cat===currentCat).forEach(i=>{
+    const d=document.createElement("div");
+    d.className="item";
+    d.onclick=()=>addItem(i);
+    d.innerHTML=`
+      <div class="item-name">${i.name}</div>
+      <div class="item-price">₩${i.price.toLocaleString()}</div>
+    `;
+    grid.appendChild(d);
+  });
+}
 
-    function renderItems(){
-      const grid = document.getElementById("grid");
-      const items = getFilteredItems();
-      grid.innerHTML = "";
+function addItem(i){
+  if(!cart[i.name]) cart[i.name]={...i,qty:0};
+  cart[i.name].qty++;
+  updateCart();
+}
 
-      items.forEach(item => {
-        const d = document.createElement("div");
-        d.className = "tile";
-        d.innerHTML = `
-          <div class="name">${escapeHtml(item.name)}</div>
-          <div class="price">${money(item.price)}</div>
-        `;
-        d.onclick = () => addToCart(item.id);
-        grid.appendChild(d);
-      });
-    }
+function updateCart(){
+  const c=document.getElementById("cart");
+  c.innerHTML="";
+  let total=0,count=0;
+  Object.values(cart).forEach(i=>{
+    total+=i.price*i.qty;
+    count+=i.qty;
+    const row=document.createElement("div");
+    row.className="cart-item";
+    row.innerHTML=`
+      <div>${i.name}<span class="qty"> x${i.qty}</span></div>
+      <button onclick="removeItem('${i.name}')">✕</button>
+    `;
+    c.appendChild(row);
+  });
+  document.getElementById("total").innerText=total.toLocaleString();
+  document.getElementById("count").innerText=count;
+  document.getElementById("change").innerText=Math.max(paid-total,0).toLocaleString();
+}
 
-    function renderCart(){
-      const cart = document.getElementById("cart");
-      cart.innerHTML = "";
+function removeItem(name){
+  delete cart[name];
+  updateCart();
+}
 
-      const items = (window.ITEMS || []);
-      const entries = Object.keys(cartCounts)
-        .map(id => ({ id, qty: cartCounts[id] }))
-        .filter(x => x.qty > 0);
+function addMoney(m){
+  paid+=m;
+  document.getElementById("paid").innerText=paid.toLocaleString();
+  updateCart();
+}
 
-      // 빈 장바구니
-      if(entries.length === 0){
-        cart.innerHTML = `<div style="color:#8a8a8a; font-weight:900; padding:10px;">(비어있음)</div>`;
-      } else {
-        for(const e of entries){
-          const item = items.find(x => x.id === e.id);
-          if(!item) continue;
+function resetMoney(){
+  paid=0;
+  document.getElementById("paid").innerText="0";
+  document.getElementById("change").innerText="0";
+}
 
-          const row = document.createElement("div");
-          row.className = "cart-item";
+function complete(){
+  alert("결제 완료");
+  cart={};
+  paid=0;
+  updateCart();
+  document.getElementById("paid").innerText="0";
+}
 
-          const label = document.createElement("div");
-          label.className = "label";
-          label.textContent = `${item.name}  x${e.qty}`;
+function setCat(c){
+  currentCat=c;
+  document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
+  event.target.classList.add("active");
+  render();
+}
 
-          const amt = document.createElement("div");
-          amt.className = "amt";
-          amt.textContent = money(item.price * e.qty);
+function searchItem(v){
+  const grid=document.getElementById("items");
+  grid.innerHTML="";
+  items.filter(i=>i.name.includes(v)).forEach(i=>{
+    const d=document.createElement("div");
+    d.className="item";
+    d.onclick=()=>addItem(i);
+    d.innerHTML=`
+      <div class="item-name">${i.name}</div>
+      <div class="item-price">₩${i.price.toLocaleString()}</div>
+    `;
+    grid.appendChild(d);
+  });
+}
 
-          const minus = document.createElement("button");
-          minus.className = "mini-btn";
-          minus.textContent = "–";
-          minus.onclick = () => setQty(e.id, e.qty - 1);
-
-          const trash = document.createElement("button");
-          trash.className = "mini-btn danger";
-          trash.textContent = "🗑";
-          trash.onclick = () => setQty(e.id, 0);
-
-          row.appendChild(label);
-          row.appendChild(amt);
-          row.appendChild(minus);
-          row.appendChild(trash);
-          cart.appendChild(row);
-        }
-      }
-
-      const { total, count } = calcTotal();
-      document.getElementById("totalText").innerText = money(total);
-      document.getElementById("countText").innerText = `총 ${count}개`;
-
-      updateMoneyUI();
-    }
-
-    function addToCart(id){
-      cartCounts[id] = (cartCounts[id] || 0) + 1;
-      renderCart();
-    }
-
-    function setQty(id, qty){
-      if(qty <= 0) delete cartCounts[id];
-      else cartCounts[id] = qty;
-      renderCart();
-    }
-
-    // ===== 결제 =====
-    function addMoney(amount){
-      paid += amount;
-      updateMoneyUI();
-    }
-
-    // ✅ 초기화: 받은돈만 0 (장바구니 유지)
-    function resetMoneyOnly(){
-      paid = 0;
-      updateMoneyUI();
-    }
-
-    function complete(){
-      const { total, count } = calcTotal();
-      if(count === 0){
-        alert("장바구니가 비어있어요!");
-        return;
-      }
-      const change = Math.max(paid - total, 0);
-      alert(`결제 완료!\n총합계: ${money(total)}\n받은돈: ${money(paid)}\n거스름: ${money(change)}`);
-
-      // 결제 후: 장바구니 비우고(현장 기본), 받은돈도 0
-      for(const k in cartCounts) delete cartCounts[k];
-      paid = 0;
-      renderCart();
-    }
-
-    function escapeHtml(s){
-      return String(s)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    // 검색
-    document.getElementById("search").addEventListener("input", (e) => {
-      keyword = e.target.value || "";
-      renderItems();
-    });
-
-    // 초기 렌더
-    renderCats();
-    renderItems();
-    renderCart();
-  </script>
+render();
+</script>
 </body>
 </html>
