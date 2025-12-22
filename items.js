@@ -1,49 +1,107 @@
-// 엄가네 품목 데이터 (대량 업로드용)
-// cat: 과일 / 야채 / 잎채소 / 생선 / 기타
-// unit: 개/봉/망/단/팩/송이/묶음 등
-// pinned: true면 상단 "자주쓰는 품목"에 고정
+// items.js (보기 좋게 정리된 현장용 품목 리스트)
+const ITEMS = [
+  // ===== 과일 =====
+  { id: "I0001", cat: "과일", name: "단감 3개", unit: "개", price: 5000 },
+  { id: "I0002", cat: "과일", name: "단감 7개", unit: "개", price: 10000 },
+  { id: "I0003", cat: "과일", name: "사과 3개", unit: "개", price: 5000 },
+  { id: "I0004", cat: "과일", name: "사과 7개", unit: "개", price: 10000 },
+  { id: "I0005", cat: "과일", name: "대봉 6개", unit: "개", price: 5000 },
+  { id: "I0006", cat: "과일", name: "대봉 13개", unit: "개", price: 10000 },
+  { id: "I0007", cat: "과일", name: "귤 9개", unit: "개", price: 3000 },
+  { id: "I0008", cat: "과일", name: "귤 20개", unit: "개", price: 6000 },
+  { id: "I0009", cat: "과일", name: "샤인 2송이", unit: "송이", price: 8000 },
 
-window.ITEMS = [
-  // ===== 과일 (자주쓰는 예시) =====
-  { id:"apple",    cat:"과일", name:"사과",        unit:"개",  price:3000, pinned:true },
-  { id:"pear",     cat:"과일", name:"배",          unit:"개",  price:3500, pinned:true },
-  { id:"banana",   cat:"과일", name:"바나나",      unit:"송이", price:4000, pinned:true },
-  { id:"tanger",   cat:"과일", name:"귤",          unit:"kg",  price:6000, pinned:true },
-  { id:"straw",    cat:"과일", name:"딸기",        unit:"팩",  price:9000, pinned:true },
-
-  // ===== 묶음판매(현장용 버튼) =====
-  // 단감 3개 5천 / 7개 만원
-  { id:"dgam_3",   cat:"과일", name:"단감(3개)",   unit:"묶음", price:5000, pinned:true },
-  { id:"dgam_7",   cat:"과일", name:"단감(7개)",   unit:"묶음", price:10000, pinned:true },
-
-  // 샤인 1송이 3천 / 3송이 6천 (예시)
-  { id:"shine_1",  cat:"과일", name:"샤인(1송이)", unit:"묶음", price:3000, pinned:true },
-  { id:"shine_3",  cat:"과일", name:"샤인(3송이)", unit:"묶음", price:6000, pinned:true },
+  { id: "I0010", cat: "과일", name: "키위", unit: "개", price: 10000 },
+  { id: "I0011", cat: "과일", name: "석류 1개", unit: "개", price: 3500 },
+  { id: "I0012", cat: "과일", name: "석류 3개", unit: "개", price: 10000 },
+  { id: "I0013", cat: "과일", name: "바나나", unit: "개", price: 2500 },
+  { id: "I0014", cat: "과일", name: "파인애플", unit: "개", price: 4000 },
+  { id: "I0015", cat: "과일", name: "딸기 1팩", unit: "팩", price: 8000 },
+  { id: "I0016", cat: "과일", name: "딸기 2팩", unit: "팩", price: 15000 },
+  { id: "I0017", cat: "과일", name: "토마토", unit: "팩", price: 10000 },
+  { id: "I0018", cat: "과일", name: "방울토마토 1팩", unit: "팩", price: 6000 },
+  { id: "I0019", cat: "과일", name: "방울토마토 2팩", unit: "팩", price: 11000 },
+  { id: "I0020", cat: "과일", name: "체리", unit: "팩", price: 12000 },
 
   // ===== 야채 =====
-  { id:"onion",    cat:"야채", name:"양파",        unit:"망",  price:8000, pinned:true },
-  { id:"potato",   cat:"야채", name:"감자",        unit:"망",  price:7000, pinned:true },
-  { id:"carrot",   cat:"야채", name:"당근",        unit:"봉",  price:6000, pinned:true },
-  { id:"zuc",      cat:"야채", name:"애호박",      unit:"개",  price:1500, pinned:true },
-  { id:"swtpot",   cat:"야채", name:"고구마",      unit:"kg",  price:6000, pinned:true },
-  { id:"garlic",   cat:"야채", name:"마늘",        unit:"망",  price:10000 },
-  { id:"cabb",     cat:"야채", name:"양배추",      unit:"통",  price:3500 },
-  { id:"radish",   cat:"야채", name:"무",          unit:"개",  price:2500 },
-  { id:"cucumber", cat:"야채", name:"오이",        unit:"개",  price:1200 },
-  { id:"pepper",   cat:"야채", name:"고추",        unit:"봉",  price:4000 },
+  { id: "I0021", cat: "야채", name: "당근", unit: "개", price: 2500 },
+  { id: "I0022", cat: "야채", name: "감자", unit: "개", price: 3000 },
+  { id: "I0023", cat: "야채", name: "고구마", unit: "개", price: 3000 },
+  { id: "I0024", cat: "야채", name: "양파", unit: "개", price: 2500 },
+  { id: "I0025", cat: "야채", name: "청양고추", unit: "봉/팩", price: 3000 },
+  { id: "I0026", cat: "야채", name: "아삭이고추", unit: "봉/팩", price: 3500 },
+  { id: "I0027", cat: "야채", name: "꽈리고추", unit: "봉/팩", price: 4000 },
+  { id: "I0028", cat: "야채", name: "표고버섯", unit: "팩", price: 5000 },
+  { id: "I0029", cat: "야채", name: "느타리버섯", unit: "팩", price: 2500 },
+
+  { id: "I0030", cat: "야채", name: "새송이 1봉", unit: "봉", price: 1500 },
+  { id: "I0031", cat: "야채", name: "새송이 2봉", unit: "봉", price: 2500 },
+  { id: "I0032", cat: "야채", name: "팽이 3봉", unit: "봉", price: 1000 },
+
+  { id: "I0033", cat: "야채", name: "오이 6개", unit: "개", price: 3000 },
+  { id: "I0034", cat: "야채", name: "가지 4개", unit: "개", price: 3000 },
+  { id: "I0035", cat: "야채", name: "애호박 3개", unit: "개", price: 3500 },
+
+  { id: "I0036", cat: "야채", name: "브로콜리 1개", unit: "개", price: 1300 },
+  { id: "I0037", cat: "야채", name: "브로콜리 3개", unit: "개", price: 3000 },
+
+  { id: "I0038", cat: "야채", name: "샐러리", unit: "단", price: 2000 },
+  { id: "I0039", cat: "야채", name: "미나리", unit: "단", price: 3000 },
+  { id: "I0040", cat: "야채", name: "우엉", unit: "개", price: 3000 },
+  { id: "I0041", cat: "야채", name: "연근", unit: "개", price: 3000 },
+  { id: "I0042", cat: "야채", name: "더덕", unit: "팩", price: 6000 },
+
+  { id: "I0043", cat: "야채", name: "알배기", unit: "통", price: 5000 },
+  { id: "I0044", cat: "야채", name: "양배추", unit: "통", price: 2000 },
+  { id: "I0045", cat: "야채", name: "양상추", unit: "통", price: 1500 },
+
+  { id: "I0046", cat: "야채", name: "대파", unit: "단", price: 1000 },
+  { id: "I0047", cat: "야채", name: "쪽파", unit: "단", price: 4000 },
+  { id: "I0048", cat: "야채", name: "부추", unit: "단", price: 2000 },
+
+  { id: "I0049", cat: "야채", name: "무", unit: "개", price: 1500 },
+
+  { id: "I0050", cat: "야채", name: "마늘 작은", unit: "망/봉", price: 1500 },
+  { id: "I0051", cat: "야채", name: "마늘 큰마늘", unit: "망/봉", price: 5000 },
 
   // ===== 잎채소 =====
-  { id:"kkae",     cat:"잎채소", name:"깻잎",      unit:"봉",  price:6000, pinned:true },
-  { id:"sangchu",  cat:"잎채소", name:"상추",      unit:"봉",  price:5000, pinned:true },
-  { id:"spin",     cat:"잎채소", name:"시금치",    unit:"봉",  price:4000 },
-  { id:"ssukgat",  cat:"잎채소", name:"쑥갓",      unit:"봉",  price:4000 },
+  { id: "I0052", cat: "잎채소", name: "시금치 1봉지", unit: "봉", price: 2000 },
+  { id: "I0053", cat: "잎채소", name: "시금치 1단", unit: "단", price: 1500 },
+  { id: "I0054", cat: "잎채소", name: "상추", unit: "봉", price: 1000 },
+  { id: "I0055", cat: "잎채소", name: "깻잎", unit: "봉", price: 1000 },
+  { id: "I0056", cat: "잎채소", name: "콩나물", unit: "봉", price: 500 },
+  { id: "I0057", cat: "잎채소", name: "숙주", unit: "봉", price: 1000 },
+  { id: "I0058", cat: "잎채소", name: "청경채", unit: "봉", price: 1000 },
+  { id: "I0059", cat: "잎채소", name: "케일", unit: "봉", price: 1000 },
+  { id: "I0060", cat: "잎채소", name: "치커리", unit: "봉", price: 1000 },
+  { id: "I0061", cat: "잎채소", name: "적겨자", unit: "봉", price: 1000 },
+  { id: "I0062", cat: "잎채소", name: "근대", unit: "봉", price: 1000 },
+  { id: "I0063", cat: "잎채소", name: "아욱", unit: "봉", price: 1500 },
+  { id: "I0064", cat: "잎채소", name: "고추잎", unit: "봉", price: 2000 },
+  { id: "I0065", cat: "잎채소", name: "쑥갓", unit: "봉", price: 1500 },
+  { id: "I0066", cat: "잎채소", name: "참나물", unit: "봉", price: 1500 },
+  { id: "I0067", cat: "잎채소", name: "취나물", unit: "봉", price: 2000 },
 
   // ===== 생선 =====
-  { id:"mackerel", cat:"생선", name:"고등어",      unit:"마리", price:5000 },
-  { id:"cutlass",  cat:"생선", name:"갈치",        unit:"마리", price:9000 },
-
-  // ===== 기타 =====
-  { id:"egg",      cat:"기타", name:"계란",        unit:"판",  price:7000, pinned:true },
-  { id:"tofu",     cat:"기타", name:"두부",        unit:"모",  price:2000, pinned:true },
-  { id:"sprout",   cat:"기타", name:"콩나물",      unit:"봉",  price:2000, pinned:true },
+  { id: "I0068", cat: "생선", name: "동태 1마리", unit: "마리", price: 3000 },
+  { id: "I0069", cat: "생선", name: "동태 2마리", unit: "마리", price: 5000 },
+  { id: "I0070", cat: "생선", name: "오징어 1마리", unit: "마리", price: 3000 },
+  { id: "I0071", cat: "생선", name: "오징어 2마리", unit: "마리", price: 5000 },
+  { id: "I0072", cat: "생선", name: "꼬막 1망", unit: "망", price: 3000 },
+  { id: "I0073", cat: "생선", name: "꼬막 2망", unit: "망", price: 5000 },
+  { id: "I0074", cat: "생선", name: "코다리 1코", unit: "코", price: 8000 },
+  { id: "I0075", cat: "생선", name: "코다리 2코", unit: "코", price: 15000 },
+  { id: "I0076", cat: "생선", name: "갈치", unit: "마리/토막", price: 7000 },
+  { id: "I0077", cat: "생선", name: "굴비", unit: "마리/두름", price: 10000 },
+  { id: "I0078", cat: "생선", name: "번데기 1봉", unit: "봉", price: 3000 },
+  { id: "I0079", cat: "생선", name: "번데기 2봉", unit: "봉", price: 5000 },
+  { id: "I0080", cat: "생선", name: "굴 1봉", unit: "봉", price: 3000 },
+  { id: "I0081", cat: "생선", name: "굴 2봉", unit: "봉", price: 5000 },
+  { id: "I0082", cat: "생선", name: "동태포 1팩", unit: "팩", price: 3000 },
+  { id: "I0083", cat: "생선", name: "동태포 2팩", unit: "팩", price: 5000 },
+  { id: "I0084", cat: "생선", name: "낀따로", unit: "팩", price: 5000 },
+  { id: "I0085", cat: "생선", name: "삼치", unit: "마리/토막", price: 5000 },
+  { id: "I0086", cat: "생선", name: "고등어 1마리", unit: "마리", price: 3500 },
+  { id: "I0087", cat: "생선", name: "고등어 3마리", unit: "마리", price: 10000 },
+  { id: "I0088", cat: "생선", name: "자반", unit: "팩", price: 6000 },
 ];
