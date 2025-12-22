@@ -1,4 +1,4 @@
-// items.js (보기 좋게 정리된 현장용 품목 리스트)
+// items.js (현장용 품목 리스트)
 const ITEMS = [
   // ===== 과일 =====
   { id: "I0001", cat: "과일", name: "단감 3개", unit: "개", price: 5000 },
@@ -10,7 +10,6 @@ const ITEMS = [
   { id: "I0007", cat: "과일", name: "귤 9개", unit: "개", price: 3000 },
   { id: "I0008", cat: "과일", name: "귤 20개", unit: "개", price: 6000 },
   { id: "I0009", cat: "과일", name: "샤인 2송이", unit: "송이", price: 8000 },
-
   { id: "I0010", cat: "과일", name: "키위", unit: "개", price: 10000 },
   { id: "I0011", cat: "과일", name: "석류 1개", unit: "개", price: 3500 },
   { id: "I0012", cat: "과일", name: "석류 3개", unit: "개", price: 10000 },
@@ -33,34 +32,26 @@ const ITEMS = [
   { id: "I0027", cat: "야채", name: "꽈리고추", unit: "봉/팩", price: 4000 },
   { id: "I0028", cat: "야채", name: "표고버섯", unit: "팩", price: 5000 },
   { id: "I0029", cat: "야채", name: "느타리버섯", unit: "팩", price: 2500 },
-
   { id: "I0030", cat: "야채", name: "새송이 1봉", unit: "봉", price: 1500 },
   { id: "I0031", cat: "야채", name: "새송이 2봉", unit: "봉", price: 2500 },
   { id: "I0032", cat: "야채", name: "팽이 3봉", unit: "봉", price: 1000 },
-
   { id: "I0033", cat: "야채", name: "오이 6개", unit: "개", price: 3000 },
   { id: "I0034", cat: "야채", name: "가지 4개", unit: "개", price: 3000 },
   { id: "I0035", cat: "야채", name: "애호박 3개", unit: "개", price: 3500 },
-
   { id: "I0036", cat: "야채", name: "브로콜리 1개", unit: "개", price: 1300 },
   { id: "I0037", cat: "야채", name: "브로콜리 3개", unit: "개", price: 3000 },
-
   { id: "I0038", cat: "야채", name: "샐러리", unit: "단", price: 2000 },
   { id: "I0039", cat: "야채", name: "미나리", unit: "단", price: 3000 },
   { id: "I0040", cat: "야채", name: "우엉", unit: "개", price: 3000 },
   { id: "I0041", cat: "야채", name: "연근", unit: "개", price: 3000 },
   { id: "I0042", cat: "야채", name: "더덕", unit: "팩", price: 6000 },
-
   { id: "I0043", cat: "야채", name: "알배기", unit: "통", price: 5000 },
   { id: "I0044", cat: "야채", name: "양배추", unit: "통", price: 2000 },
   { id: "I0045", cat: "야채", name: "양상추", unit: "통", price: 1500 },
-
   { id: "I0046", cat: "야채", name: "대파", unit: "단", price: 1000 },
   { id: "I0047", cat: "야채", name: "쪽파", unit: "단", price: 4000 },
   { id: "I0048", cat: "야채", name: "부추", unit: "단", price: 2000 },
-
   { id: "I0049", cat: "야채", name: "무", unit: "개", price: 1500 },
-
   { id: "I0050", cat: "야채", name: "마늘 작은", unit: "망/봉", price: 1500 },
   { id: "I0051", cat: "야채", name: "마늘 큰마늘", unit: "망/봉", price: 5000 },
 
@@ -105,3 +96,6 @@ const ITEMS = [
   { id: "I0087", cat: "생선", name: "고등어 3마리", unit: "마리", price: 10000 },
   { id: "I0088", cat: "생선", name: "자반", unit: "팩", price: 6000 },
 ];
+
+// ✅ index.html에서 쓰게 전역으로 노출
+window.ITEMS = ITEMS;
