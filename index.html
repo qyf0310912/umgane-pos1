@@ -1,305 +1,101 @@
-<!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>엄가네 현장 계산기</title>
+// items.js (현장용 품목 리스트)
+const ITEMS = [
+  // ===== 과일 =====
+  { id: "I0001", cat: "과일", name: "단감 3개", unit: "개", price: 5000 },
+  { id: "I0002", cat: "과일", name: "단감 7개", unit: "개", price: 10000 },
+  { id: "I0003", cat: "과일", name: "사과 3개", unit: "개", price: 5000 },
+  { id: "I0004", cat: "과일", name: "사과 7개", unit: "개", price: 10000 },
+  { id: "I0005", cat: "과일", name: "대봉 6개", unit: "개", price: 5000 },
+  { id: "I0006", cat: "과일", name: "대봉 13개", unit: "개", price: 10000 },
+  { id: "I0007", cat: "과일", name: "귤 9개", unit: "개", price: 3000 },
+  { id: "I0008", cat: "과일", name: "귤 20개", unit: "개", price: 6000 },
+  { id: "I0009", cat: "과일", name: "샤인 2송이", unit: "송이", price: 8000 },
+  { id: "I0010", cat: "과일", name: "키위", unit: "개", price: 10000 },
+  { id: "I0011", cat: "과일", name: "석류 1개", unit: "개", price: 3500 },
+  { id: "I0012", cat: "과일", name: "석류 3개", unit: "개", price: 10000 },
+  { id: "I0013", cat: "과일", name: "바나나", unit: "개", price: 2500 },
+  { id: "I0014", cat: "과일", name: "파인애플", unit: "개", price: 4000 },
+  { id: "I0015", cat: "과일", name: "딸기 1팩", unit: "팩", price: 8000 },
+  { id: "I0016", cat: "과일", name: "딸기 2팩", unit: "팩", price: 15000 },
+  { id: "I0017", cat: "과일", name: "토마토", unit: "팩", price: 10000 },
+  { id: "I0018", cat: "과일", name: "방울토마토 1팩", unit: "팩", price: 6000 },
+  { id: "I0019", cat: "과일", name: "방울토마토 2팩", unit: "팩", price: 11000 },
+  { id: "I0020", cat: "과일", name: "체리", unit: "팩", price: 12000 },
 
-<style>
-* { box-sizing: border-box; }
-body {
-  margin:0; background:#0f0f0f; color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-}
+  // ===== 야채 =====
+  { id: "I0021", cat: "야채", name: "당근", unit: "개", price: 2500 },
+  { id: "I0022", cat: "야채", name: "감자", unit: "개", price: 3000 },
+  { id: "I0023", cat: "야채", name: "고구마", unit: "개", price: 3000 },
+  { id: "I0024", cat: "야채", name: "양파", unit: "개", price: 2500 },
+  { id: "I0025", cat: "야채", name: "청양고추", unit: "봉/팩", price: 3000 },
+  { id: "I0026", cat: "야채", name: "아삭이고추", unit: "봉/팩", price: 3500 },
+  { id: "I0027", cat: "야채", name: "꽈리고추", unit: "봉/팩", price: 4000 },
+  { id: "I0028", cat: "야채", name: "표고버섯", unit: "팩", price: 5000 },
+  { id: "I0029", cat: "야채", name: "느타리버섯", unit: "팩", price: 2500 },
+  { id: "I0030", cat: "야채", name: "새송이 1봉", unit: "봉", price: 1500 },
+  { id: "I0031", cat: "야채", name: "새송이 2봉", unit: "봉", price: 2500 },
+  { id: "I0032", cat: "야채", name: "팽이 3봉", unit: "봉", price: 1000 },
+  { id: "I0033", cat: "야채", name: "오이 6개", unit: "개", price: 3000 },
+  { id: "I0034", cat: "야채", name: "가지 4개", unit: "개", price: 3000 },
+  { id: "I0035", cat: "야채", name: "애호박 3개", unit: "개", price: 3500 },
+  { id: "I0036", cat: "야채", name: "브로콜리 1개", unit: "개", price: 1300 },
+  { id: "I0037", cat: "야채", name: "브로콜리 3개", unit: "개", price: 3000 },
+  { id: "I0038", cat: "야채", name: "샐러리", unit: "단", price: 2000 },
+  { id: "I0039", cat: "야채", name: "미나리", unit: "단", price: 3000 },
+  { id: "I0040", cat: "야채", name: "우엉", unit: "개", price: 3000 },
+  { id: "I0041", cat: "야채", name: "연근", unit: "개", price: 3000 },
+  { id: "I0042", cat: "야채", name: "더덕", unit: "팩", price: 6000 },
+  { id: "I0043", cat: "야채", name: "알배기", unit: "통", price: 5000 },
+  { id: "I0044", cat: "야채", name: "양배추", unit: "통", price: 2000 },
+  { id: "I0045", cat: "야채", name: "양상추", unit: "통", price: 1500 },
+  { id: "I0046", cat: "야채", name: "대파", unit: "단", price: 1000 },
+  { id: "I0047", cat: "야채", name: "쪽파", unit: "단", price: 4000 },
+  { id: "I0048", cat: "야채", name: "부추", unit: "단", price: 2000 },
+  { id: "I0049", cat: "야채", name: "무", unit: "개", price: 1500 },
+  { id: "I0050", cat: "야채", name: "마늘 작은", unit: "망/봉", price: 1500 },
+  { id: "I0051", cat: "야채", name: "마늘 큰마늘", unit: "망/봉", price: 5000 },
 
-/* 헤더 */
-header {
-  background:#ff9800;
-  color:#111;
-  font-weight:900;
-  padding:14px;
-  text-align:center;
-  font-size:20px;
-}
+  // ===== 잎채소 =====
+  { id: "I0052", cat: "잎채소", name: "시금치 1봉지", unit: "봉", price: 2000 },
+  { id: "I0053", cat: "잎채소", name: "시금치 1단", unit: "단", price: 1500 },
+  { id: "I0054", cat: "잎채소", name: "상추", unit: "봉", price: 1000 },
+  { id: "I0055", cat: "잎채소", name: "깻잎", unit: "봉", price: 1000 },
+  { id: "I0056", cat: "잎채소", name: "콩나물", unit: "봉", price: 500 },
+  { id: "I0057", cat: "잎채소", name: "숙주", unit: "봉", price: 1000 },
+  { id: "I0058", cat: "잎채소", name: "청경채", unit: "봉", price: 1000 },
+  { id: "I0059", cat: "잎채소", name: "케일", unit: "봉", price: 1000 },
+  { id: "I0060", cat: "잎채소", name: "치커리", unit: "봉", price: 1000 },
+  { id: "I0061", cat: "잎채소", name: "적겨자", unit: "봉", price: 1000 },
+  { id: "I0062", cat: "잎채소", name: "근대", unit: "봉", price: 1000 },
+  { id: "I0063", cat: "잎채소", name: "아욱", unit: "봉", price: 1500 },
+  { id: "I0064", cat: "잎채소", name: "고추잎", unit: "봉", price: 2000 },
+  { id: "I0065", cat: "잎채소", name: "쑥갓", unit: "봉", price: 1500 },
+  { id: "I0066", cat: "잎채소", name: "참나물", unit: "봉", price: 1500 },
+  { id: "I0067", cat: "잎채소", name: "취나물", unit: "봉", price: 2000 },
 
-/* 전체 레이아웃 */
-.main {
-  display:grid;
-  grid-template-columns: 3fr 1fr;
-  height: calc(100vh - 56px);
-}
+  // ===== 생선 =====
+  { id: "I0068", cat: "생선", name: "동태 1마리", unit: "마리", price: 3000 },
+  { id: "I0069", cat: "생선", name: "동태 2마리", unit: "마리", price: 5000 },
+  { id: "I0070", cat: "생선", name: "오징어 1마리", unit: "마리", price: 3000 },
+  { id: "I0071", cat: "생선", name: "오징어 2마리", unit: "마리", price: 5000 },
+  { id: "I0072", cat: "생선", name: "꼬막 1망", unit: "망", price: 3000 },
+  { id: "I0073", cat: "생선", name: "꼬막 2망", unit: "망", price: 5000 },
+  { id: "I0074", cat: "생선", name: "코다리 1코", unit: "코", price: 8000 },
+  { id: "I0075", cat: "생선", name: "코다리 2코", unit: "코", price: 15000 },
+  { id: "I0076", cat: "생선", name: "갈치", unit: "마리/토막", price: 7000 },
+  { id: "I0077", cat: "생선", name: "굴비", unit: "마리/두름", price: 10000 },
+  { id: "I0078", cat: "생선", name: "번데기 1봉", unit: "봉", price: 3000 },
+  { id: "I0079", cat: "생선", name: "번데기 2봉", unit: "봉", price: 5000 },
+  { id: "I0080", cat: "생선", name: "굴 1봉", unit: "봉", price: 3000 },
+  { id: "I0081", cat: "생선", name: "굴 2봉", unit: "봉", price: 5000 },
+  { id: "I0082", cat: "생선", name: "동태포 1팩", unit: "팩", price: 3000 },
+  { id: "I0083", cat: "생선", name: "동태포 2팩", unit: "팩", price: 5000 },
+  { id: "I0084", cat: "생선", name: "낀따로", unit: "팩", price: 5000 },
+  { id: "I0085", cat: "생선", name: "삼치", unit: "마리/토막", price: 5000 },
+  { id: "I0086", cat: "생선", name: "고등어 1마리", unit: "마리", price: 3500 },
+  { id: "I0087", cat: "생선", name: "고등어 3마리", unit: "마리", price: 10000 },
+  { id: "I0088", cat: "생선", name: "자반", unit: "팩", price: 6000 },
+];
 
-/* ===== 좌측: 품목 ===== */
-.left {
-  padding:10px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-}
-
-.categories {
-  display:flex;
-  gap:8px;
-  margin-bottom:10px;
-}
-.categories button {
-  flex:1;
-  padding:10px 0;
-  background:#222;
-  color:#fff;
-  border:0;
-  border-radius:8px;
-  font-weight:700;
-}
-.categories button.active {
-  background:#ff9800;
-  color:#111;
-}
-
-.items {
-  flex:1;
-  overflow:auto;
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
-  gap:10px;
-}
-.item {
-  background:#1c1c1c;
-  border-radius:10px;
-  padding:14px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  cursor:pointer;
-}
-.item-name { font-size:16px; font-weight:700; }
-.item-price { margin-top:6px; font-weight:900; }
-
-/* ===== 우측: 장바구니/결제 ===== */
-.right {
-  border-left:2px solid #222;
-  display:flex;
-  flex-direction:column;
-}
-
-/* 장바구니 */
-.cart {
-  flex:1;
-  overflow:auto;
-  padding:10px;
-}
-.cart h2 {
-  margin:0 0 8px 0;
-  font-size:18px;
-}
-.cart-item {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:#1b1b1b;
-  padding:8px 10px;
-  border-radius:8px;
-  margin-bottom:6px;
-  font-size:14px;
-}
-.cart-item span.qty {
-  opacity:.8;
-  margin-left:4px;
-}
-.cart-item button {
-  background:#ff3b30;
-  border:0;
-  color:#fff;
-  font-weight:900;
-  border-radius:6px;
-  width:28px;
-  height:28px;
-}
-
-/* 결제영역 */
-.pay {
-  border-top:2px solid #222;
-  padding:10px;
-  background:#111;
-}
-.total {
-  font-size:20px;
-  font-weight:900;
-  display:flex;
-  justify-content:space-between;
-}
-.total small {
-  font-size:14px;
-  opacity:.8;
-}
-
-.money {
-  margin-top:8px;
-  font-size:16px;
-  display:flex;
-  justify-content:space-between;
-}
-
-.money-buttons {
-  display:grid;
-  grid-template-columns: repeat(3,1fr);
-  gap:6px;
-  margin-top:8px;
-}
-.money-buttons button {
-  padding:12px 0;
-  font-size:16px;
-  font-weight:900;
-  border-radius:8px;
-  border:0;
-}
-
-.complete {
-  margin-top:8px;
-  background:#34c759;
-  color:#111;
-  font-size:20px;
-  font-weight:900;
-  padding:14px;
-  border:0;
-  border-radius:10px;
-}
-.reset {
-  background:#ff3b30;
-  color:#fff;
-}
-</style>
-</head>
-
-<body>
-<header>엄가네 현장 계산기</header>
-
-<div class="main">
-  <!-- 좌측 -->
-  <div class="left">
-    <div class="categories" id="categories"></div>
-    <div class="items" id="items"></div>
-  </div>
-
-  <!-- 우측 -->
-  <div class="right">
-    <div class="cart">
-      <h2>장바구니</h2>
-      <div id="cartList"></div>
-    </div>
-
-    <div class="pay">
-      <div class="total">
-        <div>총합계 ₩<span id="total">0</span></div>
-        <small>총 <span id="totalQty">0</span>개</small>
-      </div>
-
-      <div class="money">
-        <div>받은돈 ₩<span id="paid">0</span></div>
-        <div>거스름 ₩<span id="change">0</span></div>
-      </div>
-
-      <div class="money-buttons">
-        <button onclick="addMoney(1000)">1천</button>
-        <button onclick="addMoney(5000)">5천</button>
-        <button onclick="addMoney(10000)">1만</button>
-        <button onclick="addMoney(30000)">3만</button>
-        <button onclick="addMoney(50000)">5만</button>
-        <button class="reset" onclick="resetMoney()">초기화</button>
-      </div>
-
-      <button class="complete" onclick="complete()">결제 완료</button>
-    </div>
-  </div>
-</div>
-
-<script src="items.js"></script>
-<script>
-const cats = ["과일","야채","잎채소","생선"];
-let activeCat = "과일";
-let cart = {};
-let total = 0;
-let totalQty = 0;
-let paid = 0;
-
-const catEl = document.getElementById("categories");
-cats.forEach(c=>{
-  const b=document.createElement("button");
-  b.textContent=c;
-  if(c===activeCat) b.classList.add("active");
-  b.onclick=()=>{activeCat=c;render();};
-  catEl.appendChild(b);
-});
-
-function render(){
-  document.querySelectorAll(".categories button").forEach(b=>{
-    b.classList.toggle("active", b.textContent===activeCat);
-  });
-
-  const itemsEl=document.getElementById("items");
-  itemsEl.innerHTML="";
-  ITEMS.filter(i=>i.cat===activeCat).forEach(i=>{
-    const d=document.createElement("div");
-    d.className="item";
-    d.innerHTML=`<div class="item-name">${i.name}</div>
-                 <div class="item-price">₩${i.price.toLocaleString()}</div>`;
-    d.onclick=()=>addItem(i);
-    itemsEl.appendChild(d);
-  });
-
-  updateCart();
-}
-
-function addItem(i){
-  if(!cart[i.id]) cart[i.id]={...i,qty:0};
-  cart[i.id].qty++;
-  updateCart();
-}
-
-function updateCart(){
-  const list=document.getElementById("cartList");
-  list.innerHTML="";
-  total=0; totalQty=0;
-  Object.values(cart).forEach(i=>{
-    total+=i.price*i.qty;
-    totalQty+=i.qty;
-    const d=document.createElement("div");
-    d.className="cart-item";
-    d.innerHTML=`<div>${i.name} <span class="qty">x${i.qty}</span></div>
-                 <div>₩${(i.price*i.qty).toLocaleString()}</div>
-                 <button onclick="removeItem('${i.id}')">✕</button>`;
-    list.appendChild(d);
-  });
-  document.getElementById("total").innerText=total.toLocaleString();
-  document.getElementById("totalQty").innerText=totalQty;
-  updateMoney();
-}
-
-function removeItem(id){
-  delete cart[id];
-  updateCart();
-}
-
-function addMoney(v){
-  paid+=v;
-  updateMoney();
-}
-function resetMoney(){
-  paid=0;
-  updateMoney();
-}
-function updateMoney(){
-  document.getElementById("paid").innerText=paid.toLocaleString();
-  document.getElementById("change").innerText=Math.max(paid-total,0).toLocaleString();
-}
-function complete(){
-  alert("결제 완료");
-  cart={};
-  resetMoney();
-  updateCart();
-}
-
-render();
-</script>
-</body>
-</html>
+// ✅ index.html에서 쓰게 전역으로 노출
+window.ITEMS = ITEMS;
