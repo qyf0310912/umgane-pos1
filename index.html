@@ -9,15 +9,11 @@
     :root{
       --bg:#0b0b0b;
       --panel:#151515;
-      --panel2:#1c1c1c;
-      --line:#232323;
       --txt:#f2f2f2;
       --muted:#bdbdbd;
       --orange:#ff7a00;
       --green:#2ecc71;
       --red:#ff3b30;
-      --btn:#e9e9e9;
-      --btnText:#111;
       --radius:16px;
     }
     *{ box-sizing:border-box; }
@@ -32,22 +28,17 @@
       color:#111;
       font-weight:1000;
       text-align:center;
-      padding:14px;
+      padding:12px;
       font-size:20px;
-      letter-spacing:0.2px;
       position:sticky;
       top:0;
       z-index:50;
     }
 
-    .page{
-      padding:12px;
-    }
-
-    /* 3/2 : left=품목 / right=결제 */
+    .page{ padding:12px; }
     .layout{
       display:grid;
-      grid-template-columns: 1.55fr 1fr; /* ✅ 결제창은 1/3쯤 */
+      grid-template-columns: 1.55fr 1fr; /* 결제창 1/3 정도 */
       gap:12px;
       align-items:start;
     }
@@ -59,7 +50,7 @@
       overflow:hidden;
     }
     .card-title{
-      padding:12px 14px;
+      padding:10px 12px;
       font-weight:900;
       color:#ddd;
       border-bottom:1px solid #111;
@@ -69,17 +60,14 @@
       gap:10px;
     }
     .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      color:#bbb;
-      font-size:13px;
-      font-weight:800;
+      color:#9a9a9a;
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
     }
 
     /* LEFT */
     .left-inner{ padding:12px; }
-
     .tabs{
       display:flex;
       gap:8px;
@@ -115,29 +103,15 @@
       padding:12px 12px;
       border-radius:14px;
       font-size:16px;
-      font-weight:800;
+      font-weight:900;
       outline:none;
     }
     .search::placeholder{ color:#777; }
 
-    .pin-area{
-      margin-bottom:12px;
-      padding:10px;
-      background:linear-gradient(180deg,#151515,#101010);
-      border:1px solid #171717;
-      border-radius: var(--radius);
-    }
-    .pin-title{
-      font-weight:1000;
-      margin-bottom:10px;
-      color:#fff;
-      opacity:.95;
-    }
-
-    /* ✅ 품목 타일형 4~5열 */
+    /* ✅ 품목 타일형 5열(큰화면), 줄면 4/3열 */
     .grid{
       display:grid;
-      grid-template-columns: repeat(5, minmax(0,1fr)); /* 기본 5열 */
+      grid-template-columns: repeat(5, minmax(0,1fr));
       gap:10px;
     }
     @media (max-width: 1400px){
@@ -158,7 +132,7 @@
       padding:12px;
       cursor:pointer;
       user-select:none;
-      min-height:72px;
+      min-height:74px;
       display:flex;
       flex-direction:column;
       justify-content:space-between;
@@ -192,60 +166,101 @@
     .right-inner{
       display:flex;
       flex-direction:column;
-      height: calc(100vh - 14px - 56px); /* header 제외 */
-      min-height:520px;
+      height: calc(100vh - 56px); /* 헤더 제외 */
+      min-height:540px;
     }
+
+    /* ✅ 총합계 + 총갯수 */
     .sum{
-      padding:14px;
-      font-size:26px;
+      padding:12px;
+      font-size:24px;
       font-weight:1100;
       border-bottom:1px solid #111;
       background:linear-gradient(180deg,#111,#0e0e0e);
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .sum .leftsum{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
+    .sum .badge{
+      background:#1b1b1b;
+      border:1px solid #222;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:1000;
+      font-size:14px;
+      color:#ddd;
     }
 
-    /* ✅ 장바구니만 스크롤 */
+    /* ✅ 장바구니만 스크롤 + 더 많이 보이게(컴팩트) */
     .cart-scroll{
-      padding:10px;
+      padding:8px;
       overflow:auto;
       flex: 1 1 auto;
       border-bottom:1px solid #111;
     }
     .cart-row{
       display:grid;
-      grid-template-columns: 1fr auto auto;
-      gap:10px;
+      grid-template-columns: 1fr auto;
+      gap:8px;
       align-items:center;
-      padding:10px;
+      padding:8px 8px;                /* ✅ 줄임 */
       border-radius:14px;
       background:rgba(255,255,255,.03);
       border:1px solid rgba(255,255,255,.04);
-      margin-bottom:8px;
+      margin-bottom:6px;              /* ✅ 줄임 */
+    }
+
+    .row-main{
+      display:flex;
+      flex-direction:column;
+      gap:2px;                        /* ✅ 줄임 */
+      min-width:0;
+    }
+    .row-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      min-width:0;
     }
     .cart-name{
       font-weight:1000;
-      display:flex;
-      flex-direction:column;
-      gap:2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:100%;
     }
-    .cart-name small{
-      color:#aaa;
-      font-weight:900;
-      font-size:12px;
-    }
-    .cart-price{
+    .cart-total{
       font-weight:1100;
       white-space:nowrap;
     }
 
-    /* 수량 조절 */
+    .row-bottom{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .row-bottom small{
+      color:#a8a8a8;
+      font-weight:900;
+      font-size:12px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
     .qtybox{
       display:flex;
       align-items:center;
       gap:6px;
+      flex-shrink:0;
     }
     .qbtn{
-      width:36px;
-      height:36px;
+      width:34px;                     /* ✅ 조금 줄임 */
+      height:34px;
       border:none;
       border-radius:12px;
       font-weight:1100;
@@ -254,17 +269,15 @@
       color:#fff;
     }
     .qnum{
-      min-width:44px;
+      min-width:38px;
       text-align:center;
       font-weight:1100;
       font-size:16px;
       color:#fff;
     }
-
-    /* ✅ 휴지통 (전체삭제) */
     .trash{
-      width:42px;
-      height:42px;
+      width:38px;
+      height:38px;
       border:none;
       border-radius:12px;
       cursor:pointer;
@@ -273,13 +286,13 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      font-size:18px;
+      font-size:16px;
       font-weight:1000;
     }
 
     /* ✅ 결제영역 아래 고정 */
     .pay-sticky{
-      padding:12px;
+      padding:10px 12px;
       background:linear-gradient(180deg,#0f0f0f,#0b0b0b);
     }
 
@@ -292,17 +305,17 @@
     }
     .paidcard{
       border-radius:16px;
-      padding:12px 12px;
+      padding:10px 10px;              /* ✅ 살짝 줄임 */
       border:1px solid #111;
     }
     .paidcard .t{
-      font-size:14px;
+      font-size:13px;
       font-weight:1000;
       opacity:.9;
       margin-bottom:6px;
     }
     .paidcard .v{
-      font-size:26px;
+      font-size:24px;
       font-weight:1200;
       letter-spacing:0.2px;
     }
@@ -319,7 +332,7 @@
     .paid-change .t{ color:#9dffb5; }
     .paid-change .v{ color:#d8ffe5; }
 
-    /* 돈버튼 */
+    /* 돈버튼 (✅ 10만 삭제 + 간격 정리) */
     .money{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
@@ -338,9 +351,10 @@
     }
     .mbtn:active{ transform: scale(.99); }
 
+    /* ✅ 버튼 2개만: 초기화(현금만) / 결제완료(전체) */
     .actions{
       display:grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap:10px;
     }
     .btn-reset{
@@ -354,7 +368,6 @@
       cursor:pointer;
     }
     .btn-done{
-      grid-column: 1 / -1;
       background: var(--green);
       color:#111;
       border:none;
@@ -363,7 +376,6 @@
       font-weight:1300;
       font-size:22px;
       cursor:pointer;
-      margin-top:10px;
     }
     .btn-reset:active, .btn-done:active{ transform: scale(.99); }
 
@@ -387,7 +399,7 @@
     <div class="card">
       <div class="card-title">
         <div>품목 선택</div>
-        <div class="pill">✅ 타일형 · 검색(초성) · 자주쓰는 상단고정</div>
+        <div class="pill">검색(초성) · 타일형</div>
       </div>
 
       <div class="left-inner">
@@ -395,11 +407,6 @@
 
         <div class="search-row">
           <input id="q" class="search" placeholder="검색: 고구마 / ㄱ / 사과 / 단감(3개) ..." autocomplete="off" />
-        </div>
-
-        <div class="pin-area" id="pinArea" style="display:none;">
-          <div class="pin-title">자주쓰는 품목</div>
-          <div class="grid" id="pinGrid"></div>
         </div>
 
         <div class="grid" id="grid"></div>
@@ -410,11 +417,16 @@
     <div class="card">
       <div class="card-title">
         <div>결제</div>
-        <div class="pill">✅ 장바구니만 스크롤 · 아래 고정</div>
+        <div class="pill">장바구니만 스크롤</div>
       </div>
 
       <div class="right-inner">
-        <div class="sum">총합계 <span id="total">₩0</span></div>
+        <div class="sum">
+          <div class="leftsum">
+            <div>총합계 <span id="total">₩0</span></div>
+            <div class="badge">총 <span id="count">0</span>개</div>
+          </div>
+        </div>
 
         <div class="cart-scroll" id="cart"></div>
 
@@ -430,26 +442,24 @@
             </div>
           </div>
 
+          <!-- ✅ 10만 제거 -->
           <div class="money">
             <button class="mbtn" onclick="addMoney(1000)">1천</button>
             <button class="mbtn" onclick="addMoney(5000)">5천</button>
             <button class="mbtn" onclick="addMoney(10000)">1만</button>
             <button class="mbtn" onclick="addMoney(30000)">3만</button>
             <button class="mbtn" onclick="addMoney(50000)">5만</button>
-            <button class="mbtn" onclick="addMoney(100000)">10만</button>
+            <button class="mbtn" onclick="addMoney(0)">0</button>
           </div>
 
           <div class="actions">
-            <!-- ✅ 초기화 = 받은돈/거스름만 0 -->
-            <button class="btn-reset" onclick="resetCashOnly()">초기화</button>
-            <!-- 여기는 나중에 필요하면 버튼 추가 가능 -->
-            <button class="btn-reset" style="background:#2a2a2a;" onclick="clearCartConfirm()">장바구니 비우기</button>
+            <!-- ✅ 초기화: 받은돈/거스름만 -->
+            <button class="btn-reset" onclick="resetCashOnly()">초기화(현금만)</button>
+            <!-- ✅ 결제완료: 전체 초기화 -->
+            <button class="btn-done" onclick="complete()">결제 완료</button>
           </div>
 
-          <!-- ✅ 결제완료 = 전부 초기화 -->
-          <button class="btn-done" onclick="complete()">결제 완료</button>
-
-          <div class="hint">초기화는 “받은돈/거스름만” 0, 결제완료는 “전체 초기화”</div>
+          <div class="hint">F5 새로고침하면 전부 사라짐 / 초기화는 현금만 0</div>
         </div>
       </div>
     </div>
@@ -489,18 +499,16 @@
   // ---------- 상태 ----------
   let activeCat = "과일";
   let query = "";
-  // cart: { [id]: {id,name,unit,price,qty} }
   const cart = {};
   let total = 0;
   let paid = 0;
 
-  // ---------- 렌더 ----------
+  // ---------- DOM ----------
   const $tabs = document.getElementById("tabs");
   const $grid = document.getElementById("grid");
-  const $pinArea = document.getElementById("pinArea");
-  const $pinGrid = document.getElementById("pinGrid");
   const $cart = document.getElementById("cart");
   const $total = document.getElementById("total");
+  const $count = document.getElementById("count");
   const $paid = document.getElementById("paid");
   const $change = document.getElementById("change");
   const $q = document.getElementById("q");
@@ -517,19 +525,15 @@
   }
 
   function itemMatches(it){
-    // 카테고리
     const catOk = (activeCat==="묶음") ? (it.unit === "묶음") : (it.cat === activeCat);
     if (!catOk) return false;
-
-    // 검색
     if (!query) return true;
 
+    const q = norm(query);
     const n = norm(it.name);
     const u = norm(it.unit);
-    const q = norm(query);
-
     const ch = getChosung(it.name);
-    // ✅ 일반검색 + 초성검색
+
     return n.includes(q) || u.includes(q) || ch.includes(q);
   }
 
@@ -561,43 +565,22 @@
     return d;
   }
 
-  function renderPins(){
-    const pins = ITEMS.filter(x=>x.pinned === true);
-    if (!pins.length){
-      $pinArea.style.display = "none";
-      return;
-    }
-    $pinArea.style.display = "";
-    $pinGrid.innerHTML = "";
-    // pinned는 검색 영향을 받게 하되, 카테고리 상관없이 보여주면 현장 편함
-    const filtered = pins.filter(it=>{
-      if (!query) return true;
-      const n = norm(it.name);
-      const q = norm(query);
-      const ch = getChosung(it.name);
-      return n.includes(q) || ch.includes(q);
-    });
-    for (const it of filtered){
-      $pinGrid.appendChild(makeItemTile(it));
-    }
-  }
-
   function renderItems(){
-    renderPins();
     $grid.innerHTML = "";
     const list = ITEMS.filter(itemMatches);
-    for (const it of list){
-      $grid.appendChild(makeItemTile(it));
-    }
+    for (const it of list) $grid.appendChild(makeItemTile(it));
   }
 
   function calcTotal(){
     let t = 0;
+    let c = 0;
     for (const k in cart){
       t += cart[k].price * cart[k].qty;
+      c += cart[k].qty; // ✅ 총갯수
     }
     total = t;
     $total.textContent = fmt(total);
+    $count.textContent = c.toLocaleString("ko-KR");
     updateChange();
   }
 
@@ -608,7 +591,7 @@
       const empty = document.createElement("div");
       empty.style.color = "#777";
       empty.style.fontWeight = "900";
-      empty.style.padding = "18px 10px";
+      empty.style.padding = "14px 10px";
       empty.textContent = "장바구니 비어있음";
       $cart.appendChild(empty);
       return;
@@ -620,16 +603,28 @@
       const wrap = document.createElement("div");
       wrap.className = "cart-row";
 
-      const name = document.createElement("div");
-      name.className = "cart-name";
-      name.innerHTML = `
-        <div>${row.name} <span style="opacity:.9">x${row.qty}</span></div>
-        <small>${row.unit} · ${fmt(row.price)} (개당)</small>
-      `;
+      const main = document.createElement("div");
+      main.className = "row-main";
 
-      const price = document.createElement("div");
-      price.className = "cart-price";
-      price.textContent = fmt(row.price * row.qty);
+      const top = document.createElement("div");
+      top.className = "row-top";
+
+      const nm = document.createElement("div");
+      nm.className = "cart-name";
+      nm.textContent = `${row.name} x${row.qty}`;
+
+      const tot = document.createElement("div");
+      tot.className = "cart-total";
+      tot.textContent = fmt(row.price * row.qty);
+
+      top.appendChild(nm);
+      top.appendChild(tot);
+
+      const bottom = document.createElement("div");
+      bottom.className = "row-bottom";
+
+      const sm = document.createElement("small");
+      sm.textContent = `${row.unit} · ${fmt(row.price)} (개당)`;
 
       const controls = document.createElement("div");
       controls.className = "qtybox";
@@ -644,10 +639,13 @@
       plus.onclick  = ()=> incItem(id);
       trash.onclick = ()=> delItem(id);
 
-      wrap.appendChild(name);
-      wrap.appendChild(price);
-      wrap.appendChild(controls);
+      bottom.appendChild(sm);
+      bottom.appendChild(controls);
 
+      main.appendChild(top);
+      main.appendChild(bottom);
+
+      wrap.appendChild(main);
       $cart.appendChild(wrap);
     }
   }
@@ -685,6 +683,8 @@
   }
 
   function addMoney(amount){
+    // 0 버튼은 실수 방지용(원하면 나중에 다른 걸로 바꿔도 됨)
+    if (amount <= 0) return;
     paid += amount;
     $paid.textContent = paid.toLocaleString("ko-KR");
     updateChange();
@@ -695,36 +695,27 @@
     $change.textContent = ch.toLocaleString("ko-KR");
   }
 
-  // ✅ 초기화: 받은돈/거스름만 0 (장바구니 유지)
+  // ✅ 초기화: 받은돈/거스름만 0
   function resetCashOnly(){
     paid = 0;
     $paid.textContent = "0";
     $change.textContent = "0";
   }
 
-  // ✅ 결제완료: 전체 초기화(장바구니 포함)
+  // ✅ 결제완료: 전체 초기화
   function complete(){
     if (total <= 0){
       alert("장바구니가 비어있음");
       return;
     }
     alert("결제 완료!");
-    // 전체 초기화
     for (const k in cart) delete cart[k];
     total = 0;
     paid = 0;
     $paid.textContent = "0";
     $change.textContent = "0";
     $total.textContent = fmt(0);
-    renderCart();
-  }
-
-  function clearCartConfirm(){
-    if (!Object.keys(cart).length) return;
-    const ok = confirm("장바구니를 비울까요? (품목만 비움)");
-    if (!ok) return;
-    for (const k in cart) delete cart[k];
-    calcTotal();
+    $count.textContent = "0";
     renderCart();
   }
 
@@ -734,7 +725,7 @@
     renderItems();
   });
 
-  // ---------- 시작 ----------
+  // 시작
   buildTabs();
   renderItems();
   renderCart();
