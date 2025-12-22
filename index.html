@@ -1,367 +1,248 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>엄가네 현장 POS</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>엄가네 현장 계산기</title>
 
 <style>
-  :root{
-    --bg:#0e0e0e;
-    --panel:#141414;
-    --panel2:#1c1c1c;
-    --line:#2a2a2a;
-    --accent:#ff7a00;
-    --good:#3ddb6f;
-    --bad:#ff3b30;
-    --text:#ffffff;
-    --muted:#bdbdbd;
-  }
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#0e0e0e;
+  color:#fff;
+  font-family:system-ui,-apple-system,sans-serif;
+}
+header{
+  background:#ff8c00;
+  padding:14px;
+  font-size:22px;
+  font-weight:900;
+  text-align:center;
+}
+main{
+  display:grid;
+  grid-template-columns: 3fr 2fr;
+  gap:12px;
+  padding:12px;
+  height:calc(100vh - 64px);
+}
 
-  body{
-    margin:0;
-    font-family: system-ui, -apple-system, sans-serif;
-    background:var(--bg);
-    color:var(--text);
-  }
+/* 좌측 */
+.left{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.cat-bar button{
+  background:#222;
+  color:#fff;
+  border:1px solid #444;
+  border-radius:8px;
+  padding:8px 14px;
+  margin-right:6px;
+  font-size:15px;
+}
+.cat-bar button.active{
+  background:#ff8c00;
+  color:#000;
+  font-weight:700;
+}
+.items{
+  flex:1;
+  overflow-y:auto;
+}
+.item{
+  background:#1c1c1c;
+  padding:14px;
+  border-radius:10px;
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:8px;
+  font-size:18px;
+  cursor:pointer;
+}
 
-  header{
-    background:var(--accent);
-    padding:14px;
-    font-size:22px;
-    font-weight:900;
-    text-align:center;
-  }
+/* 우측 */
+.right{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.total{
+  font-size:26px;
+  font-weight:900;
+}
+.cart{
+  background:#161616;
+  border-radius:12px;
+  padding:10px;
+  flex:1;
+  overflow-y:auto;
+}
+.cart-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.cart-item button{
+  background:#ff3b30;
+  border:none;
+  color:#fff;
+  border-radius:6px;
+  padding:4px 8px;
+  font-size:14px;
+}
 
-  .wrap{ padding:12px; }
-
-  /* ✅ PC: 좌 2/3, 우 1/3 */
-  .layout{
-    display:grid;
-    grid-template-columns: 2fr 1fr;
-    gap:12px;
-    align-items:start;
-  }
-
-  /* ✅ 모바일/태블릿: 세로로 */
-  @media (max-width: 900px){
-    .layout{ grid-template-columns:1fr; }
-  }
-
-  .card{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:12px;
-    overflow:hidden;
-  }
-
-  .card-title{
-    padding:10px 12px;
-    font-weight:900;
-    border-bottom:1px solid var(--line);
-    background:#101010;
-  }
-
-  /* 왼쪽: 카테고리/품목 */
-  .cats{
-    display:flex;
-    gap:8px;
-    padding:10px 12px;
-    flex-wrap:wrap;
-    border-bottom:1px solid var(--line);
-    background:#101010;
-  }
-  .cat-btn{
-    background:#2b2b2b;
-    color:#fff;
-    font-size:18px;
-    padding:10px 14px;
-    border-radius:10px;
-    border:1px solid #3a3a3a;
-    cursor:pointer;
-  }
-  .cat-btn.active{
-    outline:2px solid var(--accent);
-  }
-
-  .items{
-    padding:10px 12px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-  }
-  .item-btn{
-    width:100%;
-    background:#1f1f1f;
-    border:1px solid #333;
-    color:#fff;
-    font-size:22px;
-    padding:16px 14px;
-    border-radius:12px;
-    cursor:pointer;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-  .item-btn .right{
-    color:#fff;
-    font-weight:900;
-  }
-  .item-btn .left{
-    color:#fff;
-  }
-  .item-btn small{
-    color:var(--muted);
-    font-size:14px;
-    margin-left:8px;
-  }
-
-  /* 오른쪽: 결제 */
-  .paybox{ padding:12px; }
-
-  .total{
-    font-size:30px;
-    font-weight:900;
-    margin-bottom:10px;
-  }
-
-  .cart{
-    background:var(--panel2);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:10px;
-    min-height:140px;
-  }
-
-  .cart-empty{
-    color:var(--muted);
-    font-size:16px;
-    padding:10px;
-  }
-
-  .cart-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    padding:10px 8px;
-    border-bottom:1px solid #2a2a2a;
-    font-size:18px;
-  }
-  .cart-item:last-child{ border-bottom:none; }
-
-  .trash{
-    background:var(--bad);
-    color:#fff;
-    border:none;
-    border-radius:10px;
-    padding:8px 10px;
-    font-size:18px;
-    cursor:pointer;
-    margin-left:8px;
-  }
-
-  .money-row{
-    display:flex;
-    justify-content:space-between;
-    font-size:20px;
-    margin-top:10px;
-    padding:8px 2px;
-  }
-
-  .money-grid{
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap:10px;
-    margin-top:10px;
-  }
-  .m-btn{
-    padding:16px 10px;
-    font-size:20px;
-    border-radius:12px;
-    border:1px solid #3a3a3a;
-    background:#f1f1f1;
-    color:#111;
-    cursor:pointer;
-    font-weight:800;
-  }
-  .m-btn.reset{
-    background:var(--bad);
-    color:#fff;
-    border:none;
-  }
-
-  .pay-btn{
-    width:100%;
-    padding:18px;
-    font-size:26px;
-    font-weight:900;
-    background:var(--good);
-    border:none;
-    border-radius:12px;
-    margin-top:12px;
-    cursor:pointer;
-  }
+/* 하단 결제 고정 */
+.pay-footer{
+  margin-top:auto;
+}
+.money{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.money button{
+  padding:12px;
+  font-size:18px;
+}
+.reset{
+  background:#ff3b30;
+  color:#fff;
+}
+.pay{
+  background:#3bd66f;
+  color:#000;
+  font-size:22px;
+  padding:14px;
+  margin-top:8px;
+}
 </style>
 </head>
 
 <body>
 <header>엄가네 현장 계산기</header>
 
-<div class="wrap">
-  <div class="layout">
-    <!-- ✅ 왼쪽(2/3): 카테고리 + 품목 -->
-    <div class="card">
-      <div class="card-title">품목 선택</div>
-      <div class="cats" id="categories"></div>
-      <div class="items" id="items"></div>
-    </div>
+<main>
+  <!-- 좌측 -->
+  <div class="left">
+    <div class="cat-bar" id="cats"></div>
+    <div class="items" id="items"></div>
+  </div>
 
-    <!-- ✅ 오른쪽(1/3): 결제/장바구니 -->
-    <div class="card">
-      <div class="card-title">결제</div>
-      <div class="paybox">
-        <div class="total">총합계 ₩<span id="total">0</span></div>
+  <!-- 우측 -->
+  <div class="right">
+    <div class="total">총합계 ₩<span id="total">0</span></div>
 
-        <div class="cart" id="cart">
-          <div class="cart-empty">장바구니 비어있음 (왼쪽에서 품목 누르면 담김)</div>
-        </div>
+    <div class="cart" id="cart"></div>
 
-        <div class="money-row">
-          <div>받은돈 ₩<span id="paid">0</span></div>
-          <div>거스름 ₩<span id="change">0</span></div>
-        </div>
+    <div>받은돈 ₩<span id="paid">0</span> / 거스름 ₩<span id="change">0</span></div>
 
-        <div class="money-grid">
-          <button class="m-btn" onclick="addMoney(1000)">1천</button>
-          <button class="m-btn" onclick="addMoney(5000)">5천</button>
-          <button class="m-btn" onclick="addMoney(10000)">1만</button>
-          <button class="m-btn" onclick="addMoney(30000)">3만</button>
-          <button class="m-btn" onclick="addMoney(50000)">5만</button>
-          <button class="m-btn reset" onclick="resetAll()">초기화</button>
-        </div>
-
-        <button class="pay-btn" onclick="complete()">결제 완료</button>
+    <div class="pay-footer">
+      <div class="money">
+        <button onclick="addMoney(1000)">1천</button>
+        <button onclick="addMoney(5000)">5천</button>
+        <button onclick="addMoney(10000)">1만</button>
+        <button onclick="addMoney(30000)">3만</button>
+        <button onclick="addMoney(50000)">5만</button>
+        <button class="reset" onclick="resetAll()">초기화</button>
       </div>
+      <button class="pay" onclick="complete()">결제 완료</button>
     </div>
   </div>
-</div>
+</main>
 
-<!-- ✅ 품목 데이터 -->
 <script src="items.js"></script>
 
 <script>
-let total = 0;
-let paid = 0;
-let cartItems = [];
-let currentCat = null;
+let cart=[];
+let total=0;
+let paid=0;
+let currentCat="과일";
 
-function renderCategories(){
-  const cats = [...new Set((window.ITEMS||[]).map(i => i.cat))];
-  const box = document.getElementById("categories");
-  box.innerHTML = "";
+const cats=[...new Set(ITEMS.map(i=>i.cat))];
 
-  cats.forEach((c, idx) => {
-    const b = document.createElement("button");
-    b.className = "cat-btn";
-    b.innerText = c;
-    b.onclick = () => {
-      currentCat = c;
-      document.querySelectorAll(".cat-btn").forEach(x => x.classList.remove("active"));
-      b.classList.add("active");
-      renderItems(c);
-    };
-    box.appendChild(b);
+const catsDiv=document.getElementById("cats");
+cats.forEach(c=>{
+  const b=document.createElement("button");
+  b.innerText=c;
+  if(c===currentCat) b.classList.add("active");
+  b.onclick=()=>{currentCat=c;renderCats();renderItems();};
+  catsDiv.appendChild(b);
+});
 
-    if(idx === 0 && !currentCat){
-      currentCat = c;
-      b.classList.add("active");
-    }
-  });
-
-  if(currentCat) renderItems(currentCat);
-}
-
-function renderItems(cat){
-  const box = document.getElementById("items");
-  box.innerHTML = "";
-  (window.ITEMS||[]).filter(i => i.cat === cat).forEach(item => {
-    const b = document.createElement("button");
-    b.className = "item-btn";
-    b.innerHTML = `
-      <span class="left">${item.name} <small>(${item.unit})</small></span>
-      <span class="right">₩${Number(item.price).toLocaleString()}</span>
-    `;
-    b.onclick = () => addItem(item);
-    box.appendChild(b);
+function renderCats(){
+  [...catsDiv.children].forEach(b=>{
+    b.classList.toggle("active",b.innerText===currentCat);
   });
 }
 
-function addItem(item){
-  cartItems.push(item);
-  total += Number(item.price);
-  document.getElementById("total").innerText = total.toLocaleString();
+function renderItems(){
+  items.innerHTML="";
+  ITEMS.filter(i=>i.cat===currentCat).forEach(i=>{
+    const d=document.createElement("div");
+    d.className="item";
+    d.innerHTML=`<span>${i.name} (${i.unit})</span><span>₩${i.price.toLocaleString()}</span>`;
+    d.onclick=()=>addItem(i);
+    items.appendChild(d);
+  });
+}
+
+function addItem(i){
+  cart.push(i);
+  total+=i.price;
   renderCart();
-  refreshChange();
 }
 
 function renderCart(){
-  const box = document.getElementById("cart");
-  box.innerHTML = "";
-
-  if(cartItems.length === 0){
-    box.innerHTML = `<div class="cart-empty">장바구니 비어있음 (왼쪽에서 품목 누르면 담김)</div>`;
-    return;
-  }
-
-  cartItems.forEach((i, idx) => {
-    const row = document.createElement("div");
-    row.className = "cart-item";
-    row.innerHTML = `
-      <span>${i.name} ${i.unit}</span>
-      <span>
-        ₩${Number(i.price).toLocaleString()}
-        <button class="trash" onclick="removeItem(${idx})">🗑️</button>
-      </span>
-    `;
-    box.appendChild(row);
+  cartDiv.innerHTML="";
+  cart.forEach((i,idx)=>{
+    const d=document.createElement("div");
+    d.className="cart-item";
+    d.innerHTML=`${i.name} ₩${i.price.toLocaleString()}
+      <button onclick="removeItem(${idx})">🗑</button>`;
+    cartDiv.appendChild(d);
   });
+  document.getElementById("total").innerText=total.toLocaleString();
+  updateChange();
 }
 
 function removeItem(idx){
-  total -= Number(cartItems[idx].price);
-  cartItems.splice(idx,1);
-  document.getElementById("total").innerText = total.toLocaleString();
+  total-=cart[idx].price;
+  cart.splice(idx,1);
   renderCart();
-  refreshChange();
 }
 
-function addMoney(amount){
-  paid += amount;
-  document.getElementById("paid").innerText = paid.toLocaleString();
-  refreshChange();
+function addMoney(a){
+  paid+=a;
+  document.getElementById("paid").innerText=paid.toLocaleString();
+  updateChange();
 }
 
-function refreshChange(){
-  document.getElementById("change").innerText = Math.max(paid - total, 0).toLocaleString();
+function updateChange(){
+  document.getElementById("change").innerText=Math.max(paid-total,0).toLocaleString();
 }
 
 function resetAll(){
-  total = 0;
-  paid = 0;
-  cartItems = [];
-  document.getElementById("total").innerText = "0";
-  document.getElementById("paid").innerText = "0";
-  document.getElementById("change").innerText = "0";
+  cart=[];
+  total=0;
+  paid=0;
+  document.getElementById("paid").innerText="0";
+  document.getElementById("change").innerText="0";
   renderCart();
 }
 
 function complete(){
-  alert("결제 완료!");
+  alert("결제 완료");
   resetAll();
 }
 
-renderCategories();
+const items=document.getElementById("items");
+const cartDiv=document.getElementById("cart");
+
+renderItems();
 </script>
 </body>
 </html>
