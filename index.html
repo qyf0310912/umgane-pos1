@@ -1,103 +1,111 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>엄가네 현장 POS</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>엄가네 현장 POS</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #0e0e0e;
-      color: #fff;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0e0e0e;
+  color: #fff;
+}
 
-    header {
-      background: #ff7a00;
-      padding: 14px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: 900;
-    }
+header {
+  background: #ff7a00;
+  padding: 14px;
+  font-size: 22px;
+  font-weight: 900;
+  text-align: center;
+}
 
-    .container {
-      padding: 12px;
-    }
+.container { padding: 12px; }
 
-    .total {
-      font-size: 28px;
-      font-weight: 900;
-      margin-bottom: 10px;
-    }
+.total {
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
 
-    .cart {
-      background: #1c1c1c;
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 12px;
-    }
+.category-btn {
+  background: #333;
+  color: #fff;
+  font-size: 20px;
+  padding: 12px;
+  margin: 4px;
+  border-radius: 8px;
+}
 
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      margin: 6px 0;
-      font-size: 18px;
-    }
+.item-btn {
+  background: #222;
+  color: #fff;
+  font-size: 22px;
+  padding: 14px;
+  margin: 6px 0;
+  width: 100%;
+  border-radius: 10px;
+}
 
-    .pay-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 20px;
-      margin: 8px 0;
-    }
+.cart {
+  background: #1c1c1c;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 12px;
+}
 
-    .money-buttons {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin: 12px 0;
-    }
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+  font-size: 20px;
+}
 
-    button {
-      font-size: 20px;
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-    }
+.money-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 20px;
+  margin-top: 8px;
+}
 
-    .reset {
-      background: #ff3b30;
-      color: #fff;
-    }
+.money-buttons button {
+  width: 32%;
+  padding: 16px;
+  font-size: 20px;
+  margin: 4px 0;
+}
 
-    .pay-btn {
-      background: #30d158;
-      color: #000;
-      font-size: 24px;
-      font-weight: 900;
-      width: 100%;
-      margin-top: 10px;
-    }
-  </style>
+.pay-btn {
+  width: 100%;
+  padding: 18px;
+  font-size: 26px;
+  background: #3ddb6f;
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+.reset {
+  background: #ff3b30;
+  color: #fff;
+}
+</style>
 </head>
 
 <body>
 <header>엄가네 현장 계산기</header>
 
 <div class="container">
-  <div class="total">총합계 ₩<span id="total">23000</span></div>
+  <div class="total">총합계 ₩<span id="total">0</span></div>
 
-  <div class="cart" id="cart">
-    <div class="cart-item"><span>사과 3개</span><span>₩9,000</span></div>
-    <div class="cart-item"><span>양파 1망</span><span>₩8,000</span></div>
-    <div class="cart-item"><span>깻잎 1봉</span><span>₩6,000</span></div>
-  </div>
+  <div id="categories"></div>
+  <div id="items"></div>
 
-  <div class="pay-row">
-    <span>받은돈 ₩<span id="paid">0</span></span>
-    <span>거스름 ₩<span id="change">0</span></span>
+  <div class="cart" id="cart"></div>
+
+  <div class="money-row">
+    <div>받은돈 ₩<span id="paid">0</span></div>
+    <div>거스름 ₩<span id="change">0</span></div>
   </div>
 
   <div class="money-buttons">
@@ -112,32 +120,91 @@
   <button class="pay-btn" onclick="complete()">결제 완료</button>
 </div>
 
-<!-- 1️⃣ 품목 데이터 (다음 단계에서 사용) -->
 <script src="items.js"></script>
 
-<!-- 2️⃣ POS 동작 로직 -->
 <script>
-  let total = 23000;
-  let paid = 0;
+let total = 0;
+let paid = 0;
+let cartItems = [];
 
-  function addMoney(amount) {
-    paid += amount;
-    document.getElementById("paid").innerText = paid.toLocaleString();
-    document.getElementById("change").innerText =
-      Math.max(paid - total, 0).toLocaleString();
-  }
+function renderCategories() {
+  const cats = [...new Set(ITEMS.map(i => i.cat))];
+  const box = document.getElementById("categories");
+  box.innerHTML = "";
+  cats.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "category-btn";
+    b.innerText = c;
+    b.onclick = () => renderItems(c);
+    box.appendChild(b);
+  });
+}
 
-  function resetAll() {
-    paid = 0;
-    document.getElementById("paid").innerText = "0";
-    document.getElementById("change").innerText = "0";
-  }
+function renderItems(cat) {
+  const box = document.getElementById("items");
+  box.innerHTML = "";
+  ITEMS.filter(i => i.cat === cat).forEach(item => {
+    const b = document.createElement("button");
+    b.className = "item-btn";
+    b.innerText = `${item.name} (${item.unit}) ₩${item.price.toLocaleString()}`;
+    b.onclick = () => addItem(item);
+    box.appendChild(b);
+  });
+}
 
-  function complete() {
-    alert("결제 완료!");
-    resetAll();
-  }
+function addItem(item) {
+  cartItems.push(item);
+  total += item.price;
+  document.getElementById("total").innerText = total.toLocaleString();
+  renderCart();
+}
+
+function renderCart() {
+  const box = document.getElementById("cart");
+  box.innerHTML = "";
+  cartItems.forEach((i, idx) => {
+    const row = document.createElement("div");
+    row.className = "cart-item";
+    row.innerHTML = `
+      <span>${i.name} ${i.unit}</span>
+      <span>
+        ₩${i.price.toLocaleString()}
+        <button onclick="removeItem(${idx})">🗑️</button>
+      </span>`;
+    box.appendChild(row);
+  });
+}
+
+function removeItem(i) {
+  total -= cartItems[i].price;
+  cartItems.splice(i, 1);
+  document.getElementById("total").innerText = total.toLocaleString();
+  renderCart();
+}
+
+function addMoney(amount) {
+  paid += amount;
+  document.getElementById("paid").innerText = paid.toLocaleString();
+  document.getElementById("change").innerText =
+    Math.max(paid - total, 0).toLocaleString();
+}
+
+function resetAll() {
+  total = 0;
+  paid = 0;
+  cartItems = [];
+  document.getElementById("total").innerText = "0";
+  document.getElementById("paid").innerText = "0";
+  document.getElementById("change").innerText = "0";
+  renderCart();
+}
+
+function complete() {
+  alert("결제 완료!");
+  resetAll();
+}
+
+renderCategories();
 </script>
-
 </body>
 </html>
