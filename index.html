@@ -3,37 +3,44 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>라팡 POS</title>
+  <title>POS</title>
   <style>
     :root{
-      --bg:#0b0c10;
-      --panel:#111319;
-      --line:rgba(255,255,255,.08);
-      --text:#f5f7ff;
-      --muted:rgba(245,247,255,.65);
+      --bg:#10141b;
+      --panel:#151c26;
+      --card:#1b2432;
+      --cardHover:#202b3c;
+      --line:rgba(255,255,255,.11);
+
+      --text:#f3f6ff;
+      --muted:rgba(243,246,255,.72);
+      --muted2:rgba(243,246,255,.52);
+
       --accent:#ff9f00;
       --good:#29d17e;
-      --btn:#f3f4f6;
+      --danger:#ff3b30;
+
+      --btn:#f5f6f8;
       --btnText:#111;
-      --shadow:0 12px 40px rgba(0,0,0,.35);
-      --r:18px;
-      --gap:16px;
+
+      --shadow:0 14px 44px rgba(0,0,0,.42);
     }
 
     *{box-sizing:border-box;}
-    html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", "Apple SD Gothic Neo", Arial;}
+    html,body{height:100%; margin:0; background:var(--bg); color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", "Apple SD Gothic Neo", Arial;}
     button,input{font:inherit;}
 
-    /* ✅ 전체 레이아웃: 다시 3/1 */
+    /* 전체 레이아웃: 3/1 고정 */
     .app{
       height:100%;
       display:grid;
-      grid-template-columns: 3fr 1fr;   /* 왼쪽 75% / 오른쪽 25% */
-      gap:var(--gap);
+      grid-template-columns: 3fr 1fr;
+      gap:16px;
       padding:16px;
     }
 
-    .card{
+    .cardShell{
       background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
       border:1px solid var(--line);
       border-radius:22px;
@@ -45,24 +52,29 @@
     /* LEFT */
     .left{display:flex; flex-direction:column; min-height:0;}
     .leftHeader{
-      padding:12px 14px 10px;
+      padding:10px 12px;
       border-bottom:1px solid var(--line);
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:12px;
+      justify-content:flex-start;
+      gap:10px;
+      background:rgba(0,0,0,.08);
     }
-    .brand{font-weight:900; letter-spacing:.2px; font-size:20px;}
+
+    /* "라팡 POS"은 숨김(필요하면 display:block) */
+    .brand{display:none; font-weight:1000; font-size:18px; letter-spacing:.2px;}
+
     .tabs{display:flex; gap:8px; flex-wrap:wrap;}
     .tab{
       background:rgba(255,255,255,.06);
       border:1px solid var(--line);
       color:var(--text);
-      padding:8px 12px;
+      padding:9px 13px;
       border-radius:999px;
-      font-weight:800;
+      font-weight:1000;
       cursor:pointer;
       user-select:none;
+      font-size:14px;
     }
     .tab.active{
       background:rgba(255,159,0,.18);
@@ -71,11 +83,12 @@
     }
 
     .searchWrap{
-      padding:10px 14px;
+      padding:10px 12px;
       border-bottom:1px solid var(--line);
       display:flex;
       gap:10px;
       align-items:center;
+      background:rgba(0,0,0,.05);
     }
     .search{
       flex:1;
@@ -94,85 +107,118 @@
       background:transparent;
       color:var(--text);
       font-size:15px;
+      font-weight:900;
     }
     .pill{
       padding:8px 10px;
       border-radius:12px;
-ří
       border:1px solid var(--line);
       background:rgba(255,255,255,.04);
       color:var(--muted);
-      font-weight:800;
+      font-weight:1000;
       font-size:12px;
       white-space:nowrap;
     }
     .pill b{color:var(--text);}
 
+    /* 초성 버튼 바 */
+    .chosungBar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      padding:8px 12px 10px;
+      border-bottom:1px solid var(--line);
+      background:rgba(0,0,0,.04);
+    }
+    .chobtn{
+      min-width:36px;
+      height:34px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:rgba(243,246,255,.95);
+      font-weight:1100;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chobtn:active{ transform:scale(.96); }
+    .chobtn.clear{
+      background:rgba(255,59,48,.14);
+      border-color:rgba(255,59,48,.35);
+      color:#ffd1cf;
+    }
+
     .leftBody{
-      padding:12px 14px 14px;
+      padding:12px;
       min-height:0;
       overflow:auto;
     }
 
-    /* ✅ 횡열 4~5개(반응형). 카드 높이 줄여서 더 많이 보이게 */
+    /* 횡열 4~5개 */
     .grid{
       display:grid;
       gap:12px;
       grid-template-columns: repeat(5, minmax(0, 1fr));
     }
-    @media (max-width: 1280px){
-      .grid{ grid-template-columns: repeat(4, minmax(0,1fr)); }
-    }
+    @media (max-width: 1280px){ .grid{ grid-template-columns: repeat(4, minmax(0,1fr)); } }
     @media (max-width: 980px){
       .app{ grid-template-columns: 1fr; }
       .grid{ grid-template-columns: repeat(4, minmax(0,1fr)); }
     }
-    @media (max-width: 560px){
-      .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
-    }
+    @media (max-width: 560px){ .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); } }
 
-    /* ✅ 상품 카드: 카드 자체가 버튼(담기 버튼 없음) */
+    /* 상품 카드 */
     .pbtn{
       width:100%;
       text-align:left;
       cursor:pointer;
       user-select:none;
       border-radius:18px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       padding:12px 12px;
-      min-height:86px; /* 낮게 */
+      min-height:82px;
       transition:transform .03s ease, background .15s ease, border-color .15s ease;
       display:flex;
       flex-direction:column;
       justify-content:center;
       gap:6px;
+      position:relative;
+      outline:none;
     }
-    .pbtn:hover{ background:rgba(255,255,255,.045); }
+    .pbtn:hover{ background:rgba(255,255,255,.07); }
     .pbtn:active{ transform:scale(.99); }
 
+    /* ✅ 연타 강조 플래시 */
+    .pbtn.flash{
+      border-color: rgba(255,159,0,.55);
+      box-shadow: 0 0 0 3px rgba(255,159,0,.18), var(--shadow);
+      background: rgba(255,159,0,.10);
+    }
+
     .pname{
-      font-weight:1000;
-      font-size:20px;
+      font-weight:1200;
+      font-size:18px;
       letter-spacing:.1px;
-      line-height:1.1;
+      line-height:1.15;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
     .pprice{
-      font-weight:900;
+      font-weight:1000;
       font-size:14px;
-      color:rgba(245,247,255,.75);
+      color:rgba(243,246,255,.82);
     }
     .pmeta{
       margin-top:2px;
       font-size:11px;
-      color:rgba(245,247,255,.5);
-      font-weight:800;
+      color:rgba(243,246,255,.55);
+      font-weight:900;
       display:flex;
       justify-content:space-between;
       gap:8px;
+      align-items:center;
     }
     .badge{
       display:inline-flex;
@@ -183,31 +229,31 @@
       background:rgba(255,159,0,.13);
       border:1px solid rgba(255,159,0,.22);
       color:#ffd9a3;
-      font-weight:900;
+      font-weight:1000;
     }
+    .pinIcon{
+      position:absolute;
+      top:10px;
+      right:10px;
+      font-size:14px;
+      opacity:.95;
+      display:none;
+    }
+    .pbtn.pinned .pinIcon{ display:block; }
 
     /* RIGHT */
     .right{display:flex; flex-direction:column; min-height:0;}
 
-    /* ✅ 오른쪽 공간 줄이기: 패딩/요소 높이 다운 */
-    .rightHeader{
+    .rightTop{
       padding:12px 12px 10px;
       border-bottom:1px solid var(--line);
+      background:rgba(0,0,0,.07);
     }
-    .sum{
-      font-size:22px;
-      font-weight:1100;
-      letter-spacing:.1px;
-    }
-    .count{
-      margin-top:4px;
-      color:var(--muted);
-      font-weight:900;
-      font-size:12px;
-    }
+    .sum{ font-size:22px; font-weight:1200; letter-spacing:.1px; }
+    .count{ margin-top:4px; color:var(--muted); font-weight:1000; font-size:12px; }
+
     .divider{ height:1px; background:var(--line); margin:10px 0; }
 
-    /* 받은돈+거스름돈 한 줄 */
     .payline{
       display:flex;
       align-items:flex-end;
@@ -215,22 +261,15 @@
       gap:10px;
       font-weight:1100;
     }
-    .payline .label{
-      font-size:12px;
-      font-weight:900;
-      color:rgba(245,247,255,.7);
-    }
-    .payline .val{
-      font-size:18px;
-      font-weight:1100;
-    }
+    .payline .label{ font-size:12px; font-weight:1000; color:rgba(243,246,255,.72); }
+    .payline .val{ font-size:18px; font-weight:1200; }
 
-    /* ✅ 돈버튼 3x2, 높이 줄임 */
+    /* 돈버튼 3개씩 2줄(3열) */
     .paybox{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
       margin-top:10px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
     }
     .moneyBtn{
       background:var(--btn);
@@ -238,17 +277,16 @@
       border:none;
       border-radius:14px;
       padding:12px 10px;
-      font-weight:1100;
+      font-weight:1200;
       font-size:16px;
       cursor:pointer;
       user-select:none;
     }
     .moneyBtn:active{ transform:scale(.99); }
-
     .resetBtn{
-      background:rgba(255,255,255,.08);
-      color:rgba(245,247,255,.92);
-      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.10);
+      color:rgba(243,246,255,.92);
+      border:1px solid rgba(255,255,255,.18);
     }
 
     .rightBody{
@@ -272,21 +310,23 @@
     .cartHead{
       padding:10px 12px;
       border-bottom:1px solid var(--line);
-      color:rgba(245,247,255,.78);
-      font-weight:1000;
+      color:rgba(243,246,255,.82);
+      font-weight:1100;
       font-size:13px;
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:10px;
+      background:rgba(0,0,0,.06);
     }
 
-    /* ✅ 장바구니: 7개 이상 한눈에 보이게(넘치면 스크롤) */
+    /* ✅ 장바구니 7개 이상 노출(해상도 달라도 안정) */
     .cartList{
-      padding:8px 8px;
+      padding:8px;
       overflow:auto;
-      min-height:420px; /* 대충 7개 이상 보이게 */
-      max-height:520px;
+      min-height: 520px;
+      height: calc(100vh - 420px);
+      max-height: 700px;
     }
 
     .item{
@@ -295,13 +335,13 @@
       gap:10px;
       padding:10px 10px;
       border-radius:14px;
-      border:1px solid rgba(255,255,255,.06);
-      background:rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.16);
       margin-bottom:8px;
       align-items:center;
     }
     .iname{
-      font-weight:1100;
+      font-weight:1200;
       font-size:14px;
       display:flex;
       align-items:center;
@@ -309,58 +349,54 @@
     }
     .iprice{
       font-size:12px;
-      font-weight:900;
-      color:rgba(245,247,255,.65);
+      font-weight:1000;
+      color:rgba(243,246,255,.65);
       margin-top:4px;
     }
-    .qtyBox{
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
+    .qtyBox{ display:flex; align-items:center; gap:8px; }
     .qbtn{
       width:34px; height:34px;
       border-radius:12px;
       border:1px solid rgba(255,255,255,.14);
       background:rgba(255,255,255,.08);
-      color:rgba(245,247,255,.95);
-      font-weight:1100;
+      color:rgba(243,246,255,.95);
+      font-weight:1200;
       font-size:18px;
       cursor:pointer;
     }
-    .qnum{
-      min-width:28px;
-      text-align:center;
-      font-weight:1100;
-      font-size:14px;
-    }
+    .qnum{ min-width:28px; text-align:center; font-weight:1200; font-size:14px; }
     .del{
       width:38px; height:34px;
       border-radius:12px;
       border:1px solid rgba(255,59,48,.35);
       background:rgba(255,59,48,.14);
       color:#ffd1cf;
-      font-weight:1100;
+      font-weight:1200;
       cursor:pointer;
     }
 
-    .checkout{ margin-top:auto; display:flex; flex-direction:column; gap:10px; }
     .payBtn{
+      margin-top:auto;
       background:var(--accent);
       color:#19150a;
       border:none;
       border-radius:16px;
       padding:14px 12px;
-      font-weight:1200;
+      font-weight:1300;
       font-size:18px;
       cursor:pointer;
+      transition:opacity .15s ease, filter .15s ease;
     }
     .payBtn:active{ transform:scale(.99); }
+    .payBtn.locked{
+      opacity:.55;
+      cursor:not-allowed;
+      filter:saturate(.6);
+    }
 
     /* POPUP */
     .overlay{
-      position:fixed;
-      inset:0;
+      position:fixed; inset:0;
       background:rgba(0,0,0,.55);
       display:none;
       align-items:center;
@@ -377,60 +413,45 @@
       box-shadow:0 18px 70px rgba(0,0,0,.55);
       padding:18px;
     }
-    .modal h2{ margin:0 0 8px; font-size:22px; font-weight:1200; }
-    .modal .meta{
-      color:rgba(245,247,255,.72);
-      font-weight:900;
-      font-size:13px;
-      line-height:1.6;
-    }
-    .modal .actions{
-      margin-top:14px;
-      display:flex;
-      gap:10px;
-      justify-content:flex-end;
-    }
-    .mBtn{
-      border:none;
-      border-radius:14px;
-      padding:10px 14px;
-      font-weight:1100;
-      cursor:pointer;
-    }
+    .modal h2{ margin:0 0 8px; font-size:22px; font-weight:1300; }
+    .modal .meta{ color:rgba(243,246,255,.76); font-weight:1000; font-size:13px; line-height:1.6; }
+    .modal .actions{ margin-top:14px; display:flex; gap:10px; justify-content:flex-end; }
+    .mBtn{ border:none; border-radius:14px; padding:10px 14px; font-weight:1200; cursor:pointer; }
     .mOk{ background:var(--good); color:#072213; }
-    .mMute{ background:rgba(255,255,255,.08); color:rgba(245,247,255,.9); border:1px solid rgba(255,255,255,.14); }
+    .mMute{ background:rgba(255,255,255,.08); color:rgba(243,246,255,.9); border:1px solid rgba(255,255,255,.14); }
   </style>
 </head>
 
 <body>
   <div class="app">
     <!-- LEFT -->
-    <section class="card left">
+    <section class="cardShell left">
       <div class="leftHeader">
         <div class="brand">라팡 POS</div>
         <div class="tabs" id="tabs"></div>
       </div>
 
       <div class="searchWrap">
-        <div class="search" title="전카테고리 통합 검색 / 초성검색 가능 (예: ㄱㄱ)">
+        <div class="search" title="전카테고리 통합 검색 / 초성검색 가능">
           <span style="opacity:.7;font-weight:900;">🔎</span>
           <input id="q" placeholder="전카테고리 검색 (예: 감자, ㄱㅈ, ㄱㄱ)" autocomplete="off" />
         </div>
-        <div class="pill">정렬: <b>많이 찍힌 순</b></div>
+        <div class="pill">정렬: <b>고정 + 많이 찍힌 순</b></div>
       </div>
+
+      <div class="chosungBar" id="chosungBar"></div>
 
       <div class="leftBody">
         <div class="grid" id="grid"></div>
-        <div style="height:10px"></div>
-        <div style="color:rgba(245,247,255,.45); font-size:12px; font-weight:900;">
-          ※ 검색어가 있으면 전 카테고리에서 매칭된 상품만 표시됩니다. (초성/일반 검색)
+        <div style="margin-top:10px; color:rgba(243,246,255,.45); font-size:12px; font-weight:900;">
+          ※ 상품 고정: 길게 누르기(모바일) / 우클릭(PC)
         </div>
       </div>
     </section>
 
     <!-- RIGHT -->
-    <section class="card right">
-      <div class="rightHeader">
+    <section class="cardShell right">
+      <div class="rightTop">
         <div class="sum">총합계: <span id="sum">0</span>원</div>
         <div class="count">총수량: <span id="totalQty">0</span></div>
 
@@ -448,6 +469,7 @@
           </div>
         </div>
 
+        <!-- 돈버튼: 3개 x 2줄 -->
         <div class="paybox">
           <button class="moneyBtn" data-add="500">500</button>
           <button class="moneyBtn" data-add="1000">1천</button>
@@ -467,9 +489,7 @@
           <div class="cartList" id="cartList"></div>
         </div>
 
-        <div class="checkout">
-          <button class="payBtn" id="pay">결제완료</button>
-        </div>
+        <button class="payBtn" id="pay">결제완료</button>
       </div>
     </section>
   </div>
@@ -488,9 +508,13 @@
 
 <script>
 /** =========================
- *  데이터(예시) - 너가 쓰는 품목으로 계속 늘리면 됨
+ *  카테고리(고정 기준)
  *  ========================= */
-const CATEGORIES = ["과일","야채","원채소","생선"];
+const CATEGORIES = ["과일","야채","봉채소","생선","기타"];
+
+/** =========================
+ *  상품 데이터(예시) - 여기만 계속 추가하면 됨
+ *  ========================= */
 const PRODUCTS = [
   // 과일(예시)
   { id:"fruit_dangam3", cat:"과일", name:"단감/3개", price:5000 },
@@ -518,6 +542,8 @@ const PRODUCTS = [
   { id:"veg_onion", cat:"야채", name:"양파(망)", price:3000 },
   { id:"veg_potato", cat:"야채", name:"감자(봉)", price:3000 },
   { id:"veg_carrot", cat:"야채", name:"당근(봉)", price:3000 },
+
+  // 봉채소/생선/기타는 필요 시 추가
 ];
 
 /** =========================
@@ -551,25 +577,40 @@ function matchProduct(p, qRaw){
 }
 
 /** =========================
- *  많이 찍힌 상품 상단 고정(사용횟수 저장)
+ *  저장(고정/사용횟수)
  *  ========================= */
-const LS_KEY_COUNTS = "lapang_pos_counts_v2";
-function loadCounts(){ try { return JSON.parse(localStorage.getItem(LS_KEY_COUNTS) || "{}"); } catch { return {}; } }
-function saveCounts(obj){ localStorage.setItem(LS_KEY_COUNTS, JSON.stringify(obj)); }
-let counts = loadCounts();
+const LS_KEY_COUNTS = "lapang_pos_counts_v3";
+const LS_KEY_PINS   = "lapang_pos_pins_v3";
+function loadJSON(key, def){
+  try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(def)); }
+  catch{ return def; }
+}
+function saveJSON(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
 
+let counts = loadJSON(LS_KEY_COUNTS, {}); // {id: n}
+let pins   = loadJSON(LS_KEY_PINS,   {}); // {id: true}
+
+/** =========================
+ *  상태
+ *  ========================= */
 let activeCat = "과일";
 let cart = {};           // {productId: qty}
 let receivedMoney = 0;
 let soundOn = true;
 
+/* ✅ 결제 1초 잠금 */
+let payLocked = false;
+
 /** =========================
- *  렌더
+ *  DOM
  *  ========================= */
 const $tabs = document.getElementById("tabs");
 const $grid = document.getElementById("grid");
 const $q = document.getElementById("q");
 
+/** =========================
+ *  렌더: 탭
+ *  ========================= */
 function renderTabs(){
   $tabs.innerHTML = "";
   CATEGORIES.forEach(cat=>{
@@ -581,15 +622,46 @@ function renderTabs(){
   });
 }
 
+/** =========================
+ *  정렬: 1) 고정 2) 많이 찍힌 순 3) 이름
+ *  ========================= */
 function getSortedProducts(list){
   return [...list].sort((a,b)=>{
+    const pa = !!pins[a.id], pb = !!pins[b.id];
+    if (pb !== pa) return (pb?1:0) - (pa?1:0);
+
     const ca = counts[a.id] || 0;
     const cb = counts[b.id] || 0;
     if (cb !== ca) return cb - ca;
+
     return a.name.localeCompare(b.name, "ko");
   });
 }
 
+/** =========================
+ *  플래시(연타 피드백)
+ *  ========================= */
+const flashTimers = {};
+function flashCard(el, id){
+  if (!el) return;
+  el.classList.add("flash");
+  clearTimeout(flashTimers[id]);
+  flashTimers[id] = setTimeout(()=> el.classList.remove("flash"), 160);
+}
+
+/** =========================
+ *  고정(핀) 토글: 길게누르기/우클릭
+ *  ========================= */
+function togglePin(id){
+  pins[id] = !pins[id];
+  if (!pins[id]) delete pins[id];
+  saveJSON(LS_KEY_PINS, pins);
+  renderAll();
+}
+
+/** =========================
+ *  렌더: 상품 그리드
+ *  ========================= */
 function renderGrid(){
   const query = $q.value;
 
@@ -605,37 +677,57 @@ function renderGrid(){
   $grid.innerHTML = "";
   list.forEach(p=>{
     const btn = document.createElement("button");
-    btn.className = "pbtn";
-
+    btn.className = "pbtn" + (pins[p.id] ? " pinned" : "");
     const used = counts[p.id] || 0;
+
     btn.innerHTML = `
+      <div class="pinIcon">📌</div>
       <div class="pname">${p.name}</div>
       <div class="pprice">${formatWon(p.price)}원</div>
       <div class="pmeta">
-        <span>${normalize(query) ? `<span class="badge">${p.cat}</span>` : ""}</span>
-        <span style="opacity:.7">사용 ${used}</span>
+        <span>${normalize(query) ? `<span class="badge">${p.cat}</span>` : (pins[p.id] ? `<span class="badge">고정</span>` : "")}</span>
+        <span style="opacity:.75">사용 ${used}</span>
       </div>
     `;
 
-    // ✅ 카드 아무데나 누르면 바로 담김 (담기버튼 삭제)
+    /* ✅ 카드 아무데나 누르면 담김 + 플래시 */
     btn.onclick = ()=>{
       addToCart(p.id, 1);
       counts[p.id] = (counts[p.id] || 0) + 1;
-      saveCounts(counts);
+      saveJSON(LS_KEY_COUNTS, counts);
+      flashCard(btn, p.id);
       renderAll();
     };
+
+    /* ✅ PC: 우클릭 고정/해제 */
+    btn.oncontextmenu = (e)=>{
+      e.preventDefault();
+      togglePin(p.id);
+      return false;
+    };
+
+    /* ✅ 모바일: 길게누르기 고정/해제 */
+    let pressTimer = null;
+    btn.addEventListener("touchstart", ()=>{
+      pressTimer = setTimeout(()=> togglePin(p.id), 520);
+    }, {passive:true});
+    btn.addEventListener("touchend", ()=>{ clearTimeout(pressTimer); }, {passive:true});
+    btn.addEventListener("touchmove", ()=>{ clearTimeout(pressTimer); }, {passive:true});
 
     $grid.appendChild(btn);
   });
 }
 
+/** =========================
+ *  렌더: 장바구니
+ *  ========================= */
 function renderCart(){
   const $list = document.getElementById("cartList");
   const ids = Object.keys(cart);
   document.getElementById("cartCount").textContent = ids.length;
 
   if (!ids.length){
-    $list.innerHTML = `<div style="padding:14px 10px; color:rgba(245,247,255,.55); font-weight:900;">담긴 상품 없음</div>`;
+    $list.innerHTML = `<div style="padding:14px 10px; color:rgba(243,246,255,.55); font-weight:1000;">담긴 상품 없음</div>`;
     return;
   }
 
@@ -643,10 +735,15 @@ function renderCart(){
     .map(id => ({ p: PRODUCTS.find(x=>x.id===id), qty: cart[id] }))
     .filter(x=>x.p);
 
+  // 심플: 고정/사용순에 맞춰 정렬(복잡한 가격정렬 X)
   items.sort((a,b)=>{
+    const pa = !!pins[a.p.id], pb = !!pins[b.p.id];
+    if (pb !== pa) return (pb?1:0) - (pa?1:0);
+
     const ca = counts[a.p.id] || 0;
     const cb = counts[b.p.id] || 0;
     if (cb !== ca) return cb - ca;
+
     return a.p.name.localeCompare(b.p.name,"ko");
   });
 
@@ -656,7 +753,7 @@ function renderCart(){
     row.className = "item";
     row.innerHTML = `
       <div>
-        <div class="iname">${p.name} <span style="opacity:.75;font-weight:1100;">x${qty}</span></div>
+        <div class="iname">${p.name} <span style="opacity:.75;font-weight:1200;">x${qty}</span></div>
         <div class="iprice">${formatWon(p.price)}원 · 합 ${formatWon(p.price*qty)}원</div>
       </div>
       <div class="qtyBox">
@@ -692,6 +789,10 @@ function renderTotals(){
   document.getElementById("received").textContent = formatWon(receivedMoney);
   const change = Math.max(0, receivedMoney - sum);
   document.getElementById("change").textContent = formatWon(change);
+
+  // pay 버튼 락 UI 반영
+  const payBtn = document.getElementById("pay");
+  payBtn.classList.toggle("locked", payLocked);
 }
 
 function renderAll(){
@@ -729,13 +830,41 @@ document.querySelectorAll(".moneyBtn[data-add]").forEach(btn=>{
   };
 });
 document.getElementById("resetReceived").onclick = ()=>{
-  // 초기화는 받은돈만 리셋(카트 유지)
-  receivedMoney = 0;
+  receivedMoney = 0; // 초기화는 받은돈만 리셋
   renderTotals();
 };
 
 /** =========================
- *  결제완료 + 팝업 + 사운드
+ *  초성 버튼 생성
+ *  ========================= */
+const CHOS = ["ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+const $chosungBar = document.getElementById("chosungBar");
+function renderChosung(){
+  $chosungBar.innerHTML = "";
+  CHOS.forEach(c=>{
+    const b = document.createElement("button");
+    b.className = "chobtn";
+    b.textContent = c;
+    b.onclick = ()=>{
+      $q.value += c;   // 누적
+      renderGrid();    // 즉시 반영
+    };
+    $chosungBar.appendChild(b);
+  });
+
+  const clr = document.createElement("button");
+  clr.className = "chobtn clear";
+  clr.textContent = "✕";
+  clr.onclick = ()=>{
+    $q.value = "";
+    renderGrid();
+  };
+  $chosungBar.appendChild(clr);
+}
+renderChosung();
+
+/** =========================
+ *  결제완료 + 팝업 + 사운드 + 1초 잠금
  *  ========================= */
 const $overlay = document.getElementById("overlay");
 const $receiptMeta = document.getElementById("receiptMeta");
@@ -749,14 +878,26 @@ function beep(){
     const g = ctx.createGain();
     o.type = "sine";
     o.frequency.value = 880;
-    g.gain.value = 0.04;
+    g.gain.value = 0.05;
     o.connect(g); g.connect(ctx.destination);
     o.start();
     setTimeout(()=>{ o.stop(); ctx.close(); }, 180);
   }catch(e){}
 }
 
+function lockPayFor1s(){
+  payLocked = true;
+  renderTotals();
+  setTimeout(()=>{
+    payLocked = false;
+    renderTotals();
+  }, 1000);
+}
+
 document.getElementById("pay").onclick = ()=>{
+  if (payLocked) return; // ✅ 중복 클릭 방지
+  lockPayFor1s();
+
   const {sum, qty} = calcTotal();
   if (sum <= 0){
     alert("담긴 상품이 없습니다.");
@@ -789,12 +930,12 @@ $toggleSound.onclick = ()=>{
 };
 
 /** =========================
- *  검색
+ *  검색(타이핑 반영)
  *  ========================= */
 let qTimer = null;
 $q.addEventListener("input", ()=>{
   clearTimeout(qTimer);
-  qTimer = setTimeout(()=> renderGrid(), 50);
+  qTimer = setTimeout(()=> renderGrid(), 30);
 });
 
 /** =========================
