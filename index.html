@@ -6,6 +6,7 @@
 <title>엄가네 POS</title>
 
 <style>
+/* (너가 준 CSS 그대로) */
 :root{
   --bg:#0f1219;
   --panel:#121827;
@@ -21,17 +22,13 @@
   --btnText:#111;
   --shadow:0 14px 44px rgba(0,0,0,.35);
 }
-
 *{box-sizing:border-box}
 html,body{height:100%; margin:0; background:var(--bg); color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",system-ui,Segoe UI,Roboto,sans-serif;
 }
 button,input{font:inherit}
 button{border:none; background:none}
-
 .app{height:100%; display:grid; grid-template-columns:3fr 1fr; gap:14px; padding:14px}
-
-/* LEFT */
 .left{
   background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
   border:1px solid var(--line);
@@ -51,7 +48,6 @@ button{border:none; background:none}
   background:#1d2332; color:var(--text); font-weight:1000; cursor:pointer;
 }
 .tab.active{background:rgba(255,159,0,.18); border-color:rgba(255,159,0,.45)}
-
 .searchwrap{padding:10px 12px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.015)}
 .searchrow{display:flex; gap:10px; align-items:center}
 .search{
@@ -71,7 +67,6 @@ button{border:none; background:none}
   white-space:nowrap;
 }
 .sort small{opacity:.7; font-weight:900}
-
 .cho{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap}
 .cho button{
   padding:8px 10px; border-radius:12px; border:1px solid var(--line);
@@ -79,21 +74,19 @@ button{border:none; background:none}
   font-weight:1100; cursor:pointer; min-width:40px;
 }
 .cho button.clear{background:rgba(255,77,79,.18); border-color:rgba(255,77,79,.35)}
-
 .products{
   padding:12px; overflow:auto;
   display:grid; grid-template-columns:repeat(4, minmax(0,1fr));
   gap:12px;
 }
 @media (min-width:1500px){ .products{grid-template-columns:repeat(5, minmax(0,1fr))} }
-
 .card{
   background:linear-gradient(180deg, var(--card2), var(--card1));
   border:1px solid rgba(255,255,255,.16);
   border-radius:18px; padding:14px;
   cursor:pointer; user-select:none;
   position:relative; min-height:90px;
-  touch-action:manipulation; /* ✅ 터치 정확도 */
+  touch-action:manipulation;
 }
 .card.flash{box-shadow:0 0 0 3px rgba(255,159,0,.45)}
 .name{font-size:18px; font-weight:1200; letter-spacing:-.2px}
@@ -113,16 +106,12 @@ button{border:none; background:none}
   background:rgba(0,0,0,.15)
 }
 .pin.on{border-color:rgba(255,159,0,.55); background:rgba(255,159,0,.18)}
-/* ✅ 메타 영역이 클릭 가로채지 못하게 */
 .meta, .meta * { pointer-events:none; }
-
 .hint{
   padding:8px 12px 12px;
   color:var(--muted); font-size:12px; font-weight:900;
   border-top:1px solid var(--line); background:rgba(255,255,255,.01)
 }
-
-/* RIGHT */
 .right{
   background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
   border:1px solid var(--line);
@@ -131,8 +120,6 @@ button{border:none; background:none}
   overflow:hidden;
   display:flex; flex-direction:column;
 }
-
-/* ✅ 네가 원하는 순서: 장바구니 → 총합계/총수량 → 받은돈/거스름돈 → 버튼 6개 → 결제완료 */
 .cart{padding:12px; overflow:auto; flex:1; min-height:240px}
 .carthead{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-weight:1200}
 .carthead .muted{opacity:.7; font-weight:1000}
@@ -150,20 +137,16 @@ button{border:none; background:none}
 }
 .ctrl.del{background:rgba(255,77,79,.18); border-color:rgba(255,77,79,.35)}
 .count{width:26px; text-align:center; font-weight:1300}
-
 .summary{padding:12px; border-top:1px solid var(--line); background:rgba(255,255,255,.015)}
 .row{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-bottom:8px}
 .label{font-size:12px; opacity:.7; font-weight:1100}
 .val{font-size:20px; font-weight:1300}
 .smallval{font-size:14px; font-weight:1200; opacity:.95}
-
-/* ✅ 받은돈 왼쪽 / 거스름돈 오른쪽 (한 줄) */
 .payline{display:flex; align-items:flex-end; gap:12px; margin-top:10px}
 .payline .block{flex:1}
 .payline .divider{width:2px; height:26px; background:rgba(255,255,255,.14); border-radius:99px; align-self:center}
 .payline .leftAlign{text-align:left}
 .payline .rightAlign{text-align:right}
-
 .money{
   padding:12px; border-top:1px solid var(--line);
   display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
@@ -175,7 +158,6 @@ button{border:none; background:none}
   background:var(--btn); color:var(--btnText);
 }
 .money button.reset{background:rgba(255,77,79,.22); color:#ffe2e2}
-
 .pay{
   margin:12px; margin-top:0;
   border-radius:16px; padding:16px;
@@ -184,8 +166,6 @@ button{border:none; background:none}
   cursor:pointer;
 }
 .pay.locked{opacity:.55; pointer-events:none}
-
-/* 팝업 */
 .overlay{position:fixed; inset:0; background:rgba(0,0,0,.65); display:none; align-items:center; justify-content:center; z-index:9999}
 .overlay.show{display:flex}
 .modal{
@@ -201,8 +181,6 @@ button{border:none; background:none}
 .modal button{padding:10px 14px; border-radius:14px; font-weight:1300; cursor:pointer}
 .modal .ok{background:var(--good); color:#082010}
 .modal .cancel{background:rgba(255,255,255,.08); color:var(--text)}
-
-/* 토스트(디버그) */
 .toast{
   position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
   background:rgba(0,0,0,.75);
@@ -218,7 +196,6 @@ button{border:none; background:none}
 
 <body>
 <div class="app">
-
   <section class="left">
     <div class="topbar"><div class="tabs" id="tabs"></div></div>
 
@@ -293,38 +270,29 @@ button{border:none; background:none}
 
 <div class="toast" id="toast"></div>
 
+<!-- ✅ 먼저 시트에서 ITEMS를 채우는 파일 -->
+<script src="./items.js"></script>
+
 <script>
-/* JS 에러 즉시 알림 */
 window.addEventListener("error", (e)=>{
   alert("JS오류: " + (e?.message || e));
 });
 
-const CATS = ["과일","야채","봉채소","생선","기타"];
+/* ✅ 이제 “하드코딩 PRODUCTS” 삭제!
+   window.ITEMS(시트에서 온 것)을 PRODUCTS로 사용 */
+const PRODUCTS = Array.isArray(window.ITEMS) ? window.ITEMS : [];
 
-/* ✅ 여기 상품만 너 가게대로 계속 추가하면 됨 */
-const PRODUCTS = [
-  {id:"apple_3",     cat:"과일",  name:"사과",        price:3000},
-  {id:"tomato",      cat:"과일",  name:"토마토",      price:10000},
-  {id:"banana",      cat:"과일",  name:"바나나",      price:2500},
-  {id:"tangerine",   cat:"과일",  name:"귤",          price:3000},
-  {id:"kiwi",        cat:"과일",  name:"키위",        price:10000},
-  {id:"straw1",      cat:"과일",  name:"딸기/1팩",    price:8000},
-  {id:"straw2",      cat:"과일",  name:"딸기/2팩",    price:15000},
-
-  {id:"potato",      cat:"야채",  name:"감자",        price:3000},
-  {id:"onion",       cat:"야채",  name:"양파",        price:3000},
-  {id:"carrot",      cat:"야채",  name:"당근",        price:3000},
-
-  {id:"bag_green",   cat:"봉채소",name:"봉지채소",    price:2000},
-  {id:"fish1",       cat:"생선",  name:"고등어",      price:6000},
-  {id:"etc1",        cat:"기타",  name:"계란",        price:6000},
-];
+/* ✅ 카테고리도 자동 생성(시트 기준) */
+const CATS = (() => {
+  const set = new Set(PRODUCTS.map(p => p.cat));
+  return Array.from(set);
+})();
 
 const LS_KEY="umgane_pos_state_v2";
 const state = (()=>{ try{
   const s=JSON.parse(localStorage.getItem(LS_KEY)||"{}");
-  return { pinned:s.pinned||{}, used:s.used||{}, lastCat:s.lastCat||"과일" };
-}catch(_){ return {pinned:{}, used:{}, lastCat:"과일"}; }})();
+  return { pinned:s.pinned||{}, used:s.used||{}, lastCat:s.lastCat|| (CATS[0] || "과일") };
+}catch(_){ return {pinned:{}, used:{}, lastCat:(CATS[0] || "과일")}; }})();
 const saveState=()=>localStorage.setItem(LS_KEY, JSON.stringify(state));
 
 const productMap = Object.fromEntries(PRODUCTS.map(p=>[p.id,p]));
@@ -334,7 +302,6 @@ let q = "";
 let received = 0;
 let payLocked = false;
 
-/* ✅ 연타/이중 이벤트 방지 (토마토→바나나 재발 방지용) */
 let tapLock = false;
 function lockTap(ms=120){
   tapLock = true;
@@ -386,6 +353,9 @@ function sortedList(list){
   });
 }
 
+/* ✅ 여기서 “핀만 노출” 같은 필터 없음!
+   - 검색이면 전카테고리 검색
+   - 아니면 현재 카테고리 전부 노출 */
 function currentProducts(){
   const filtered = PRODUCTS.filter(p=>{
     if(q.trim()) return matchQuery(p,q);
@@ -408,7 +378,7 @@ function renderTabs(){
 function togglePin(id){
   state.pinned[id]=!state.pinned[id];
   saveState();
-  renderProducts(); /* 고정은 재정렬 필요 */
+  renderProducts();
 }
 
 function attachPinHandlers(cardEl, id){
@@ -438,7 +408,7 @@ function renderProducts(){
         <span class="pin ${pinned?"on":""}">📌</span>
       </div>
       <div class="name">${p.name}</div>
-      <div class="price">${p.price.toLocaleString()}원</div>
+      <div class="price">${Number(p.price).toLocaleString()}원</div>
     `;
     attachPinHandlers(d, p.id);
     productsEl.appendChild(d);
@@ -446,7 +416,7 @@ function renderProducts(){
 }
 
 function updateUsedBadge(id){
-  const card = productsEl.querySelector(`.card[data-id="${id}"]`);
+  const card = productsEl.querySelector(\`.card[data-id="\${id}"]\`);
   if(!card) return;
   const badge = card.querySelector(".badge");
   if(badge) badge.textContent = "사용 " + (state.used[id]||0);
@@ -457,9 +427,9 @@ function flash(el){
   setTimeout(()=>el.classList.remove("flash"), 140);
 }
 
-/* ✅ 담기: pointerdown + tapLock */
+/* 담기 */
 productsEl.addEventListener("pointerdown", (e)=>{
-  if(tapLock) return; // ✅ 연타 방지
+  if(tapLock) return;
   const card = e.target.closest(".card");
   if(!card) return;
   if(card.dataset.suppress==="1") return;
@@ -471,8 +441,6 @@ productsEl.addEventListener("pointerdown", (e)=>{
   lockTap(120);
   addToCart(id, 1);
   flash(card);
-  // 디버그 (필요없으면 아래 줄 주석처리)
-  toast(`눌림: ${p.name} (id:${id})`);
 });
 
 function addToCart(id,n){
@@ -482,17 +450,16 @@ function addToCart(id,n){
   if(n>0){
     state.used[id]=(state.used[id]||0)+1;
     saveState();
-    // ✅ 상품목록 전체 재렌더 금지(배치 안 움직임)
     updateUsedBadge(id);
   }
-  renderCart(); // ✅ 반드시 함수 안에서만 렌더
+  renderCart();
 }
 
 function sumCart(){
   let sum=0, qty=0;
   for(const id in cart){
     const p=productMap[id];
-    sum += p.price*cart[id];
+    sum += Number(p.price)*cart[id];
     qty += cart[id];
   }
   return {sum,qty};
@@ -519,7 +486,7 @@ function renderCart(){
     item.innerHTML=`
       <div>
         <div class="title">${p.name} <span style="opacity:.7">x${qn}</span></div>
-        <div class="sub">${p.price.toLocaleString()}원 · 합 ${(p.price*qn).toLocaleString()}원</div>
+        <div class="sub">${Number(p.price).toLocaleString()}원 · 합 ${(Number(p.price)*qn).toLocaleString()}원</div>
       </div>
       <div class="controls">
         <button class="ctrl" data-act="minus">-</button>
@@ -541,7 +508,7 @@ document.querySelectorAll('.money button[data-add]').forEach(b=>{
 });
 document.getElementById("reset").onclick=()=>{ received=0; renderCart(); };
 
-/* 결제 팝업 + 소리 + 1초 잠금 */
+/* 결제 팝업 */
 const overlay=document.getElementById("overlay");
 const payBtn=document.getElementById("pay");
 const okBtn=document.getElementById("okBtn");
@@ -594,11 +561,17 @@ clear.className="clear"; clear.textContent="X";
 clear.onclick=()=>{ qEl.value=""; q=""; renderProducts(); qEl.focus(); };
 choEl.appendChild(clear);
 
-/* 초기 렌더 */
+/* ✅ 초기 렌더 */
+if(!PRODUCTS.length){
+  // 시트가 아직 로딩/캐시가 비었을 때 안내
+  productsEl.innerHTML = `<div style="grid-column:1/-1;opacity:.8;font-weight:1100;padding:14px;border:1px dashed rgba(255,255,255,.25);border-radius:16px">
+    상품을 불러오는 중... (시트 공개/CSV 확인 필요)<br/>
+    필요하면 콘솔에서 <b>reloadItemsFromSheet()</b> 실행
+  </div>`;
+}
 renderTabs();
 renderProducts();
 renderCart();
 </script>
-
 </body>
 </html>
