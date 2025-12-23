@@ -2,671 +2,201 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>라팡 POS</title>
+
   <style>
-    :root{
-      --bg:#0b0c10;
-      --panel:#111319;
-      --line:rgba(255,255,255,.10);
-      --text:#f5f7ff;
-      --muted:rgba(245,247,255,.70);
-      --accent:#ff9f00;
-      --good:#29d17e;
-      --bad:#ff3b30;
-      --r:18px;
-      --shadow:0 12px 40px rgba(0,0,0,.35);
-      --tap2:64px;
+    body{
+      margin:0;
+      background:#0b0c10;
+      color:#fff;
+      font-family: system-ui, -apple-system, "Apple SD Gothic Neo","Noto Sans KR", sans-serif;
     }
-
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; margin:0; background:var(--bg); color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo","Noto Sans KR", sans-serif; }
-    button { font: inherit; }
-    .app{ height:100%; display:flex; flex-direction:column; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0; }
-
-    .topbar{ padding:14px 16px 10px; display:flex; align-items:center; gap:10px; }
-    .brand{ font-weight:900; letter-spacing:.3px; font-size:20px; }
-    .hint{ color:var(--muted); font-size:13px; margin-left:auto; }
-
-    .shell{
-      flex:1;
+    .wrap{
       display:grid;
-      grid-template-columns: 1.35fr .95fr;
+      grid-template-columns: 1.4fr 1fr;
+      height:100vh;
       gap:12px;
-      padding: 0 12px 12px;
-      min-height:0;
+      padding:12px;
+      box-sizing:border-box;
     }
-
     .panel{
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border: 1px solid var(--line);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-      min-height:0;
-      overflow:hidden;
-    }
-    .left,.right{ display:flex; flex-direction:column; min-height:0; }
-
-    .cats{
-      display:flex; gap:8px; padding:10px; overflow:auto;
-      border-bottom:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-    }
-    .catbtn{
-      flex:0 0 auto;
-      height:44px;
-      padding:0 14px;
-      border-radius: 999px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
-      color:var(--text);
-      font-weight:800;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-    .catbtn.active{
-      border-color: rgba(255,159,0,.6);
-      background: rgba(255,159,0,.12);
-    }
-
-    .itemsWrap{ flex:1; min-height:0; overflow:auto; padding:10px; }
-    .items{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:10px; }
-    .item{
-      border:1px solid var(--line);
+      background:#111319;
       border-radius:16px;
-      background: rgba(255,255,255,.03);
-      padding:10px;
-      display:flex; flex-direction:column; gap:6px;
-      cursor:pointer;
-      user-select:none;
-      min-height:86px;
+      padding:12px;
+      box-sizing:border-box;
+      overflow:auto;
     }
-    .item:active{ transform: scale(.99); }
-    .iname{ font-weight:900; font-size:22px; line-height:1.05; }
-    .iprice{ font-weight:800; font-size:14px; color:var(--muted); }
-    .itag{ margin-top:auto; display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .pill{
-      font-size:12px; color:var(--muted);
-      border:1px solid var(--line);
-      padding:4px 8px; border-radius:999px;
-      background: rgba(0,0,0,.15);
-    }
-    .add{
-      font-size:12px; font-weight:900;
-      color:#111;
-      background: var(--accent);
+    h1{ margin:0 0 8px; font-size:20px; }
+
+    .cats button{
+      margin:4px;
+      padding:10px 14px;
+      border-radius:999px;
       border:none;
-      padding:6px 10px;
-      border-radius: 999px;
-    }
-
-    .summary{
-      padding: 12px 12px 10px;
-      border-bottom:1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      display:flex; gap:10px; align-items:flex-end;
-    }
-    .sumBox{
-      flex:1;
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:10px;
-      background: rgba(255,255,255,.03);
-    }
-    .sumLabel{ font-size:12px; color:var(--muted); font-weight:800; }
-    .sumValue{ font-size:28px; font-weight:1000; letter-spacing:.2px; margin-top:4px; }
-    .sumValue.small{ font-size:22px; }
-
-    .cart{ flex:1; min-height:0; overflow:auto; padding: 10px 12px; }
-    .cartItem{
-      display:flex; align-items:center; gap:10px;
-      padding: 10px 10px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
-      border-radius: 16px;
-      margin-bottom:10px;
-    }
-    .cname{
-      font-weight:950; font-size:18px; line-height:1.1;
-      min-width:0; flex:1;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    .cmeta{ display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex:0 0 auto; }
-    .cqty{ color:var(--muted); font-weight:900; font-size:14px; }
-    .cprice{ font-weight:1000; font-size:18px; }
-    .del{
-      width:46px; height:46px;
-      border-radius: 14px;
-      border:1px solid rgba(255,59,48,.35);
-      background: rgba(255,59,48,.10);
-      color: var(--text);
-      font-weight:1000;
+      background:#222;
+      color:#fff;
+      font-weight:700;
       cursor:pointer;
     }
+    .cats button.active{ background:#ff9f00; color:#111; }
 
-    .payRow{
-      padding: 10px 12px;
-      border-top:1px solid var(--line);
-      background: rgba(0,0,0,.22);
-      display:flex; gap:10px;
-    }
-    .payBox{
-      flex:1;
-      border:1px solid var(--line);
-      border-radius: 16px;
-      padding: 10px;
-      background: rgba(255,255,255,.03);
-    }
-    .payLabel{
-      font-size:12px; color:var(--muted); font-weight:900;
-      display:flex; justify-content:space-between; align-items:center;
-      margin-bottom:6px;
-    }
-    .payValue{
-      font-size:34px;
-      font-weight:1000;
-      letter-spacing:.2px;
-      line-height:1.05;
-      white-space:nowrap;
-    }
-    .payValue.good{ color: var(--good); }
-    .payValue.bad{ color: var(--bad); }
-
-    .keypad{
-      padding: 10px 12px 12px;
+    .items{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-      background: rgba(0,0,0,.18);
-      border-top:1px solid var(--line);
+      gap:8px;
     }
-    .kbtn{
-      height: var(--tap2);
-      border-radius: 18px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      font-weight:1000;
-      font-size:20px;
+    .item{
+      background:#1a1c22;
+      border-radius:12px;
+      padding:10px;
       cursor:pointer;
-      user-select:none;
     }
-    .kbtn:active{ transform: scale(.99); }
-    .kbtn.accent{ background: rgba(255,159,0,.16); border-color: rgba(255,159,0,.45); }
-    .kbtn.danger{ background: rgba(255,59,48,.12); border-color: rgba(255,59,48,.35); }
+    .item-name{ font-size:18px; font-weight:900; }
+    .item-price{ color:#aaa; margin-top:4px; }
 
-    .payFixed{
-      position: sticky;
-      bottom: 0;
-      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-      background: linear-gradient(180deg, rgba(11,12,16,0), rgba(11,12,16,.75) 35%, rgba(11,12,16,.92));
-      backdrop-filter: blur(10px);
-      border-top:1px solid rgba(255,255,255,.06);
+    .cart-item{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:6px;
+      font-size:18px;
     }
-    .payDone{
+
+    .big{
+      font-size:28px;
+      font-weight:900;
+    }
+
+    .keys button{
       width:100%;
-      height: 76px;
-      border-radius: 22px;
+      height:56px;
+      margin:4px 0;
+      font-size:20px;
+      font-weight:900;
+      border-radius:12px;
       border:none;
-      background: var(--accent);
-      color:#111;
-      font-weight:1000;
-      font-size:26px;
       cursor:pointer;
-      box-shadow: 0 14px 34px rgba(255,159,0,.18);
     }
-    .payDone:active{ transform: scale(.995); }
-
-    @media (max-width: 980px){
-      .shell{ grid-template-columns: 1fr; }
-      .items{ grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .hint{ display:none; }
-    }
-    @media (max-width: 420px){
-      .items{ grid-template-columns: 1fr; }
-      .iname{ font-size:24px; }
-      .sumValue{ font-size:26px; }
-      .payValue{ font-size:30px; }
-    }
+    .pay{ background:#ff9f00; color:#111; height:70px; font-size:26px; }
   </style>
 </head>
+
 <body>
-  <div class="app">
-    <div class="topbar">
-      <div class="brand">라팡 POS</div>
-      <div class="hint">탭: 담기 · 받은돈: 버튼/숫자</div>
-    </div>
 
-    <div class="shell">
-      <div class="panel left">
-        <div class="cats" id="cats"></div>
-        <div class="itemsWrap">
-          <div class="items" id="items"></div>
-        </div>
-      </div>
-
-      <div class="panel right">
-        <div class="summary">
-          <div class="sumBox">
-            <div class="sumLabel">총합계</div>
-            <div class="sumValue" id="totalAmount">0원</div>
-          </div>
-          <div class="sumBox" style="max-width:160px;">
-            <div class="sumLabel">총갯수</div>
-            <div class="sumValue small" id="totalCount">0</div>
-          </div>
-        </div>
-
-        <div class="cart" id="cart"></div>
-
-        <div class="payRow">
-          <div class="payBox">
-            <div class="payLabel">
-              <span>받은돈</span>
-              <span id="receivedHint" style="color:var(--muted); font-weight:900;">숫자 입력</span>
-            </div>
-            <div class="payValue" id="received">0원</div>
-          </div>
-          <div class="payBox">
-            <div class="payLabel"><span>거스름돈</span><span style="color:var(--muted); font-weight:900;">자동</span></div>
-            <div class="payValue good" id="change">0원</div>
-          </div>
-        </div>
-
-        <div class="keypad" id="keypad"></div>
-
-        <div class="payFixed">
-          <button class="payDone" id="payDoneBtn">결제완료</button>
-        </div>
-      </div>
-    </div>
+<div class="wrap">
+  <!-- 왼쪽 -->
+  <div class="panel">
+    <h1>라팡 POS</h1>
+    <div class="cats" id="cats"></div>
+    <div class="items" id="items"></div>
   </div>
 
-  <script>
-    // ====== 라팡 품목 데이터 ======
-    window.ITEMS = [
-      // 과일
-      { cat: "과일", name: "단감/3개", unit: "개", price: 5000 },
-      { cat: "과일", name: "단감/7개", unit: "개", price: 10000 },
-      { cat: "과일", name: "사과/3개", unit: "개", price: 5000 },
-      { cat: "과일", name: "사과/7개", unit: "개", price: 10000 },
-      { cat: "과일", name: "대봉/6개", unit: "개", price: 5000 },
-      { cat: "과일", name: "대봉/13개", unit: "개", price: 10000 },
-      { cat: "과일", name: "귤/9개", unit: "개", price: 3000 },
-      { cat: "과일", name: "귤/20개", unit: "개", price: 6000 },
-      { cat: "과일", name: "샤인/2송이", unit: "개", price: 8000 },
-      { cat: "과일", name: "키위", unit: "개", price: 10000 },
-      { cat: "과일", name: "석류/1개", unit: "개", price: 3500 },
-      { cat: "과일", name: "석류/3개", unit: "개", price: 10000 },
-      { cat: "과일", name: "바나나", unit: "개", price: 2500 },
-      { cat: "과일", name: "파인애플", unit: "개", price: 4000 },
-      { cat: "과일", name: "딸기/1팩", unit: "개", price: 8000 },
-      { cat: "과일", name: "딸기/2팩", unit: "개", price: 15000 },
-      { cat: "과일", name: "토마토", unit: "개", price: 10000 },
-      { cat: "과일", name: "방울토마토/1팩", unit: "개", price: 6000 },
-      { cat: "과일", name: "방울토마토/2팩", unit: "개", price: 11000 },
-      { cat: "과일", name: "체리", unit: "개", price: 12000 },
+  <!-- 오른쪽 -->
+  <div class="panel">
+    <div class="big">총합계: <span id="total">0원</span></div>
+    <div>총수량: <span id="count">0</span></div>
+    <hr>
+    <div id="cart"></div>
+    <hr>
+    <div class="big">받은돈: <span id="received">0원</span></div>
+    <div class="big">거스름돈: <span id="change">0원</span></div>
 
-      // 야채
-      { cat: "야채", name: "당근", unit: "개", price: 2500 },
-      { cat: "야채", name: "감자", unit: "개", price: 3000 },
-      { cat: "야채", name: "고구마", unit: "개", price: 3000 },
-      { cat: "야채", name: "양파", unit: "개", price: 2500 },
-      { cat: "야채", name: "청양", unit: "개", price: 3000 },
-      { cat: "야채", name: "아삭이", unit: "개", price: 3500 },
-      { cat: "야채", name: "꽈리", unit: "개", price: 4000 },
-      { cat: "야채", name: "표고", unit: "개", price: 5000 },
-      { cat: "야채", name: "느타리", unit: "개", price: 2500 },
-      { cat: "야채", name: "새송이/1봉", unit: "개", price: 1500 },
-      { cat: "야채", name: "새송이/2봉", unit: "개", price: 2500 },
-      { cat: "야채", name: "팽이/3봉", unit: "개", price: 1000 },
-      { cat: "야채", name: "오이/6개", unit: "개", price: 3000 },
-      { cat: "야채", name: "가지/4개", unit: "개", price: 3000 },
-      { cat: "야채", name: "애호박/3개", unit: "개", price: 3500 },
-      { cat: "야채", name: "브로콜리/1개", unit: "개", price: 1300 },
-      { cat: "야채", name: "브로콜리/3개", unit: "개", price: 3000 },
-      { cat: "야채", name: "샐러리", unit: "개", price: 2000 },
-      { cat: "야채", name: "미나리", unit: "개", price: 3000 },
-      { cat: "야채", name: "우엉", unit: "개", price: 3000 },
-      { cat: "야채", name: "연근", unit: "개", price: 3000 },
-      { cat: "야채", name: "더덕", unit: "개", price: 6000 },
-      { cat: "야채", name: "알배기", unit: "개", price: 5000 },
-      { cat: "야채", name: "양배추", unit: "개", price: 2000 },
-      { cat: "야채", name: "양상추", unit: "개", price: 1500 },
-      { cat: "야채", name: "대파", unit: "개", price: 1000 },
-      { cat: "야채", name: "쪽파", unit: "개", price: 4000 },
-      { cat: "야채", name: "부추", unit: "개", price: 2000 },
-      { cat: "야채", name: "무", unit: "개", price: 1500 },
-      { cat: "야채", name: "마늘/작은", unit: "개", price: 1500 },
-      { cat: "야채", name: "마늘/큰마늘", unit: "개", price: 5000 },
+    <div class="keys">
+      <button onclick="addMoney(1000)">1천</button>
+      <button onclick="addMoney(5000)">5천</button>
+      <button onclick="addMoney(10000)">1만</button>
+      <button onclick="addMoney(30000)">3만</button>
+      <button onclick="addMoney(50000)">5만</button>
+      <button onclick="resetMoney()">초기화</button>
+      <button class="pay" onclick="pay()">결제완료</button>
+    </div>
+  </div>
+</div>
 
-      // 잎채소
-      { cat: "잎채소", name: "시금치/1봉지", unit: "개", price: 2000 },
-      { cat: "잎채소", name: "시금치/1단", unit: "개", price: 1500 },
-      { cat: "잎채소", name: "상추", unit: "개", price: 1000 },
-      { cat: "잎채소", name: "깻잎", unit: "개", price: 1000 },
-      { cat: "잎채소", name: "콩나물", unit: "개", price: 500 },
-      { cat: "잎채소", name: "숙주", unit: "개", price: 1000 },
-      { cat: "잎채소", name: "청경채", unit: "개", price: 1000 },
-      { cat: "잎채소", name: "케일", unit: "개", price: 1000 },
-      { cat: "잎채소", name: "치커리", unit: "개", price: 1000 },
-      { cat: "잎채소", name: "적겨자", unit: "개", price: 1000 },
-      { cat: "잎채소", name: "근대", unit: "개", price: 1000 },
-      { cat: "잎채소", name: "아욱", unit: "개", price: 1500 },
-      { cat: "잎채소", name: "고추잎", unit: "개", price: 2000 },
-      { cat: "잎채소", name: "쑥갓", unit: "개", price: 1500 },
-      { cat: "잎채소", name: "참나물", unit: "개", price: 1500 },
-      { cat: "잎채소", name: "취나물", unit: "개", price: 2000 },
+<!-- 🔴 품목 데이터 불러오기 (네가 이미 만든 items.js) -->
+<script src="./items.js"></script>
 
-      // 생선
-      { cat: "생선", name: "동태/1마리", unit: "개", price: 3000 },
-      { cat: "생선", name: "동태/2마리", unit: "개", price: 5000 },
-      { cat: "생선", name: "오징어/1마리", unit: "개", price: 3000 },
-      { cat: "생선", name: "오징어/2마리", unit: "개", price: 5000 },
-      { cat: "생선", name: "꼬막/1망", unit: "개", price: 3000 },
-      { cat: "생선", name: "꼬막/2망", unit: "개", price: 5000 },
-      { cat: "생선", name: "코다리/1코", unit: "개", price: 8000 },
-      { cat: "생선", name: "코다리/2코", unit: "개", price: 15000 },
-      { cat: "생선", name: "갈치", unit: "개", price: 7000 },
-      { cat: "생선", name: "굴비", unit: "개", price: 10000 },
-      { cat: "생선", name: "번데기/1봉", unit: "개", price: 3000 },
-      { cat: "생선", name: "번데기/2봉", unit: "개", price: 5000 },
-      { cat: "생선", name: "굴/1봉", unit: "개", price: 3000 },
-      { cat: "생선", name: "굴/2봉", unit: "개", price: 5000 },
-      { cat: "생선", name: "동태포/1팩", unit: "개", price: 3000 },
-      { cat: "생선", name: "동태포/2팩", unit: "개", price: 5000 },
-      { cat: "생선", name: "낀따로", unit: "개", price: 5000 },
-      { cat: "생선", name: "삼치", unit: "개", price: 5000 },
-      { cat: "생선", name: "고등어/1마리", unit: "개", price: 3500 },
-      { cat: "생선", name: "고등어/3마리", unit: "개", price: 10000 },
-      { cat: "생선", name: "자반", unit: "개", price: 6000 },
-    ];
+<script>
+/* ===== 여기부터 JS ===== */
+alert("메인 JS 실행됨"); // ✔️ 이거 뜨면 정상
 
-    // ====== 상태 ======
-    const state = {
-      cat: null,
-      cart: new Map(), // name -> {item, qty}
-      received: 0
+const state = {
+  cat:null,
+  cart:new Map(),
+  received:0
+};
+
+const fmt = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")+"원";
+
+const catsEl = document.getElementById("cats");
+const itemsEl = document.getElementById("items");
+const cartEl  = document.getElementById("cart");
+
+function renderCats(){
+  const cats=[...new Set(ITEMS.map(i=>i.cat))];
+  if(!state.cat) state.cat=cats[0];
+  catsEl.innerHTML="";
+  cats.forEach(c=>{
+    const b=document.createElement("button");
+    b.textContent=c;
+    if(c===state.cat) b.classList.add("active");
+    b.onclick=()=>{state.cat=c; render();};
+    catsEl.appendChild(b);
+  });
+}
+
+function renderItems(){
+  itemsEl.innerHTML="";
+  ITEMS.filter(i=>i.cat===state.cat).forEach(it=>{
+    const d=document.createElement("div");
+    d.className="item";
+    d.innerHTML=`<div class="item-name">${it.name}</div>
+                 <div class="item-price">${fmt(it.price)}</div>`;
+    d.onclick=()=>{
+      const v=state.cart.get(it.name)||{item:it,qty:0};
+      v.qty++; state.cart.set(it.name,v);
+      render();
     };
+    itemsEl.appendChild(d);
+  });
+}
 
-    // ✅ (중요) iPad에서도 절대 점(.) 안 나오게: 천단위 콤마 고정 포맷
-    const fmt = (n) => {
-      n = Math.max(0, Number(n || 0));
-      const s = String(Math.trunc(n));
-      const withComma = s.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      return withComma + "원";
-    };
+function renderCart(){
+  cartEl.innerHTML="";
+  let total=0,count=0;
+  state.cart.forEach(v=>{
+    total+=v.item.price*v.qty;
+    count+=v.qty;
+    const d=document.createElement("div");
+    d.className="cart-item";
+    d.textContent=`${v.item.name} x${v.qty}`;
+    cartEl.appendChild(d);
+  });
+  document.getElementById("total").textContent=fmt(total);
+  document.getElementById("count").textContent=count;
+  document.getElementById("received").textContent=fmt(state.received);
+  document.getElementById("change").textContent=
+    fmt(Math.max(0,state.received-total));
+}
 
-    const sumCart = () => {
-      let total = 0, count = 0;
-      for (const {item, qty} of state.cart.values()){
-        total += item.price * qty;
-        count += qty;
-      }
-      return { total, count };
-    };
+function render(){
+  renderCats();
+  renderItems();
+  renderCart();
+}
 
-    // ====== DOM ======
-    const catsEl = document.getElementById("cats");
-    const itemsEl = document.getElementById("items");
-    const cartEl  = document.getElementById("cart");
+function addMoney(v){ state.received+=v; renderCart(); }
+function resetMoney(){ state.received=0; renderCart(); }
 
-    const totalAmountEl = document.getElementById("totalAmount");
-    const totalCountEl  = document.getElementById("totalCount");
-    const receivedEl    = document.getElementById("received");
-    const changeEl      = document.getElementById("change");
-    const receivedHint  = document.getElementById("receivedHint");
+function pay(){
+  alert("결제 완료");
+  state.cart.clear();
+  state.received=0;
+  render();
+}
 
-    // ====== 카테고리 ======
-    function getCats(){
-      const s = new Set(window.ITEMS.map(x => x.cat));
-      return Array.from(s);
-    }
+render();
+</script>
 
-    function renderCats(){
-      const cats = getCats();
-      if (!state.cat) state.cat = cats[0] || "전체";
-      catsEl.innerHTML = "";
-      for (const c of cats){
-        const b = document.createElement("button");
-        b.className = "catbtn" + (c===state.cat ? " active":"");
-        b.textContent = c;
-        b.onclick = () => { state.cat = c; renderCats(); renderItems(); };
-        catsEl.appendChild(b);
-      }
-    }
-
-    // ====== 아이템 ======
-    function itemsInCat(cat){
-      return window.ITEMS.filter(x => x.cat === cat);
-    }
-
-    function addToCart(item){
-      const key = item.name;
-      const cur = state.cart.get(key);
-      if (cur) cur.qty += 1;
-      else state.cart.set(key, { item, qty: 1 });
-      renderAllRight();
-    }
-
-    function renderItems(){
-      const list = itemsInCat(state.cat);
-      itemsEl.innerHTML = "";
-
-      for (const it of list){
-        const card = document.createElement("div");
-        card.className = "item";
-        card.onclick = () => addToCart(it);
-
-        const name = document.createElement("div");
-        name.className = "iname";
-        name.textContent = it.name;
-
-        const price = document.createElement("div");
-        price.className = "iprice";
-        price.textContent = fmt(it.price);
-
-        const tag = document.createElement("div");
-        tag.className = "itag";
-
-        const pill = document.createElement("div");
-        pill.className = "pill";
-        pill.textContent = it.cat;
-
-        const add = document.createElement("button");
-        add.className = "add";
-        add.textContent = "+ 담기";
-        add.onclick = (e) => { e.stopPropagation(); addToCart(it); };
-
-        tag.appendChild(pill);
-        tag.appendChild(add);
-
-        card.appendChild(name);
-        card.appendChild(price);
-        card.appendChild(tag);
-
-        itemsEl.appendChild(card);
-      }
-    }
-
-    // ====== 장바구니 ======
-    function delItem(name){
-      state.cart.delete(name);
-      renderAllRight();
-    }
-
-    function renderCart(){
-      cartEl.innerHTML = "";
-      if (state.cart.size === 0){
-        const empty = document.createElement("div");
-        empty.style.color = "rgba(245,247,255,.65)";
-        empty.style.fontWeight = "900";
-        empty.style.padding = "18px 6px";
-        empty.textContent = "장바구니가 비었어요";
-        cartEl.appendChild(empty);
-        return;
-      }
-
-      for (const [key, v] of state.cart.entries()){
-        const row = document.createElement("div");
-        row.className = "cartItem";
-
-        const cname = document.createElement("div");
-        cname.className = "cname";
-        cname.textContent = v.item.name;
-
-        const meta = document.createElement("div");
-        meta.className = "cmeta";
-
-        const qty = document.createElement("div");
-        qty.className = "cqty";
-        qty.textContent = "x" + v.qty;
-
-        const price = document.createElement("div");
-        price.className = "cprice";
-        price.textContent = fmt(v.item.price * v.qty);
-
-        meta.appendChild(qty);
-        meta.appendChild(price);
-
-        const del = document.createElement("button");
-        del.className = "del";
-        del.textContent = "삭제";
-        del.onclick = () => delItem(key);
-
-        row.appendChild(cname);
-        row.appendChild(meta);
-        row.appendChild(del);
-
-        cartEl.appendChild(row);
-      }
-    }
-
-    // ====== 합계/받은돈/거스름돈 ======
-    function renderTotals(){
-      const { total, count } = sumCart();
-      totalAmountEl.textContent = fmt(total);
-      totalCountEl.textContent = String(count);
-
-      receivedEl.textContent = fmt(state.received);
-
-      const change = state.received - total;
-      if (total === 0){
-        changeEl.textContent = fmt(0);
-        changeEl.classList.remove("bad");
-        changeEl.classList.add("good");
-        receivedHint.textContent = "숫자 입력";
-      } else {
-        changeEl.textContent = fmt(Math.max(0, change));
-        if (change < 0){
-          changeEl.classList.add("bad");
-          changeEl.classList.remove("good");
-          receivedHint.textContent = "부족 " + fmt(Math.abs(change));
-        } else {
-          changeEl.classList.remove("bad");
-          changeEl.classList.add("good");
-          receivedHint.textContent = "OK";
-        }
-      }
-    }
-
-    // ====== 키패드 ======
-    const keypadEl = document.getElementById("keypad");
-
-    // ✅ 요청한 버튼 구성: 1천/5천/1만/3만/5만/초기화
-    const quickAdds = [
-      { label: "1천", val: 1000 },
-      { label: "5천", val: 5000 },
-      { label: "1만", val: 10000 },
-      { label: "3만", val: 30000 },
-      { label: "5만", val: 50000 },
-      { label: "초기화", val: null }
-    ];
-
-    function renderKeypad(){
-      keypadEl.innerHTML = "";
-
-      // 1) 빠른금액 6개(2줄로 자동 배치됨: 3열 그리드)
-      for (const q of quickAdds){
-        const b = document.createElement("button");
-        b.className = "kbtn " + (q.label === "초기화" ? "danger" : "accent");
-        b.textContent = q.label;
-        b.onclick = () => {
-          if (q.label === "초기화") state.received = 0;      // ✅ 받은돈만 리셋
-          else state.received += q.val;
-          renderTotals();
-        };
-        keypadEl.appendChild(b);
-      }
-
-      // 2) 숫자 1~9
-      for (let i=1;i<=9;i++){
-        const b = document.createElement("button");
-        b.className = "kbtn";
-        b.textContent = String(i);
-        b.onclick = () => {
-          state.received = Number(String(state.received) + String(i));
-          renderTotals();
-        };
-        keypadEl.appendChild(b);
-      }
-
-      // 3) 0, 백스페이스(⌫), 00
-      const zero = document.createElement("button");
-      zero.className = "kbtn";
-      zero.textContent = "0";
-      zero.onclick = () => { state.received = Number(String(state.received) + "0"); renderTotals(); };
-
-      const back = document.createElement("button");
-      back.className = "kbtn danger";
-      back.textContent = "⌫";
-      back.onclick = () => {
-        const s = String(state.received);
-        state.received = s.length <= 1 ? 0 : Number(s.slice(0,-1));
-        renderTotals();
-      };
-
-      const d00 = document.createElement("button");
-      d00.className = "kbtn";
-      d00.textContent = "00";
-      d00.onclick = () => { state.received = Number(String(state.received) + "00"); renderTotals(); };
-
-      keypadEl.appendChild(zero);
-      keypadEl.appendChild(back);
-      keypadEl.appendChild(d00);
-    }
-
-    // ====== 결제완료 ======
-    document.getElementById("payDoneBtn").onclick = () => {
-      const { total } = sumCart();
-      if (total <= 0){ alert("장바구니가 비었습니다."); return; }
-      if (state.received < total){
-        alert("받은돈이 부족합니다.\n부족: " + fmt(total - state.received));
-        return;
-      }
-      state.cart.clear();
-      state.received = 0;
-      renderAllRight();
-    };
-
-    function renderAllRight(){
-      renderCart();
-      renderTotals();
-    }
-
-    function renderAll(){
-      renderCats();
-      renderItems();
-      renderCart();
-      renderTotals();
-      renderKeypad();
-    }
-
-    renderAll();
-
-    // iOS 제스처 확대 방지(현장 터치 안정)
-    document.addEventListener("gesturestart", (e) => e.preventDefault());
-  </script>
 </body>
 </html>
