@@ -1,353 +1,445 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>엄가네 현장 계산기</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>엄가네 현장 계산기</title>
 
-<style>
-:root{
-  --bg:#0e0e0e;
-  --panel:#1a1a1a;
-  --card:#222;
-  --accent:#ffae00;
-  --text:#fff;
-  --sub:#aaa;
-  --green:#2ecc71;
-  --red:#ff3b30;
-}
+  <style>
+    :root{
+      --bg:#0b0b10; --panel:#0f0f16; --card:#171725; --stroke:#2a2a3a;
+      --text:#f2f2f6; --muted:#a7a7b6; --accent:#ff9f0a; --ok:#2ee06a; --bad:#ff3b30;
+      --paid:#60a5fa; --chg:#34d399;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; background:var(--bg); color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",system-ui,Segoe UI,Roboto,sans-serif; }
+    header{
+      height:56px; display:flex; align-items:center; justify-content:center;
+      background:var(--accent); color:#111; font-weight:1000; letter-spacing:-.2px;
+      position:sticky; top:0; z-index:10;
+    }
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
+    /* ===== Layout 70/30 ===== */
+    .wrap{ height:calc(100vh - 56px); display:flex; gap:12px; padding:12px; }
+    .left{ width:70%; min-width:0; display:flex; flex-direction:column; gap:10px; }
+    .right{ width:30%; min-width:320px; background:var(--panel); border:1px solid var(--stroke);
+      border-radius:16px; overflow:hidden; display:flex; flex-direction:column; }
 
-/* ===== HEADER ===== */
-header{
-  background:var(--accent);
-  color:#111;
-  padding:12px;
-  text-align:center;
-  font-weight:700;
-  font-size:18px;
-}
+    /* ===== Cats + Search ===== */
+    .topline{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .cats{ display:flex; gap:8px; flex-wrap:wrap; }
+    .cat{
+      padding:10px 14px; border-radius:999px; border:1px solid var(--stroke);
+      background:#13131d; color:var(--muted); font-weight:1000; cursor:pointer; user-select:none;
+    }
+    .cat.on{ background:var(--accent); color:#111; border:none; }
+    .search{ flex:1; min-width:240px; }
+    .search input{
+      width:100%; padding:12px 14px; border-radius:14px; border:1px solid var(--stroke);
+      background:#0f0f16; color:var(--text); font-size:16px; font-weight:900; outline:none;
+    }
+    .search input::placeholder{ color:#7e7e92; }
 
-/* ===== LAYOUT ===== */
-main{
-  display:flex;
-  height:calc(100vh - 48px);
-}
+    /* ===== Products grid ===== */
+    .gridWrap{
+      flex:1; min-height:0; border:1px solid var(--stroke); border-radius:16px;
+      background:linear-gradient(180deg,#10101a,#0b0b10);
+      padding:10px; overflow:auto;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr)); /* ✅ 4열 고정 */
+      gap:10px;
+    }
+    .pbtn{
+      height:86px; border-radius:16px; border:1px solid var(--stroke);
+      background:#171725; color:var(--text); cursor:pointer; user-select:none;
+      padding:12px 10px;
+      display:flex; flex-direction:column; justify-content:space-between; align-items:center; text-align:center;
+    }
+    .pname{
+      font-size:20px; font-weight:1100; letter-spacing:-.3px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;
+    }
+    .pprice{
+      font-size:13px; font-weight:1000; color:var(--muted);
+    }
 
-.left{
-  width:70%;
-  padding:12px;
-  overflow:auto;
-}
+    /* ===== Right: summary fixed ===== */
+    .sumBar{
+      padding:12px 14px; border-bottom:1px solid var(--stroke); background:#0e0e16;
+      display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    }
+    .sumLeft{ font-size:28px; font-weight:1200; letter-spacing:-.4px; }
+    .sumRight{ font-size:16px; font-weight:1000; color:var(--muted); white-space:nowrap; }
 
-.right{
-  width:30%;
-  padding:12px;
-  background:#111;
-  display:flex;
-  flex-direction:column;
-}
+    /* ===== Cart list scroll only ===== */
+    .cart{
+      flex:1; min-height:0; overflow:auto; padding:10px;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .row{
+      border:1px solid var(--stroke); border-radius:14px; background:#13131d;
+      padding:10px 10px; display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center;
+    }
+    .rLeft{ min-width:0; }
+    .rName{ font-size:15px; font-weight:1100; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .rSub{ margin-top:4px; font-size:12px; color:var(--muted); font-weight:900; display:flex; gap:10px; }
+    .rRight{ display:flex; align-items:center; gap:8px; white-space:nowrap; }
+    .rQty{
+      font-size:14px; font-weight:1100; color:var(--accent);
+      padding:6px 10px; border-radius:999px; border:1px solid var(--stroke); background:#10101a;
+    }
+    .trash{
+      width:42px; height:38px; border:none; border-radius:12px; cursor:pointer;
+      background:var(--bad); color:#fff; font-size:16px; font-weight:1100;
+    }
 
-/* ===== CATEGORY ===== */
-.categories{
-  display:flex;
-  gap:8px;
-  margin-bottom:10px;
-}
-.cat{
-  flex:1;
-  padding:10px;
-  border-radius:10px;
-  background:#222;
-  text-align:center;
-  cursor:pointer;
-}
-.cat.active{
-  background:var(--accent);
-  color:#111;
-  font-weight:700;
-}
+    /* ===== Payment block fixed ===== */
+    .payBox{
+      border-top:1px solid var(--stroke);
+      padding:12px;
+      background:#0e0e16;
+    }
+    .paidLine{
+      border:1px solid var(--stroke); border-radius:14px; background:#121222;
+      padding:12px;
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      margin-bottom:10px;
+    }
+    .paidLine .label{ color:var(--muted); font-weight:1000; }
+    .paidLine .nums{ display:flex; gap:14px; font-weight:1200; letter-spacing:-.3px; font-size:18px; }
+    .paid{ color:var(--paid); }
+    .chg{ color:var(--chg); }
 
-/* ===== SEARCH ===== */
-.search{
-  margin-bottom:10px;
-}
-.search input{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:none;
-  font-size:16px;
-}
+    .moneyBtns{
+      display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:10px;
+    }
+    .moneyBtns button{
+      height:54px; border-radius:14px; border:1px solid var(--stroke);
+      background:#f1f1f1; color:#111; font-size:18px; font-weight:1100; cursor:pointer;
+    }
+    .moneyBtns .reset{
+      background:var(--bad); color:#fff; border:none;
+    }
+    .payBtn{
+      width:100%; height:68px; border:none; border-radius:16px; cursor:pointer;
+      background:var(--ok); color:#111; font-size:24px; font-weight:1200;
+    }
 
-/* ===== ITEMS GRID ===== */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-}
-
-.item{
-  background:var(--card);
-  border-radius:14px;
-  padding:14px 10px;
-  text-align:center;
-  cursor:pointer;
-}
-.item-name{
-  font-size:18px;
-  font-weight:700;
-}
-.item-unit{
-  font-size:11px;
-  color:var(--sub);
-}
-.item-price{
-  margin-top:6px;
-  font-size:13px;
-  color:#ddd;
-}
-
-/* ===== CART ===== */
-.cart-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:8px;
-}
-
-.cart-list{
-  flex:1;
-  background:var(--panel);
-  border-radius:12px;
-  padding:8px;
-  overflow:auto;
-}
-
-.cart-item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:6px 4px;
-  border-bottom:1px solid #333;
-  font-size:14px;
-}
-.cart-item span.qty{
-  color:var(--accent);
-  margin-left:6px;
-}
-.cart-item button{
-  background:none;
-  border:none;
-  color:var(--red);
-  font-size:16px;
-  cursor:pointer;
-}
-
-/* ===== PAYMENT ===== */
-.pay-info{
-  margin-top:10px;
-  background:var(--panel);
-  border-radius:12px;
-  padding:10px;
-  display:flex;
-  justify-content:space-between;
-  font-size:16px;
-}
-
-.money-buttons{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-  margin-top:10px;
-}
-.money-buttons button{
-  padding:12px;
-  border-radius:10px;
-  border:none;
-  font-size:16px;
-  cursor:pointer;
-}
-
-.reset{
-  background:var(--red);
-  color:#fff;
-}
-
-.pay{
-  margin-top:10px;
-  padding:16px;
-  border:none;
-  border-radius:14px;
-  font-size:20px;
-  font-weight:700;
-  background:var(--green);
-  cursor:pointer;
-}
-</style>
+    /* Small screens: stack */
+    @media (max-width: 900px){
+      .wrap{ flex-direction:column; height:auto; }
+      .left,.right{ width:100%; }
+      .right{ min-width:0; }
+      .grid{ grid-template-columns:repeat(4, minmax(0, 1fr)); }
+    }
+  </style>
 </head>
 
 <body>
 <header>엄가네 현장 계산기</header>
 
-<main>
-  <!-- LEFT -->
-  <div class="left">
-    <div class="categories">
-      <div class="cat active" onclick="setCat('과일')">과일</div>
-      <div class="cat" onclick="setCat('야채')">야채</div>
-      <div class="cat" onclick="setCat('잎채소')">잎채소</div>
-      <div class="cat" onclick="setCat('생선')">생선</div>
+<div class="wrap">
+  <!-- LEFT 70% -->
+  <section class="left">
+    <div class="topline">
+      <div class="cats" id="cats"></div>
+      <div class="search">
+        <input id="q" placeholder="검색 (예: ㄱ, 고구마, 감자)" />
+      </div>
     </div>
 
-    <div class="search">
-      <input placeholder="검색 (예: ㄱ, 고구마, 감자)" oninput="searchItem(this.value)">
+    <div class="gridWrap">
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <!-- RIGHT 30% -->
+  <aside class="right">
+    <div class="sumBar">
+      <div class="sumLeft" id="sumText">₩0</div>
+      <div class="sumRight" id="cntText">총 0개</div>
     </div>
 
-    <div class="grid" id="items"></div>
-  </div>
+    <div class="cart" id="cart"></div>
 
-  <!-- RIGHT -->
-  <div class="right">
-    <div class="cart-header">
-      <div>총합계</div>
-      <div>₩<span id="total">0</span> / 총 <span id="count">0</span>개</div>
+    <div class="payBox">
+      <div class="paidLine">
+        <div class="label">받은돈 / 거스름</div>
+        <div class="nums">
+          <span class="paid" id="paidText">₩0</span>
+          <span class="chg" id="chgText">₩0</span>
+        </div>
+      </div>
+
+      <div class="moneyBtns">
+        <button onclick="addMoney(1000)">1천</button>
+        <button onclick="addMoney(5000)">5천</button>
+        <button onclick="addMoney(10000)">1만</button>
+        <button onclick="addMoney(30000)">3만</button>
+        <button onclick="addMoney(50000)">5만</button>
+        <!-- ✅ 10만 삭제, 그 자리에 초기화(받은돈만) -->
+        <button class="reset" onclick="resetMoneyOnly()">초기화</button>
+      </div>
+
+      <button class="payBtn" onclick="complete()">결제 완료</button>
     </div>
-
-    <div class="cart-list" id="cart"></div>
-
-    <div class="pay-info">
-      <div>받은돈 ₩<span id="paid">0</span></div>
-      <div>거스름 ₩<span id="change">0</span></div>
-    </div>
-
-    <div class="money-buttons">
-      <button onclick="addMoney(1000)">1천</button>
-      <button onclick="addMoney(5000)">5천</button>
-      <button onclick="addMoney(10000)">1만</button>
-      <button onclick="addMoney(30000)">3만</button>
-      <button onclick="addMoney(50000)">5만</button>
-      <button class="reset" onclick="resetMoney()">초기화</button>
-    </div>
-
-    <button class="pay" onclick="complete()">결제 완료</button>
-  </div>
-</main>
+  </aside>
+</div>
 
 <script>
-const items=[
-  {cat:"야채",name:"감자",price:3000},
-  {cat:"야채",name:"고구마",price:3000},
-  {cat:"야채",name:"양파",price:2500},
-  {cat:"야채",name:"애호박 3개",price:3500},
-  {cat:"과일",name:"사과 3개",price:5000},
-  {cat:"과일",name:"사과 7개",price:10000},
-  {cat:"과일",name:"단감 3개",price:5000},
-  {cat:"과일",name:"단감 7개",price:10000},
+/* =========================================================
+   ✅ (2번) 데이터 연결: 구글시트 CSV 붙여넣기
+   - 시트: category,name,unit,price (헤더 포함)
+   - 공개: 파일 > 공유 > 웹에 게시 > CSV
+   - 아래 SHEET_URL에 넣으면 자동 로드됨
+   ========================================================= */
+const SHEET_URL = ""; // 예: "https://docs.google.com/spreadsheets/d/e/XXXX/pub?output=csv"
+
+/* =========================================================
+   ✅ 샘플 품목 (SHEET_URL 비워두면 이걸로 동작)
+   - 묶음상품은 '다른 품목'으로 넣으면 끝
+   ========================================================= */
+const ITEMS_FALLBACK = [
+  {category:"과일", name:"단감 3개", unit:"개", price:5000},
+  {category:"과일", name:"단감 7개", unit:"개", price:10000},
+  {category:"과일", name:"사과 3개", unit:"개", price:5000},
+  {category:"과일", name:"사과 7개", unit:"개", price:10000},
+  {category:"과일", name:"바나나", unit:"개", price:2500},
+  {category:"야채", name:"감자", unit:"개", price:3000},
+  {category:"야채", name:"고구마", unit:"개", price:3000},
+  {category:"야채", name:"양파", unit:"개", price:2500},
+  {category:"야채", name:"애호박 3개", unit:"개", price:3500},
+  {category:"잎채소", name:"상추", unit:"봉", price:1000},
+  {category:"생선", name:"오징어 1마리", unit:"마리", price:3000},
 ];
 
-let currentCat="과일";
-let cart={};
-let paid=0;
+/* ===== 카테고리 (고정) ===== */
+const CATEGORIES = ["과일","야채","잎채소","생선","기타"];
 
-function render(){
-  const grid=document.getElementById("items");
-  grid.innerHTML="";
-  items.filter(i=>i.cat===currentCat).forEach(i=>{
-    const d=document.createElement("div");
-    d.className="item";
-    d.onclick=()=>addItem(i);
-    d.innerHTML=`
-      <div class="item-name">${i.name}</div>
-      <div class="item-price">₩${i.price.toLocaleString()}</div>
-    `;
-    grid.appendChild(d);
+/* ===== 상태 ===== */
+let ITEMS = [];
+let activeCat = "과일";
+let query = "";
+let paid = 0;
+
+/* cartMap: key=name|price -> {name, price, unit, category, qty} */
+const cartMap = new Map();
+
+/* ===== 유틸 ===== */
+const money = n => "₩" + (n||0).toLocaleString("ko-KR");
+
+function calcTotals(){
+  let total = 0, count = 0;
+  cartMap.forEach(v => { total += v.price * v.qty; count += v.qty; });
+  return { total, count };
+}
+function updateMoneyLine(){
+  const { total } = calcTotals();
+  document.getElementById("paidText").innerText = money(paid);
+  document.getElementById("chgText").innerText = money(Math.max(paid - total, 0));
+}
+
+/* =========================================================
+   ✅ 초성 검색 (ㄱ,ㄴ,ㄷ… + 일반 부분검색 모두 지원)
+   ========================================================= */
+const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+function getChosung(str){
+  let out = "";
+  for(const ch of str){
+    const code = ch.charCodeAt(0);
+    if(code >= 0xAC00 && code <= 0xD7A3){
+      const idx = Math.floor((code - 0xAC00) / (21 * 28));
+      out += CHO[idx] || "";
+    } else {
+      out += ch;
+    }
+  }
+  return out;
+}
+function matchQuery(name, q){
+  if(!q) return true;
+  const s = (name||"").toLowerCase();
+  const qq = q.toLowerCase();
+  if(s.includes(qq)) return true;                 // 일반 포함
+  const cs = getChosung(name);
+  if(cs.includes(q)) return true;                 // 초성 포함 (ㄱㄱ 등)
+  return false;
+}
+
+/* ===== 렌더 ===== */
+function renderCats(){
+  const el = document.getElementById("cats");
+  el.innerHTML = "";
+  CATEGORIES.forEach(cat=>{
+    const b = document.createElement("div");
+    b.className = "cat" + (cat===activeCat ? " on" : "");
+    b.textContent = cat;
+    b.onclick = ()=>{ activeCat = cat; renderAll(); };
+    el.appendChild(b);
   });
 }
 
-function addItem(i){
-  if(!cart[i.name]) cart[i.name]={...i,qty:0};
-  cart[i.name].qty++;
-  updateCart();
+function getFilteredItems(){
+  return ITEMS
+    .filter(x => (activeCat==="기타" ? true : x.category === activeCat))
+    .filter(x => matchQuery(x.name, query));
 }
 
-function updateCart(){
-  const c=document.getElementById("cart");
-  c.innerHTML="";
-  let total=0,count=0;
-  Object.values(cart).forEach(i=>{
-    total+=i.price*i.qty;
-    count+=i.qty;
-    const row=document.createElement("div");
-    row.className="cart-item";
-    row.innerHTML=`
-      <div>${i.name}<span class="qty"> x${i.qty}</span></div>
-      <button onclick="removeItem('${i.name}')">✕</button>
+function renderGrid(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  const list = getFilteredItems();
+
+  list.forEach(item=>{
+    const btn = document.createElement("button");
+    btn.className = "pbtn";
+    btn.innerHTML = `
+      <div class="pname" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div>
+      <div class="pprice">${money(item.price)}</div>
     `;
-    c.appendChild(row);
+    btn.onclick = ()=> addItem(item);
+    grid.appendChild(btn);
   });
-  document.getElementById("total").innerText=total.toLocaleString();
-  document.getElementById("count").innerText=count;
-  document.getElementById("change").innerText=Math.max(paid-total,0).toLocaleString();
 }
 
-function removeItem(name){
-  delete cart[name];
-  updateCart();
+function renderCart(){
+  const cart = document.getElementById("cart");
+  cart.innerHTML = "";
+
+  if(cartMap.size === 0){
+    cart.innerHTML = `<div style="color:#8d8da3;font-weight:1000;padding:8px;">(비어있음)</div>`;
+  } else {
+    [...cartMap.values()].forEach(v=>{
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `
+        <div class="rLeft">
+          <div class="rName">${escapeHtml(v.name)}</div>
+          <div class="rSub">
+            <span>단가 ${money(v.price)}</span>
+            <span>합계 ${money(v.price * v.qty)}</span>
+          </div>
+        </div>
+        <div class="rRight">
+          <div class="rQty">x${v.qty}</div>
+          <button class="trash" title="삭제">🗑</button>
+        </div>
+      `;
+      row.querySelector(".trash").onclick = ()=> { cartMap.delete(v.key); renderAll(); };
+      cart.appendChild(row);
+    });
+  }
+
+  const { total, count } = calcTotals();
+  document.getElementById("sumText").innerText = money(total);
+  document.getElementById("cntText").innerText = `총 ${count}개`;
+  updateMoneyLine();
 }
 
-function addMoney(m){
-  paid+=m;
-  document.getElementById("paid").innerText=paid.toLocaleString();
-  updateCart();
+function renderAll(){
+  renderCats();
+  renderGrid();
+  renderCart();
 }
 
-function resetMoney(){
-  paid=0;
-  document.getElementById("paid").innerText="0";
-  document.getElementById("change").innerText="0";
+/* ===== 액션 ===== */
+function addItem(item){
+  const key = `${item.name}__${item.price}`; // 이름+가격 기준(묶음은 이름이 다름)
+  const prev = cartMap.get(key);
+  if(prev){
+    prev.qty += 1;
+  } else {
+    cartMap.set(key, {
+      key, category:item.category, name:item.name, unit:item.unit||"", price:Number(item.price)||0, qty:1
+    });
+  }
+  renderAll();
 }
 
+function addMoney(n){
+  paid += n;
+  updateMoneyLine();
+}
+function resetMoneyOnly(){
+  paid = 0;
+  updateMoneyLine();
+}
 function complete(){
-  alert("결제 완료");
-  cart={};
-  paid=0;
-  updateCart();
-  document.getElementById("paid").innerText="0";
+  const { total, count } = calcTotals();
+  if(count === 0){
+    alert("품목을 먼저 선택하세요.");
+    return;
+  }
+  const change = Math.max(paid - total, 0);
+  alert(`결제 완료\n총합계: ${money(total)}\n총갯수: ${count}개\n받은돈: ${money(paid)}\n거스름: ${money(change)}`);
+
+  // 결제 후: 장바구니 비우고 받은돈도 0
+  cartMap.clear();
+  paid = 0;
+  renderAll();
 }
 
-function setCat(c){
-  currentCat=c;
-  document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
-  event.target.classList.add("active");
-  render();
+/* ===== CSV 로드 ===== */
+async function loadFromSheet(url){
+  const res = await fetch(url, { cache:"no-store" });
+  if(!res.ok) throw new Error("시트 불러오기 실패");
+  const text = await res.text();
+
+  // 간단 CSV 파서(따옴표 없는 기본 CSV 기준)
+  const lines = text.trim().split(/\r?\n/);
+  if(lines.length < 2) return [];
+  const header = lines[0].split(",").map(s=>s.trim().toLowerCase());
+  const idxC = header.indexOf("category");
+  const idxN = header.indexOf("name");
+  const idxU = header.indexOf("unit");
+  const idxP = header.indexOf("price");
+
+  const out = [];
+  for(let i=1;i<lines.length;i++){
+    const cols = lines[i].split(",").map(s=>s.trim());
+    const category = cols[idxC] || "";
+    const name = cols[idxN] || "";
+    const unit = cols[idxU] || "";
+    const price = Number((cols[idxP]||"").replace(/[^\d]/g,""));
+    if(!category || !name || !price) continue;
+    out.push({ category, name, unit, price });
+  }
+  return out;
 }
 
-function searchItem(v){
-  const grid=document.getElementById("items");
-  grid.innerHTML="";
-  items.filter(i=>i.name.includes(v)).forEach(i=>{
-    const d=document.createElement("div");
-    d.className="item";
-    d.onclick=()=>addItem(i);
-    d.innerHTML=`
-      <div class="item-name">${i.name}</div>
-      <div class="item-price">₩${i.price.toLocaleString()}</div>
-    `;
-    grid.appendChild(d);
-  });
+/* ===== 보안용 escape ===== */
+function escapeHtml(s){
+  return String(s||"")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
-render();
+/* ===== Init ===== */
+document.getElementById("q").addEventListener("input", (e)=>{
+  query = (e.target.value||"").trim();
+  renderAll();
+});
+
+(async function init(){
+  try{
+    if(SHEET_URL){
+      ITEMS = await loadFromSheet(SHEET_URL);
+      if(!ITEMS.length) ITEMS = ITEMS_FALLBACK;
+    } else {
+      ITEMS = ITEMS_FALLBACK;
+    }
+  } catch(e){
+    ITEMS = ITEMS_FALLBACK;
+    alert("시트 로드 실패 → 임시 품목으로 실행합니다.\n(SHEET_URL 확인 필요)");
+  }
+  renderAll();
+})();
 </script>
 </body>
 </html>
