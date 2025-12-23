@@ -2,172 +2,154 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>엄가네 POS</title>
 
 <style>
 :root{
   --bg:#0f1219;
-  --panel:#121827;
-  --card1:#1e2639;
-  --card2:#242f4a;
-  --line:rgba(255,255,255,.12);
+  --panel:#141a26;
+  --card:#1e2639;
+  --line:rgba(255,255,255,.1);
   --text:#f7f9ff;
-  --muted:rgba(247,249,255,.65);
+  --muted:rgba(255,255,255,.6);
   --accent:#ff9f00;
-  --danger:#ff4d4f;
 }
 
 *{box-sizing:border-box}
-html,body{
-  height:100%; margin:0;
-  background:var(--bg); color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",system-ui,Segoe UI,Roboto,sans-serif;
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",system-ui;
 }
-button,input{font:inherit}
-button{border:none; background:none; color:inherit; cursor:pointer}
 
-/* 상단바 */
-.topbar{
-  height:56px;
-  display:flex; align-items:center; gap:12px;
-  padding:0 14px;
+/* 상단 카테고리 */
+.top{
+  display:flex;
+  gap:10px;
+  padding:12px;
   border-bottom:1px solid var(--line);
   background:#0b0e14;
 }
-.burger{
-  font-size:22px;
-  padding:6px 10px;
-  border-radius:10px;
-  background:rgba(255,255,255,.06);
-}
-.title{font-weight:900}
-
-/* 드로어 */
-.drawer{
-  position:fixed; inset:0 auto 0 0;
-  width:220px;
-  background:#0b0e14;
-  border-right:1px solid var(--line);
-  transform:translateX(-100%);
-  transition:.2s;
-  z-index:10;
-}
-.drawer.open{transform:translateX(0)}
-.drawer button{
-  display:block;
-  width:100%;
-  padding:14px;
-  text-align:left;
+.cat{
+  padding:10px 18px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#1a2030;
   font-weight:900;
-  border-bottom:1px solid var(--line);
+  cursor:pointer;
 }
-.drawer button.active{
-  background:rgba(255,159,0,.18);
-  color:var(--accent);
+.cat.active{
+  background:rgba(255,159,0,.2);
+  border-color:var(--accent);
+  color:#ffd28a;
 }
 
-/* 본문 */
-.main{padding:12px}
-.grid{
+/* 상품 영역 */
+.products{
+  padding:12px;
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  grid-template-columns:repeat(4,1fr);
   gap:12px;
 }
 .card{
-  background:linear-gradient(180deg,var(--card2),var(--card1));
-  border:1px solid var(--line);
-  border-radius:16px;
+  background:linear-gradient(180deg,#242f4a,#1e2639);
+  border-radius:18px;
   padding:14px;
+  border:1px solid rgba(255,255,255,.12);
+  cursor:pointer;
 }
-.name{font-weight:900}
-.price{margin-top:6px; opacity:.9}
-.pin{float:right}
+.name{font-size:18px;font-weight:900}
+.price{margin-top:6px;font-size:14px;font-weight:800;opacity:.9}
+.used{
+  position:absolute;
+  right:12px;
+  top:12px;
+  font-size:12px;
+  opacity:.6;
+}
+.cardWrap{position:relative}
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
-  <button class="burger" onclick="toggleDrawer()">☰</button>
-  <div class="title" id="currentCat">전체</div>
-</div>
-
-<div class="drawer" id="drawer"></div>
-
-<div class="main">
-  <div class="grid" id="grid"></div>
-</div>
-
-<!-- 상품 데이터 -->
-<script src="./items.js"></script>
+<div class="top" id="cats"></div>
+<div class="products" id="products"></div>
 
 <script>
-let currentCat = "전체";
+/* ===== 상품 데이터 (지금은 하드코딩, 나중에 시트 연결 가능) ===== */
+const ITEMS = [
+  {name:"사과", price:3000, cat:"과일"},
+  {name:"바나나", price:2500, cat:"과일"},
+  {name:"토마토", price:10000, cat:"과일"},
 
-/* 드로어 열고닫기 */
-function toggleDrawer(){
-  document.getElementById("drawer").classList.toggle("open");
-}
+  {name:"감자", price:3000, cat:"야채"},
+  {name:"고구마", price:3000, cat:"야채"},
+  {name:"양파", price:2500, cat:"야채"},
+  {name:"당근", price:2500, cat:"야채"},
+
+  {name:"상추", price:1500, cat:"잎채소"},
+  {name:"깻잎", price:2000, cat:"잎채소"},
+  {name:"부추", price:2000, cat:"잎채소"},
+
+  {name:"고등어", price:6000, cat:"생선"},
+];
+
+const CATS = ["전체","과일","야채","잎채소","생선"];
+
+let currentCat="전체";
+
+/* 클릭 횟수 저장 */
+const used = JSON.parse(localStorage.getItem("USED")||"{}");
+const saveUsed=()=>localStorage.setItem("USED",JSON.stringify(used));
 
 /* 카테고리 렌더 */
-function renderDrawer(cats){
-  const d = document.getElementById("drawer");
-  d.innerHTML = "";
-  ["전체", ...cats].forEach(c=>{
-    const b=document.createElement("button");
+const catsEl=document.getElementById("cats");
+function renderCats(){
+  catsEl.innerHTML="";
+  CATS.forEach(c=>{
+    const b=document.createElement("div");
+    b.className="cat"+(c===currentCat?" active":"");
     b.textContent=c;
-    if(c===currentCat) b.classList.add("active");
-    b.onclick=()=>{
-      currentCat=c;
-      renderAll();
-    };
-    d.appendChild(b);
+    b.onclick=()=>{currentCat=c; renderAll();}
+    catsEl.appendChild(b);
   });
 }
 
 /* 상품 렌더 */
-function renderAll(){
-  if(!window.ITEMS || !ITEMS.length) return;
-
-  document.getElementById("currentCat").textContent=currentCat;
-  document.getElementById("drawer").classList.remove("open");
-
-  const list = ITEMS
-    .filter(i=> currentCat==="전체" || i.cat===currentCat)
-    .sort((a,b)=>{
-      if((b.usage||0)!==(a.usage||0)) return (b.usage||0)-(a.usage||0);
-      return (b.last||0)-(a.last||0);
+const prodEl=document.getElementById("products");
+function renderProducts(){
+  prodEl.innerHTML="";
+  ITEMS
+    .filter(i=>currentCat==="전체"||i.cat===currentCat)
+    .sort((a,b)=>(used[b.name]||0)-(used[a.name]||0))
+    .forEach(i=>{
+      const d=document.createElement("div");
+      d.className="cardWrap";
+      d.innerHTML=`
+        <div class="card">
+          <div class="name">${i.name}</div>
+          <div class="price">${i.price.toLocaleString()}원</div>
+        </div>
+        <div class="used">사용 ${used[i.name]||0}</div>
+      `;
+      d.onclick=()=>{
+        used[i.name]=(used[i.name]||0)+1;
+        saveUsed();
+        renderProducts();
+      };
+      prodEl.appendChild(d);
     });
-
-  const g=document.getElementById("grid");
-  g.innerHTML="";
-
-  list.forEach(i=>{
-    const c=document.createElement("div");
-    c.className="card";
-    c.innerHTML=`
-      <div class="name">
-        ${i.name}
-        ${i.pinned?'📌':''}
-      </div>
-      <div class="price">${Number(i.price).toLocaleString()}원</div>
-    `;
-    c.onclick=()=>{
-      i.usage=(i.usage||0)+1;
-      i.last=Date.now();
-      renderAll();
-    };
-    g.appendChild(c);
-  });
 }
 
-/* items.js 로드 완료 후 실행 */
-document.addEventListener("ITEMS_READY",()=>{
-  const cats=[...new Set(ITEMS.map(i=>i.cat))];
-  renderDrawer(cats);
-  renderAll();
-});
+function renderAll(){
+  renderCats();
+  renderProducts();
+}
+
+renderAll();
 </script>
 
 </body>
