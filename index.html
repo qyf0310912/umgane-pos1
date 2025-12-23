@@ -642,4 +642,31 @@
       const { total } = sumCart();
       if (total <= 0){ alert("장바구니가 비었습니다."); return; }
       if (state.received < total){
-        alert("받은돈이 부족합니
+        alert("받은돈이 부족합니다.\n부족: " + fmt(total - state.received));
+        return;
+      }
+      state.cart.clear();
+      state.received = 0;
+      renderAllRight();
+    };
+
+    function renderAllRight(){
+      renderCart();
+      renderTotals();
+    }
+
+    function renderAll(){
+      renderCats();
+      renderItems();
+      renderCart();
+      renderTotals();
+      renderKeypad();
+    }
+
+    renderAll();
+
+    // iOS 제스처 확대 방지(현장 터치 안정)
+    document.addEventListener("gesturestart", (e) => e.preventDefault());
+  </script>
+</body>
+</html>
