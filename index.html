@@ -6,11 +6,10 @@
   <title>엄가네 POS</title>
   <style>
     :root{
-      /* ✅ 눈에 잘 띄고 피로 덜한 “딥 블루그레이” */
       --bg:#0d1117;
       --panel:#121a24;
       --panel2:#0f1620;
-      --card:#1e2a3a;      /* ✅ 검정에 묻히지 않게 카드 더 밝게 */
+      --card:#1e2a3a;
       --card2:#223145;
       --line:rgba(255,255,255,.12);
 
@@ -28,7 +27,6 @@
       --shadow:0 14px 46px rgba(0,0,0,.45);
       --r:20px;
 
-      /* ✅ 가독성(글씨 크게) */
       --name:18px;
       --price:14px;
       --small:12px;
@@ -39,7 +37,6 @@
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", "Apple SD Gothic Neo", Arial;}
     button,input{font:inherit;}
 
-    /* ✅ 3/1 레이아웃 고정 */
     .app{
       height:100%;
       display:grid;
@@ -64,12 +61,10 @@
       border-bottom:1px solid var(--line);
       display:flex;
       align-items:center;
-      justify-content:flex-start; /* ✅ 탭 왼쪽 고정 */
+      justify-content:flex-start;
       gap:10px;
       background:rgba(0,0,0,.10);
     }
-
-    /* ✅ “라팡 POS” 삭제(표시 안 함) */
     .brand{display:none;}
 
     .tabs{display:flex; gap:8px; flex-wrap:wrap;}
@@ -129,7 +124,6 @@
     }
     .pill b{color:var(--text);}
 
-    /* 초성 버튼 바 */
     .chosungBar{
       display:flex;
       flex-wrap:wrap;
@@ -163,7 +157,6 @@
       overflow:auto;
     }
 
-    /* ✅ 횡열 4~5개 (큰 화면 5, 중간 4, 모바일 3) */
     .grid{
       display:grid;
       gap:12px;
@@ -176,7 +169,6 @@
     }
     @media (max-width: 560px){ .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); } }
 
-    /* 상품 카드(✅ 카드 전체 클릭=담기, 담기 버튼 없음) */
     .pbtn{
       width:100%;
       text-align:left;
@@ -199,14 +191,12 @@
     .pbtn:hover{ background:rgba(255,255,255,.07); }
     .pbtn:active{ transform:scale(.99); }
 
-    /* ✅ 연타 강조 플래시 */
     .pbtn.flash{
       border-color: rgba(255,159,0,.60);
       box-shadow: 0 0 0 3px rgba(255,159,0,.18), var(--shadow);
       background: rgba(255,159,0,.12);
     }
 
-    /* ✅ 고정 표시 */
     .pinIcon{
       position:absolute;
       top:10px;
@@ -255,65 +245,17 @@
 
     /* RIGHT */
     .right{display:flex; flex-direction:column; min-height:0;}
-
-    .rightTop{
-      padding:12px 12px 10px;
-      border-bottom:1px solid var(--line);
-      background:rgba(0,0,0,.08);
-    }
-    .sum{ font-size:22px; font-weight:1300; letter-spacing:.1px; }
-    .count{ margin-top:4px; color:var(--muted); font-weight:1000; font-size:12px; }
-
-    .divider{ height:1px; background:var(--line); margin:10px 0; }
-
-    /* ✅ 받은돈/거스름돈 한 줄, 상단 고정(최적 동선) */
-    .payline{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:10px;
-      font-weight:1100;
-    }
-    .payline .label{ font-size:12px; font-weight:1000; color:rgba(246,248,255,.74); }
-    .payline .val{ font-size:18px; font-weight:1300; }
-    .barSep{ opacity:.55; font-weight:1200; }
-
-    /* ✅ 돈버튼: 3개씩 2줄(총 6칸) */
-    .paybox{
-      margin-top:10px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-    }
-    .moneyBtn{
-      background:var(--btn);
-      color:var(--btnText);
-      border:none;
-      border-radius:14px;
-      padding:12px 10px;
-      font-weight:1300;
-      font-size:16px;
-      cursor:pointer;
-      user-select:none;
-    }
-    .moneyBtn:active{ transform:scale(.99); }
-
-    /* ✅ 초기화 버튼 다른 컬러 */
-    .resetBtn{
-      background:rgba(255,59,48,.16);
-      color:#ffd1cf;
-      border:1px solid rgba(255,59,48,.35);
-    }
-
     .rightBody{
-      padding:10px 12px 12px;
+      padding:12px;
       min-height:0;
       overflow:hidden;
       display:flex;
       flex-direction:column;
-      gap:10px;
+      gap:12px;
+      height:100%;
     }
 
+    /* ✅ 1) 장바구니가 맨 위 */
     .cart{
       background:rgba(255,255,255,.03);
       border:1px solid var(--line);
@@ -322,6 +264,7 @@
       display:flex;
       flex-direction:column;
       min-height:0;
+      flex: 1 1 auto;
     }
     .cartHead{
       padding:10px 12px;
@@ -340,9 +283,8 @@
     .cartList{
       padding:8px;
       overflow:auto;
-      min-height: 520px;
-      height: calc(100vh - 420px);
-      max-height: 720px;
+      min-height: 420px;         /* 화면이 작아도 최소 7개쯤 보이게 */
+      max-height: 65vh;
     }
 
     .item{
@@ -391,9 +333,56 @@
       cursor:pointer;
     }
 
-    /* 결제버튼(고정) */
+    /* ✅ 2) 총합계/받은돈/버튼은 결제완료 “바로 위” */
+    .payPanel{
+      background:rgba(0,0,0,.08);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:12px;
+    }
+    .sum{ font-size:22px; font-weight:1300; letter-spacing:.1px; }
+    .count{ margin-top:4px; color:var(--muted); font-weight:1000; font-size:12px; }
+    .divider{ height:1px; background:var(--line); margin:10px 0; }
+
+    /* 받은돈/거스름돈 한 줄 */
+    .payline{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:10px;
+      font-weight:1100;
+    }
+    .payline .label{ font-size:12px; font-weight:1000; color:rgba(246,248,255,.74); }
+    .payline .val{ font-size:18px; font-weight:1300; }
+    .barSep{ opacity:.55; font-weight:1200; }
+
+    /* 돈버튼 3x2 */
+    .paybox{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    .moneyBtn{
+      background:var(--btn);
+      color:var(--btnText);
+      border:none;
+      border-radius:14px;
+      padding:12px 10px;
+      font-weight:1300;
+      font-size:16px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .moneyBtn:active{ transform:scale(.99); }
+    .resetBtn{
+      background:rgba(255,59,48,.16);
+      color:#ffd1cf;
+      border:1px solid rgba(255,59,48,.35);
+    }
+
+    /* ✅ 5) 결제완료는 하단 고정(항상 보이게) */
     .payBtn{
-      margin-top:auto;
       background:var(--accent);
       color:#19150a;
       border:none;
@@ -403,6 +392,10 @@
       font-size:18px;
       cursor:pointer;
       transition:opacity .15s ease, filter .15s ease;
+      position: sticky;
+      bottom: 0;
+      z-index: 3;
+      box-shadow: 0 -10px 24px rgba(0,0,0,.25);
     }
     .payBtn:active{ transform:scale(.99); }
     .payBtn.locked{
@@ -468,35 +461,8 @@
 
     <!-- RIGHT -->
     <section class="shell right">
-      <div class="rightTop">
-        <div class="sum">총합계: <span id="sum">0</span>원</div>
-        <div class="count">총수량: <span id="totalQty">0</span></div>
-
-        <div class="divider"></div>
-
-        <div class="payline">
-          <div>
-            <div class="label">받은돈</div>
-            <div class="val"><span id="received">0</span>원</div>
-          </div>
-          <div class="barSep">|</div>
-          <div style="text-align:right;">
-            <div class="label">거스름돈</div>
-            <div class="val"><span id="change">0</span>원</div>
-          </div>
-        </div>
-
-        <div class="paybox">
-          <button class="moneyBtn" data-add="500">500</button>
-          <button class="moneyBtn" data-add="1000">1천</button>
-          <button class="moneyBtn" data-add="5000">5천</button>
-          <button class="moneyBtn" data-add="10000">1만</button>
-          <button class="moneyBtn" data-add="50000">5만</button>
-          <button class="moneyBtn resetBtn" id="resetReceived">초기화</button>
-        </div>
-      </div>
-
       <div class="rightBody">
+        <!-- 1) 장바구니 -->
         <div class="cart">
           <div class="cartHead">
             <div>장바구니 (수량 조절 + 삭제)</div>
@@ -505,6 +471,36 @@
           <div class="cartList" id="cartList"></div>
         </div>
 
+        <!-- 2) 총합계 / 3) 받은돈·거스름돈 / 4) 거스름돈 버튼 -->
+        <div class="payPanel">
+          <div class="sum">총합계: <span id="sum">0</span>원</div>
+          <div class="count">총수량: <span id="totalQty">0</span></div>
+
+          <div class="divider"></div>
+
+          <div class="payline">
+            <div>
+              <div class="label">받은돈</div>
+              <div class="val"><span id="received">0</span>원</div>
+            </div>
+            <div class="barSep">|</div>
+            <div style="text-align:right;">
+              <div class="label">거스름돈</div>
+              <div class="val"><span id="change">0</span>원</div>
+            </div>
+          </div>
+
+          <div class="paybox">
+            <button class="moneyBtn" data-add="500">500</button>
+            <button class="moneyBtn" data-add="1000">1천</button>
+            <button class="moneyBtn" data-add="5000">5천</button>
+            <button class="moneyBtn" data-add="10000">1만</button>
+            <button class="moneyBtn" data-add="50000">5만</button>
+            <button class="moneyBtn resetBtn" id="resetReceived">초기화</button>
+          </div>
+        </div>
+
+        <!-- 5) 결제완료 -->
         <button class="payBtn" id="pay">결제완료</button>
       </div>
     </section>
@@ -523,17 +519,11 @@
   </div>
 
 <script>
-/* =========================
-   ✅ 고정 카테고리/순서 (네가 확정한 기준)
-   과일 / 야채 / 봉채소 / 생선 / 기타
-   ========================= */
+/* ✅ 고정 카테고리/순서 */
 const CATEGORIES = ["과일","야채","봉채소","생선","기타"];
 
-/* =========================
-   ✅ 상품 데이터 (id는 절대 유니크!)
-   ========================= */
+/* ✅ 상품 데이터 (id는 유니크) */
 const PRODUCTS = [
-  // 과일(예시)
   { id:"fruit_dangam3", cat:"과일", name:"단감/3개", price:5000 },
   { id:"fruit_dangam7", cat:"과일", name:"단감/7개", price:10000 },
   { id:"fruit_apple3", cat:"과일", name:"사과/3개", price:5000 },
@@ -555,20 +545,14 @@ const PRODUCTS = [
   { id:"fruit_cherryTom2", cat:"과일", name:"방울토마토/2팩", price:11000 },
   { id:"fruit_cherry", cat:"과일", name:"체리", price:12000 },
 
-  // 야채(예시)
   { id:"veg_onion", cat:"야채", name:"양파", price:3000 },
   { id:"veg_potato", cat:"야채", name:"감자", price:3000 },
   { id:"veg_carrot", cat:"야채", name:"당근", price:3000 },
-
-  // 봉채소/생선/기타는 필요하면 추가
 ];
 
-/* ✅ productMap: id로만 접근 (정렬/검색해도 클릭 꼬임 절대 없음) */
 const productMap = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
 
-/* =========================
-   초성검색 유틸
-   ========================= */
+/* 초성검색 */
 const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
 function getChosung(str){
   let out = "";
@@ -585,9 +569,7 @@ function getChosung(str){
   }
   return out;
 }
-function normalize(s){
-  return (s||"").toString().trim().replace(/\s+/g,"").toLowerCase();
-}
+function normalize(s){ return (s||"").toString().trim().replace(/\s+/g,"").toLowerCase(); }
 function matchProduct(p, qRaw){
   const q = normalize(qRaw);
   if (!q) return true;
@@ -596,9 +578,7 @@ function matchProduct(p, qRaw){
   return nameN.includes(q) || choN.includes(q);
 }
 
-/* =========================
-   저장(고정/사용횟수)
-   ========================= */
+/* 저장(고정/사용횟수) */
 const LS_KEY_COUNTS = "umgane_pos_counts_v1";
 const LS_KEY_PINS   = "umgane_pos_pins_v1";
 function loadJSON(key, def){
@@ -606,31 +586,24 @@ function loadJSON(key, def){
   catch{ return def; }
 }
 function saveJSON(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
+let counts = loadJSON(LS_KEY_COUNTS, {});
+let pins   = loadJSON(LS_KEY_PINS,   {});
 
-let counts = loadJSON(LS_KEY_COUNTS, {}); // {id: n}
-let pins   = loadJSON(LS_KEY_PINS,   {}); // {id: true}
-
-/* =========================
-   상태
-   ========================= */
+/* 상태 */
 let activeCat = "과일";
-let cart = {};           // {productId: qty}
+let cart = {};
 let receivedMoney = 0;
 let soundOn = true;
 
-/* ✅ 결제 1초 잠금 */
+/* 결제 1초 잠금 */
 let payLocked = false;
 
-/* =========================
-   DOM
-   ========================= */
+/* DOM */
 const $tabs = document.getElementById("tabs");
 const $grid = document.getElementById("grid");
 const $q = document.getElementById("q");
 
-/* =========================
-   렌더: 탭
-   ========================= */
+/* 탭 */
 function renderTabs(){
   $tabs.innerHTML = "";
   CATEGORIES.forEach(cat=>{
@@ -642,9 +615,7 @@ function renderTabs(){
   });
 }
 
-/* =========================
-   정렬: 1) 고정 2) 많이 찍힌 순 3) 이름
-   ========================= */
+/* 정렬: 고정 > 많이찍힘 > 이름 */
 function getSortedProducts(list){
   return [...list].sort((a,b)=>{
     const pa = !!pins[a.id], pb = !!pins[b.id];
@@ -658,9 +629,7 @@ function getSortedProducts(list){
   });
 }
 
-/* =========================
-   플래시(연타 피드백)
-   ========================= */
+/* 플래시 */
 const flashTimers = {};
 function flashCard(el, id){
   if (!el) return;
@@ -669,9 +638,7 @@ function flashCard(el, id){
   flashTimers[id] = setTimeout(()=> el.classList.remove("flash"), 170);
 }
 
-/* =========================
-   고정(핀) 토글
-   ========================= */
+/* 고정 토글 */
 function togglePin(id){
   pins[id] = !pins[id];
   if (!pins[id]) delete pins[id];
@@ -679,9 +646,7 @@ function togglePin(id){
   renderAll();
 }
 
-/* =========================
-   ✅ 렌더: 상품 그리드 (핵심: id로만 담기)
-   ========================= */
+/* 상품 그리드 (✅ id로만 담기) */
 function renderGrid(){
   const query = $q.value;
 
@@ -691,7 +656,6 @@ function renderGrid(){
   } else {
     list = PRODUCTS.filter(p => p.cat === activeCat);
   }
-
   list = getSortedProducts(list);
 
   $grid.innerHTML = "";
@@ -710,7 +674,6 @@ function renderGrid(){
       </div>
     `;
 
-    /* ✅ 카드 아무데나 누르면 담김 (id로!) */
     btn.onclick = ()=>{
       addToCartById(p.id, 1);
       counts[p.id] = (counts[p.id] || 0) + 1;
@@ -719,14 +682,12 @@ function renderGrid(){
       renderAll();
     };
 
-    /* ✅ PC: 우클릭 고정/해제 */
     btn.oncontextmenu = (e)=>{
       e.preventDefault();
       togglePin(p.id);
       return false;
     };
 
-    /* ✅ 모바일: 길게누르기 고정/해제 */
     let pressTimer = null;
     btn.addEventListener("touchstart", ()=>{
       pressTimer = setTimeout(()=> togglePin(p.id), 520);
@@ -738,9 +699,7 @@ function renderGrid(){
   });
 }
 
-/* =========================
-   렌더: 장바구니
-   ========================= */
+/* 장바구니 */
 function renderCart(){
   const $list = document.getElementById("cartList");
   const ids = Object.keys(cart);
@@ -755,7 +714,6 @@ function renderCart(){
     .map(id => ({ p: productMap[id], qty: cart[id] }))
     .filter(x=>x.p);
 
-  /* ✅ 심플: 고정/사용순 정렬(가격정렬X) */
   items.sort((a,b)=>{
     const pa = !!pins[a.p.id], pb = !!pins[b.p.id];
     if (pb !== pa) return (pb?1:0) - (pa?1:0);
@@ -821,9 +779,7 @@ function renderAll(){
   renderTotals();
 }
 
-/* =========================
-   카트 조작 (✅ id 기반)
-   ========================= */
+/* 카트 조작(id 기반) */
 function addToCartById(id, n){
   if (!productMap[id]) return;
   cart[id] = (cart[id] || 0) + n;
@@ -839,9 +795,7 @@ function removeItem(id){
   renderAll();
 }
 
-/* =========================
-   돈 버튼
-   ========================= */
+/* 돈 버튼 */
 document.querySelectorAll(".moneyBtn[data-add]").forEach(btn=>{
   btn.onclick = ()=>{
     const add = Number(btn.getAttribute("data-add") || 0);
@@ -850,13 +804,11 @@ document.querySelectorAll(".moneyBtn[data-add]").forEach(btn=>{
   };
 });
 document.getElementById("resetReceived").onclick = ()=>{
-  receivedMoney = 0; // ✅ 초기화는 받은돈만
+  receivedMoney = 0;
   renderTotals();
 };
 
-/* =========================
-   초성 버튼 생성 (ㄱ ㄴ ㄷ ... + X)
-   ========================= */
+/* 초성 버튼 */
 const CHOS = ["ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
 const $chosungBar = document.getElementById("chosungBar");
 function renderChosung(){
@@ -866,12 +818,11 @@ function renderChosung(){
     b.className = "chobtn";
     b.textContent = c;
     b.onclick = ()=>{
-      $q.value += c;   // 누적 입력
+      $q.value += c;
       renderGrid();
     };
     $chosungBar.appendChild(b);
   });
-
   const clr = document.createElement("button");
   clr.className = "chobtn clear";
   clr.textContent = "✕";
@@ -883,9 +834,7 @@ function renderChosung(){
 }
 renderChosung();
 
-/* =========================
-   결제완료 + 팝업 + 사운드 + 1초 잠금
-   ========================= */
+/* 결제 팝업/소리/1초 잠금 */
 const $overlay = document.getElementById("overlay");
 const $receiptMeta = document.getElementById("receiptMeta");
 const $toggleSound = document.getElementById("toggleSound");
@@ -915,7 +864,7 @@ function lockPayFor1s(){
 }
 
 document.getElementById("pay").onclick = ()=>{
-  if (payLocked) return; // ✅ 중복결제 방지
+  if (payLocked) return;
   lockPayFor1s();
 
   const {sum, qty} = calcTotal();
@@ -935,7 +884,6 @@ document.getElementById("pay").onclick = ()=>{
   $overlay.classList.add("show");
   beep();
 
-  // ✅ 결제완료 후 전체 리셋(완료감 확실)
   cart = {};
   receivedMoney = 0;
   renderAll();
@@ -949,18 +897,14 @@ $toggleSound.onclick = ()=>{
   $toggleSound.textContent = "완료음: " + (soundOn ? "ON" : "OFF");
 };
 
-/* =========================
-   검색(타이핑 반영)
-   ========================= */
+/* 검색 */
 let qTimer = null;
 $q.addEventListener("input", ()=>{
   clearTimeout(qTimer);
   qTimer = setTimeout(()=> renderGrid(), 30);
 });
 
-/* =========================
-   기타
-   ========================= */
+/* 기타 */
 function formatWon(n){
   n = Math.round(Number(n)||0);
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
