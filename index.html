@@ -33,7 +33,7 @@ button,input{font:inherit}
 .app{
   height:100%;
   display:grid;
-  grid-template-columns: 3fr 1fr;   /* 왼쪽 3 / 오른쪽 1 */
+  grid-template-columns: 3fr 1fr;
   gap:14px;
   padding:14px;
 }
@@ -49,7 +49,6 @@ button,input{font:inherit}
   flex-direction:column;
 }
 
-/* top bar */
 .topbar{
   display:flex;
   align-items:center;
@@ -58,7 +57,6 @@ button,input{font:inherit}
   border-bottom:1px solid var(--line);
   background:rgba(255,255,255,.02);
 }
-
 .tabs{ display:flex; gap:8px; flex-wrap:wrap; }
 .tab{
   padding:8px 14px;
@@ -147,12 +145,13 @@ button,input{font:inherit}
   padding:12px;
   overflow:auto;
   display:grid;
-  grid-template-columns:repeat(4, minmax(0,1fr)); /* 4~5개 가로 기준: 화면 넓으면 5로 자동 확장 */
+  grid-template-columns:repeat(4, minmax(0,1fr));
   gap:12px;
 }
 @media (min-width: 1500px){
   .products{ grid-template-columns:repeat(5, minmax(0,1fr)); }
 }
+
 .card{
   background:linear-gradient(180deg, var(--card2), var(--card));
   border:1px solid rgba(255,255,255,.14);
@@ -163,11 +162,11 @@ button,input{font:inherit}
   position:relative;
   min-height:86px;
   transition:.08s;
+  z-index:1;
 }
 .card:active{transform:scale(.985)}
-.card.flash{
-  box-shadow:0 0 0 3px rgba(255,159,0,.45);
-}
+.card.flash{ box-shadow:0 0 0 3px rgba(255,159,0,.45); }
+
 .name{font-size:18px; font-weight:1100; letter-spacing:-.2px}
 .price{margin-top:6px; font-size:14px; opacity:.9; font-weight:900}
 .meta{
@@ -198,6 +197,10 @@ button,input{font:inherit}
   border-color:rgba(255,159,0,.55);
   background:rgba(255,159,0,.18);
 }
+
+/* ✅ 클릭 가로채기 방지: meta 영역이 클릭을 먹지 못하게 */
+.meta, .meta * { pointer-events:none; }
+
 .hint{
   padding:8px 12px 12px;
   color:var(--muted);
@@ -218,7 +221,7 @@ button,input{font:inherit}
   flex-direction:column;
 }
 
-/* cart area first */
+/* cart */
 .cart{
   padding:12px;
   overflow:auto;
@@ -242,21 +245,9 @@ button,input{font:inherit}
   gap:10px;
   margin-bottom:8px;
 }
-.item .title{
-  font-weight:1100;
-  font-size:14px;
-}
-.item .sub{
-  margin-top:4px;
-  font-size:12px;
-  opacity:.8;
-  font-weight:900;
-}
-.controls{
-  display:flex;
-  gap:8px;
-  align-items:center;
-}
+.item .title{ font-weight:1100; font-size:14px; }
+.item .sub{ margin-top:4px; font-size:12px; opacity:.8; font-weight:900; }
+.controls{ display:flex; gap:8px; align-items:center; }
 .ctrl{
   width:38px; height:36px;
   border-radius:12px;
@@ -266,16 +257,9 @@ button,input{font:inherit}
   font-weight:1200;
   cursor:pointer;
 }
-.ctrl.del{
-  background:rgba(255,77,79,.18);
-  border-color:rgba(255,77,79,.35);
-}
+.ctrl.del{ background:rgba(255,77,79,.18); border-color:rgba(255,77,79,.35); }
 .ctrl:active{transform:scale(.98)}
-.count{
-  width:26px;
-  text-align:center;
-  font-weight:1200;
-}
+.count{ width:26px; text-align:center; font-weight:1200; }
 
 /* summary */
 .summary{
@@ -290,12 +274,11 @@ button,input{font:inherit}
   gap:12px;
   margin-bottom:8px;
 }
-.row:last-child{margin-bottom:0}
 .label{font-size:12px; opacity:.7; font-weight:1000}
 .val{font-size:20px; font-weight:1200}
 .smallval{font-size:14px; font-weight:1100; opacity:.95}
 
-/* 받은돈/거스름돈 한 줄 */
+/* ✅ 받은돈(왼쪽) / 거스름돈(오른쪽) 한 줄 */
 .payline{
   display:flex;
   align-items:flex-end;
@@ -303,8 +286,7 @@ button,input{font:inherit}
   font-weight:1200;
   margin-top:10px;
 }
-.payline .block{flex:1}
-.payline .block .label{margin-bottom:2px}
+.payline .block{ flex:1; }
 .payline .divider{
   width:2px;
   height:26px;
@@ -312,8 +294,10 @@ button,input{font:inherit}
   border-radius:99px;
   align-self:center;
 }
+.payline .leftAlign{ text-align:left; }
+.payline .rightAlign{ text-align:right; } /* ✅ 거스름돈 오른쪽 정렬 */
 
-/* money buttons 3개씩 2줄 (총 6개) */
+/* money buttons: 3개씩 2줄 */
 .money{
   padding:12px;
   border-top:1px solid var(--line);
@@ -391,7 +375,6 @@ button,input{font:inherit}
   <!-- LEFT -->
   <section class="left">
     <div class="topbar">
-      <!-- 카테고리: 오른쪽→왼쪽 이동(탭을 왼쪽에 고정) -->
       <div class="tabs" id="tabs"></div>
     </div>
 
@@ -401,7 +384,7 @@ button,input{font:inherit}
           <span class="icon">🔎</span>
           <input id="q" placeholder="전카테고리 검색 (예: 감자, ㄱㅈ, ㄱㄱ)" autocomplete="off" />
         </div>
-        <div class="sort" id="sortBtn" title="정렬은 고정 → 많이찍힌 → 이름">
+        <div class="sort" id="sortBtn" title="정렬은 고정 → 많이찍힌(사용횟수) → 이름">
           정렬: <small>고정 + 많이 찍힌 순</small>
         </div>
       </div>
@@ -430,13 +413,14 @@ button,input{font:inherit}
         </div>
       </div>
 
+      <!-- ✅ 한 줄: 받은돈 왼쪽 / 거스름돈 오른쪽 -->
       <div class="payline">
-        <div class="block">
+        <div class="block leftAlign">
           <div class="label">받은돈</div>
           <div class="val" id="received">0원</div>
         </div>
         <div class="divider"></div>
-        <div class="block">
+        <div class="block rightAlign">
           <div class="label">거스름돈</div>
           <div class="val" id="change">0원</div>
         </div>
@@ -470,11 +454,11 @@ button,input{font:inherit}
 
 <script>
 /* =========================
-   0) 데이터 (여기에 상품 늘려도 안전)
+   0) 데이터
    ========================= */
 const CATS = ["과일","야채","봉채소","생선","기타"];
 
-/* 샘플: 너는 여기 계속 늘리면 됨. (id만 유니크면 절대 안 꼬임) */
+// ✅ id만 유니크면 절대 안 꼬임 (토마토→바나나 방지의 핵심)
 const PRODUCTS = [
   {id:"apple_3",     cat:"과일",  name:"사과",        price:3000},
   {id:"tomato",      cat:"과일",  name:"토마토",      price:10000},
@@ -498,7 +482,7 @@ const PRODUCTS = [
 ];
 
 /* =========================
-   1) 상태 저장(고정/사용횟수)
+   1) 상태 저장(고정/사용횟수/마지막 카테고리)
    ========================= */
 const LS_KEY = "umgane_pos_state_v1";
 const state = loadState();
@@ -507,8 +491,8 @@ function loadState(){
   try{
     const s = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
     return {
-      pinned: s.pinned || {},     // {id:true}
-      used:   s.used   || {},     // {id:count}
+      pinned: s.pinned || {},
+      used:   s.used   || {},
       lastCat: s.lastCat || "과일"
     };
   }catch(e){
@@ -520,7 +504,7 @@ function saveState(){
 }
 
 /* =========================
-   2) 장바구니/결제 상태
+   2) 기본 상태
    ========================= */
 const productMap = Object.fromEntries(PRODUCTS.map(p=>[p.id,p]));
 let activeCat = state.lastCat;
@@ -530,7 +514,7 @@ let locked = false;
 const cart = {}; // {id: qty}
 
 /* =========================
-   3) 초성 검색 유틸
+   3) 초성 검색
    ========================= */
 const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
 function getChosung(str){
@@ -554,7 +538,6 @@ function matchQuery(p, query){
   const nameLower = name.toLowerCase();
   const tLower = t.toLowerCase().replace(/\s/g,"");
   if(nameLower.includes(tLower)) return true;
-  // 초성 포함 (예: ㄱㅈ -> 감자)
   const cho = getChosung(name);
   if(cho.includes(tLower)) return true;
   return false;
@@ -595,10 +578,7 @@ function sortedList(list){
 
 function currentProducts(){
   const filtered = PRODUCTS.filter(p=>{
-    // 검색이 있으면 전카테고리 노출
-    if(q.trim()){
-      return matchQuery(p, q);
-    }
+    if(q.trim()) return matchQuery(p, q);   // 검색이 있으면 전카테고리
     return p.cat === activeCat;
   });
   return sortedList(filtered);
@@ -618,31 +598,15 @@ function renderProducts(){
 
     d.innerHTML = `
       <div class="meta">
-        <span class="badge">${used ? "사용 "+used : "사용 0"}</span>
-        <span class="pin ${pinned ? "on":""}" title="고정(길게/우클릭)">📌</span>
+        <span class="badge">${"사용 "+used}</span>
+        <span class="pin ${pinned ? "on":""}">📌</span>
       </div>
       <div class="name">${p.name}</div>
       <div class="price">${p.price.toLocaleString()}원</div>
     `;
 
-    // 클릭 담기 (버튼 없음)
-    d.addEventListener("click", ()=>{
-      addToCart(p.id, 1);
-      flash(d);
-    });
-
-    // 길게누르기(모바일)로 고정 토글
-    let pressTimer = null;
-    d.addEventListener("touchstart", ()=>{
-      pressTimer = setTimeout(()=>togglePin(p.id), 450);
-    }, {passive:true});
-    d.addEventListener("touchend", ()=>{ if(pressTimer) clearTimeout(pressTimer); pressTimer=null; });
-
-    // 우클릭(PC)로 고정 토글
-    d.addEventListener("contextmenu", (e)=>{
-      e.preventDefault();
-      togglePin(p.id);
-    });
+    // 길게누르기/우클릭으로 고정만 (담기는 부모에서 정확히 처리)
+    attachPinHandlers(d, p.id);
 
     productsEl.appendChild(d);
   });
@@ -659,19 +623,64 @@ function togglePin(id){
   renderProducts();
 }
 
+function attachPinHandlers(cardEl, id){
+  let pressTimer = null;
+
+  cardEl.addEventListener("touchstart", ()=>{
+    pressTimer = setTimeout(()=>{
+      // 길게누르면 고정 토글 + 다음 클릭(터치업) 담기 방지
+      cardEl.dataset.suppress = "1";
+      togglePin(id);
+      setTimeout(()=>{ delete cardEl.dataset.suppress; }, 350);
+    }, 450);
+  }, {passive:true});
+
+  cardEl.addEventListener("touchend", ()=>{
+    if(pressTimer) clearTimeout(pressTimer);
+    pressTimer = null;
+  });
+
+  cardEl.addEventListener("contextmenu", (e)=>{
+    e.preventDefault();
+    togglePin(id);
+  });
+}
+
 /* =========================
-   5) 장바구니/합계
+   5) ✅ 담기(이벤트 위임) — 토마토→바나나 방지 핵심
+   ========================= */
+productsEl.addEventListener("click", (e)=>{
+  const card = e.target.closest(".card");
+  if(!card) return;
+
+  // 길게누르기 후 담기 방지
+  if(card.dataset.suppress === "1") return;
+
+  const id = card.dataset.id;
+  if(!productMap[id]){
+    alert("상품ID 오류: " + id);
+    return;
+  }
+
+  addToCart(id, 1);
+  flash(card);
+});
+
+/* =========================
+   6) 장바구니/합계
    ========================= */
 function addToCart(id, n){
   cart[id] = (cart[id]||0) + n;
   if(cart[id] <= 0) delete cart[id];
 
-  // 사용횟수 누적 (실무: “많이 찍힌 상품” 상단 자동)
-  state.used[id] = (state.used[id]||0) + (n>0 ? 1 : 0);
-  saveState();
+  // “많이 찍힌” 용 사용횟수 누적(추가할 때만)
+  if(n > 0){
+    state.used[id] = (state.used[id]||0) + 1;
+    saveState();
+  }
 
   renderCart();
-  renderProducts(); // 사용수 badge/정렬 반영
+  renderProducts(); // 사용수/정렬 반영
 }
 
 function sumCart(){
@@ -691,7 +700,6 @@ function renderCart(){
   document.getElementById("received").textContent = received.toLocaleString()+"원";
   document.getElementById("change").textContent = Math.max(0, received - sum).toLocaleString()+"원";
 
-  // 헤더
   cartEl.innerHTML = `
     <div class="carthead">
       <div>장바구니 <span class="muted">(수량 조절 + 삭제)</span></div>
@@ -699,9 +707,7 @@ function renderCart(){
     </div>
   `;
 
-  // 최소 7개 이상 노출 체감: 아이템 높이/패딩을 작게 유지 + cart는 flex:1 scroll
-  const ids = Object.keys(cart);
-  ids.forEach(id=>{
+  Object.keys(cart).forEach(id=>{
     const p = productMap[id];
     const qn = cart[id];
 
@@ -713,10 +719,10 @@ function renderCart(){
         <div class="sub">${p.price.toLocaleString()}원 · 합 ${(p.price*qn).toLocaleString()}원</div>
       </div>
       <div class="controls">
-        <button class="ctrl" data-act="minus" title="-">-</button>
+        <button class="ctrl" data-act="minus">-</button>
         <div class="count">${qn}</div>
-        <button class="ctrl" data-act="plus" title="+">+</button>
-        <button class="ctrl del" data-act="del" title="삭제">✕</button>
+        <button class="ctrl" data-act="plus">+</button>
+        <button class="ctrl del" data-act="del">✕</button>
       </div>
     `;
 
@@ -729,7 +735,7 @@ function renderCart(){
 }
 
 /* =========================
-   6) 결제(확인 팝업 + 소리 + 1초 잠금)
+   7) 결제(확인 팝업 + 소리 + 1초 잠금)
    ========================= */
 const overlay = document.getElementById("overlay");
 const payBtn = document.getElementById("pay");
@@ -742,8 +748,7 @@ function beep(){
     const ctx = new (window.AudioContext||window.webkitAudioContext)();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
-    o.type="sine";
-    o.frequency.value=880;
+    o.type="sine"; o.frequency.value=880;
     g.gain.value=0.06;
     o.connect(g); g.connect(ctx.destination);
     o.start();
@@ -754,27 +759,23 @@ function beep(){
 payBtn.onclick = ()=>{
   if(locked) return;
   const {sum, qty} = sumCart();
-  if(qty === 0){
-    modalText.textContent = "장바구니가 비었습니다.";
-  }else{
-    modalText.textContent = `총 ${sum.toLocaleString()}원 / ${qty}개 · 결제완료 처리할까요?`;
-  }
+  modalText.textContent = (qty===0)
+    ? "장바구니가 비었습니다."
+    : `총 ${sum.toLocaleString()}원 / ${qty}개 · 결제완료 처리할까요?`;
+
   overlay.classList.add("show");
   beep();
 };
-
 cancelBtn.onclick = ()=> overlay.classList.remove("show");
 
 okBtn.onclick = ()=>{
   overlay.classList.remove("show");
   beep();
 
-  // 1초 잠금
   locked = true;
   payBtn.classList.add("locked");
 
   setTimeout(()=>{
-    // 결제 완료 후 초기화(장바구니 + 받은돈)
     for(const id in cart) delete cart[id];
     received = 0;
     renderCart();
@@ -785,7 +786,7 @@ okBtn.onclick = ()=>{
 };
 
 /* =========================
-   7) 받은돈 버튼 / 초기화(받은돈만)
+   8) 받은돈 버튼 / 초기화(받은돈만)
    ========================= */
 document.querySelectorAll('.money button[data-add]').forEach(b=>{
   b.onclick = ()=>{
@@ -799,11 +800,10 @@ document.getElementById("reset").onclick = ()=>{
 };
 
 /* =========================
-   8) 검색/초성 키보드
+   9) 검색/초성키
    ========================= */
 const qEl = document.getElementById("q");
 qEl.value = q;
-
 qEl.addEventListener("input", ()=>{
   q = qEl.value;
   renderProducts();
@@ -835,7 +835,7 @@ clear.onclick=()=>{
 choEl.appendChild(clear);
 
 /* =========================
-   9) 실행
+   10) 실행
    ========================= */
 function renderAll(){
   renderTabs();
