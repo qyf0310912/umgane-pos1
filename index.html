@@ -2,91 +2,159 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>엄가네 POS</title>
 
 <style>
-body{margin:0;background:#0b0c10;color:#fff;font-family:sans-serif}
-.top{display:flex;align-items:center;padding:10px;background:#111}
-.hamburger{font-size:22px;cursor:pointer}
-.title{margin-left:10px;font-weight:bold}
+:root{
+  --bg:#0f1219;
+  --panel:#121827;
+  --card1:#1e2639;
+  --card2:#242f4a;
+  --line:rgba(255,255,255,.12);
+  --text:#f7f9ff;
+  --muted:rgba(247,249,255,.65);
+  --accent:#ff9f00;
+  --danger:#ff4d4f;
+}
+
+*{box-sizing:border-box}
+html,body{
+  height:100%; margin:0;
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",system-ui,Segoe UI,Roboto,sans-serif;
+}
+button,input{font:inherit}
+button{border:none; background:none; color:inherit; cursor:pointer}
+
+/* 상단바 */
+.topbar{
+  height:56px;
+  display:flex; align-items:center; gap:12px;
+  padding:0 14px;
+  border-bottom:1px solid var(--line);
+  background:#0b0e14;
+}
+.burger{
+  font-size:22px;
+  padding:6px 10px;
+  border-radius:10px;
+  background:rgba(255,255,255,.06);
+}
+.title{font-weight:900}
+
+/* 드로어 */
 .drawer{
-  position:fixed;top:0;left:-240px;width:240px;height:100%;
-  background:#161a22;transition:.3s;padding:20px
+  position:fixed; inset:0 auto 0 0;
+  width:220px;
+  background:#0b0e14;
+  border-right:1px solid var(--line);
+  transform:translateX(-100%);
+  transition:.2s;
+  z-index:10;
 }
-.drawer.open{left:0}
+.drawer.open{transform:translateX(0)}
 .drawer button{
-  width:100%;margin-bottom:10px;padding:12px;
-  background:#222;border:none;color:#fff;font-size:16px
+  display:block;
+  width:100%;
+  padding:14px;
+  text-align:left;
+  font-weight:900;
+  border-bottom:1px solid var(--line);
 }
-.drawer button.active{background:#ff9f00;color:#000}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:12px}
+.drawer button.active{
+  background:rgba(255,159,0,.18);
+  color:var(--accent);
+}
+
+/* 본문 */
+.main{padding:12px}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:12px;
+}
 .card{
-  background:#1b2233;border-radius:12px;padding:14px;
-  cursor:pointer
+  background:linear-gradient(180deg,var(--card2),var(--card1));
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
 }
-.card .name{font-size:18px}
-.card .price{margin-top:6px;font-size:14px}
-.pin{float:right;color:#ff3b30}
+.name{font-weight:900}
+.price{margin-top:6px; opacity:.9}
+.pin{float:right}
 </style>
 </head>
 
 <body>
 
-<div class="top">
-  <div class="hamburger" onclick="toggleDrawer()">☰</div>
+<div class="topbar">
+  <button class="burger" onclick="toggleDrawer()">☰</button>
   <div class="title" id="currentCat">전체</div>
 </div>
 
 <div class="drawer" id="drawer"></div>
 
-<div class="grid" id="grid"></div>
+<div class="main">
+  <div class="grid" id="grid"></div>
+</div>
 
+<!-- 상품 데이터 -->
 <script src="./items.js"></script>
+
 <script>
 let currentCat = "전체";
 
+/* 드로어 열고닫기 */
 function toggleDrawer(){
   document.getElementById("drawer").classList.toggle("open");
 }
 
+/* 카테고리 렌더 */
 function renderDrawer(cats){
   const d = document.getElementById("drawer");
   d.innerHTML = "";
-  ["전체",...cats].forEach(c=>{
+  ["전체", ...cats].forEach(c=>{
     const b=document.createElement("button");
     b.textContent=c;
     if(c===currentCat) b.classList.add("active");
-    b.onclick=()=>{currentCat=c;renderAll()};
+    b.onclick=()=>{
+      currentCat=c;
+      renderAll();
+    };
     d.appendChild(b);
   });
 }
 
+/* 상품 렌더 */
 function renderAll(){
+  if(!window.ITEMS || !ITEMS.length) return;
+
   document.getElementById("currentCat").textContent=currentCat;
   document.getElementById("drawer").classList.remove("open");
 
-  let items = window.ITEMS
-    .filter(i=>currentCat==="전체"||i.cat===currentCat)
+  const list = ITEMS
+    .filter(i=> currentCat==="전체" || i.cat===currentCat)
     .sort((a,b)=>{
-      if(a.pinned!==b.pinned) return b.pinned-a.pinned;
-      if(a.usage!==b.usage) return b.usage-a.usage;
-      return b.last-a.last;
+      if((b.usage||0)!==(a.usage||0)) return (b.usage||0)-(a.usage||0);
+      return (b.last||0)-(a.last||0);
     });
 
   const g=document.getElementById("grid");
   g.innerHTML="";
-  items.forEach(i=>{
+
+  list.forEach(i=>{
     const c=document.createElement("div");
     c.className="card";
     c.innerHTML=`
-      <div class="name">${i.name}
-        ${i.pinned?'<span class="pin">📌</span>':''}
+      <div class="name">
+        ${i.name}
+        ${i.pinned?'📌':''}
       </div>
-      <div class="price">${i.price.toLocaleString()}원</div>
+      <div class="price">${Number(i.price).toLocaleString()}원</div>
     `;
     c.onclick=()=>{
-      i.usage++;
+      i.usage=(i.usage||0)+1;
       i.last=Date.now();
       renderAll();
     };
@@ -94,6 +162,7 @@ function renderAll(){
   });
 }
 
+/* items.js 로드 완료 후 실행 */
 document.addEventListener("ITEMS_READY",()=>{
   const cats=[...new Set(ITEMS.map(i=>i.cat))];
   renderDrawer(cats);
