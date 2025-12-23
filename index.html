@@ -2,201 +2,419 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>라팡 POS</title>
 
   <style>
-    body{
-      margin:0;
-      background:#0b0c10;
-      color:#fff;
-      font-family: system-ui, -apple-system, "Apple SD Gothic Neo","Noto Sans KR", sans-serif;
+    :root{
+      --bg:#0b0c10;
+      --panel:#111319;
+      --panel2:#0f1116;
+      --line:rgba(255,255,255,.08);
+      --text:#f5f7ff;
+      --muted:rgba(245,247,255,.65);
+      --accent:#ff9f00;
+      --good:#29d17e;
+      --bad:#ff3b30;
+      --shadow:0 12px 40px rgba(0,0,0,.35);
+      --r:18px;
     }
-    .wrap{
-      display:grid;
-      grid-template-columns: 1.4fr 1fr;
-      height:100vh;
-      gap:12px;
-      padding:12px;
-      box-sizing:border-box;
-    }
-    .panel{
-      background:#111319;
-      border-radius:16px;
-      padding:12px;
-      box-sizing:border-box;
-      overflow:auto;
-    }
-    h1{ margin:0 0 8px; font-size:20px; }
 
-    .cats button{
-      margin:4px;
-      padding:10px 14px;
-      border-radius:999px;
-      border:none;
-      background:#222;
-      color:#fff;
-      font-weight:700;
-      cursor:pointer;
-    }
-    .cats button.active{ background:#ff9f00; color:#111; }
+    *{box-sizing:border-box;}
+    html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;}
+    .app{height:100%; padding:12px; display:grid; grid-template-columns: 1.35fr 1fr; gap:12px;}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015)); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden;}
+    .panel-inner{height:100%; display:flex; flex-direction:column;}
 
+    /* Left */
+    .left-top{padding:12px 12px 8px; display:flex; gap:8px; align-items:center;}
+    .title{font-weight:900; font-size:18px; letter-spacing:.2px; opacity:.95; margin-right:auto;}
+    .cats{display:flex; gap:8px; flex-wrap:wrap;}
+    .catbtn{
+      padding:10px 14px; border-radius:999px; border:1px solid var(--line);
+      background:rgba(255,255,255,.04); color:var(--text); font-weight:900; cursor:pointer;
+    }
+    .catbtn.active{background:var(--accent); color:#111; border-color:transparent;}
+
+    .items-wrap{padding:10px 12px 12px; overflow:auto;}
     .items{
       display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:8px;
+      grid-template-columns: repeat(4, minmax(0, 1fr)); /* ✅ 4열 고정 */
+      gap:10px;
     }
-    .item{
-      background:#1a1c22;
-      border-radius:12px;
-      padding:10px;
-      cursor:pointer;
-    }
-    .item-name{ font-size:18px; font-weight:900; }
-    .item-price{ color:#aaa; margin-top:4px; }
-
-    .cart-item{
+    .card{
+      background:rgba(255,255,255,.035);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
       display:flex;
-      justify-content:space-between;
-      margin-bottom:6px;
-      font-size:18px;
+      flex-direction:column;
+      gap:8px;
+      min-height:92px;
     }
-
-    .big{
-      font-size:28px;
-      font-weight:900;
-    }
-
-    .keys button{
-      width:100%;
-      height:56px;
-      margin:4px 0;
-      font-size:20px;
-      font-weight:900;
-      border-radius:12px;
-      border:none;
+    .iname{font-size:20px; font-weight:1000; line-height:1.05;}
+    .iprice{font-size:13px; color:var(--muted); font-weight:800;}
+    .add{
+      margin-top:auto;
+      align-self:flex-end;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,159,0,.14); /* ✅ 눈 덜 아프게 */
+      color:var(--accent);
+      font-weight:1000;
       cursor:pointer;
     }
-    .pay{ background:#ff9f00; color:#111; height:70px; font-size:26px; }
+    .add:active{transform:translateY(1px);}
+
+    /* Right */
+    .right{position:relative;}
+    .right-top{
+      padding:12px;
+      display:grid;
+      grid-template-columns: 1fr 170px;
+      gap:10px;
+      border-bottom:1px solid var(--line);
+    }
+    .sumBox,.cntBox{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+    }
+    .lbl{font-size:12px; color:var(--muted); font-weight:900; margin-bottom:6px;}
+    .sum{font-size:28px; font-weight:1000;}
+    .cnt{font-size:22px; font-weight:1000;}
+
+    .cart{
+      padding:10px 12px;
+      overflow:auto;
+      /* ✅ 최소 7줄 이상 한눈에: 높이 확보 + 스크롤 */
+      max-height: calc(100vh - 12px - 12px - 110px - 150px - 110px); 
+    }
+    .row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      padding:10px 0;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      align-items:center;
+    }
+    .rname{font-size:18px; font-weight:1000;}
+    .rsub{font-size:13px; color:var(--muted); font-weight:800; margin-top:4px;}
+    .ract{display:flex; gap:8px; align-items:center;}
+    .mini{
+      min-width:44px; height:40px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      font-weight:1000;
+      cursor:pointer;
+    }
+    .del{background:rgba(255,59,48,.14); border-color:rgba(255,59,48,.22); color:#ff8b84;}
+    .qty{min-width:62px; text-align:center; font-weight:1000; color:var(--text); opacity:.95;}
+
+    .moneyBar{
+      padding:12px;
+      border-top:1px solid var(--line);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      background:rgba(0,0,0,.12);
+    }
+    .moneyLine{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .moneyBox{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+    }
+    .moneyVal{font-size:28px; font-weight:1000;}
+    .moneyVal.good{color:var(--good);}
+    .moneyVal.bad{color:var(--bad);}
+
+    .quick{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap:10px;
+    }
+    .qbtn{
+      height:56px;
+      border-radius:14px;
+      border:1px solid rgba(255,159,0,.25);
+      background:rgba(255,159,0,.10);
+      color:var(--text);
+      font-weight:1000;
+      font-size:18px;
+      cursor:pointer;
+    }
+    .reset{
+      border-color:rgba(255,59,48,.25);
+      background:rgba(255,59,48,.10);
+    }
+
+    .paybar{
+      position:sticky;
+      bottom:0;
+      padding:12px;
+      background:linear-gradient(180deg, rgba(11,12,16,0), rgba(11,12,16,.85) 22%, rgba(11,12,16,.95));
+    }
+    .paybtn{
+      width:100%;
+      height:78px;
+      border-radius:18px;
+      border:none;
+      background:var(--accent);
+      color:#111;
+      font-weight:1100;
+      font-size:28px;
+      cursor:pointer;
+    }
+
+    /* 작은 화면 대응 */
+    @media (max-width: 1100px){
+      .app{grid-template-columns: 1fr;}
+      .items{grid-template-columns: repeat(3, minmax(0,1fr));}
+      .right-top{grid-template-columns: 1fr 150px;}
+    }
+    @media (max-width: 680px){
+      .items{grid-template-columns: repeat(2, minmax(0,1fr));}
+      .quick{grid-template-columns: repeat(3, 1fr);}
+    }
   </style>
 </head>
 
 <body>
+  <div class="app">
 
-<div class="wrap">
-  <!-- 왼쪽 -->
-  <div class="panel">
-    <h1>라팡 POS</h1>
-    <div class="cats" id="cats"></div>
-    <div class="items" id="items"></div>
-  </div>
-
-  <!-- 오른쪽 -->
-  <div class="panel">
-    <div class="big">총합계: <span id="total">0원</span></div>
-    <div>총수량: <span id="count">0</span></div>
-    <hr>
-    <div id="cart"></div>
-    <hr>
-    <div class="big">받은돈: <span id="received">0원</span></div>
-    <div class="big">거스름돈: <span id="change">0원</span></div>
-
-    <div class="keys">
-      <button onclick="addMoney(1000)">1천</button>
-      <button onclick="addMoney(5000)">5천</button>
-      <button onclick="addMoney(10000)">1만</button>
-      <button onclick="addMoney(30000)">3만</button>
-      <button onclick="addMoney(50000)">5만</button>
-      <button onclick="resetMoney()">초기화</button>
-      <button class="pay" onclick="pay()">결제완료</button>
+    <!-- LEFT -->
+    <div class="panel">
+      <div class="panel-inner">
+        <div class="left-top">
+          <div class="title">라팡 POS</div>
+          <div class="cats" id="cats"></div>
+        </div>
+        <div class="items-wrap">
+          <div class="items" id="items"></div>
+        </div>
+      </div>
     </div>
+
+    <!-- RIGHT -->
+    <div class="panel right">
+      <div class="panel-inner">
+
+        <div class="right-top">
+          <div class="sumBox">
+            <div class="lbl">총합계</div>
+            <div class="sum" id="total">0원</div>
+          </div>
+          <div class="cntBox">
+            <div class="lbl">총갯수</div>
+            <div class="cnt" id="count">0</div>
+          </div>
+        </div>
+
+        <div class="cart" id="cart"></div>
+
+        <div class="moneyBar">
+          <div class="moneyLine">
+            <div class="moneyBox">
+              <div class="lbl">받은돈</div>
+              <div class="moneyVal" id="received">0원</div>
+            </div>
+            <div class="moneyBox">
+              <div class="lbl">거스름돈</div>
+              <div class="moneyVal bad" id="change">0원</div>
+            </div>
+          </div>
+
+          <!-- ✅ 빠른 현금 버튼: 500/1천/5천/1만/5만/초기화 -->
+          <div class="quick">
+            <button class="qbtn" onclick="addMoney(500)">500</button>
+            <button class="qbtn" onclick="addMoney(1000)">1천</button>
+            <button class="qbtn" onclick="addMoney(5000)">5천</button>
+            <button class="qbtn" onclick="addMoney(10000)">1만</button>
+            <button class="qbtn" onclick="addMoney(50000)">5만</button>
+            <button class="qbtn reset" onclick="resetMoney()">초기화</button>
+          </div>
+        </div>
+
+        <div class="paybar">
+          <button class="paybtn" onclick="pay()">결제 완료</button>
+        </div>
+
+      </div>
+    </div>
+
   </div>
-</div>
 
-<!-- 🔴 품목 데이터 불러오기 (네가 이미 만든 items.js) -->
-<script src="./items.js"></script>
+  <!-- ✅ 품목 데이터 -->
+  <script src="./items.js"></script>
 
-<script>
-/* ===== 여기부터 JS ===== */
-alert("메인 JS 실행됨"); // ✔️ 이거 뜨면 정상
+  <script>
+    // iOS 제스처 확대 방지(현장 터치 안정)
+    document.addEventListener("gesturestart", (e) => e.preventDefault());
 
-const state = {
-  cat:null,
-  cart:new Map(),
-  received:0
-};
-
-const fmt = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")+"원";
-
-const catsEl = document.getElementById("cats");
-const itemsEl = document.getElementById("items");
-const cartEl  = document.getElementById("cart");
-
-function renderCats(){
-  const cats=[...new Set(ITEMS.map(i=>i.cat))];
-  if(!state.cat) state.cat=cats[0];
-  catsEl.innerHTML="";
-  cats.forEach(c=>{
-    const b=document.createElement("button");
-    b.textContent=c;
-    if(c===state.cat) b.classList.add("active");
-    b.onclick=()=>{state.cat=c; render();};
-    catsEl.appendChild(b);
-  });
-}
-
-function renderItems(){
-  itemsEl.innerHTML="";
-  ITEMS.filter(i=>i.cat===state.cat).forEach(it=>{
-    const d=document.createElement("div");
-    d.className="item";
-    d.innerHTML=`<div class="item-name">${it.name}</div>
-                 <div class="item-price">${fmt(it.price)}</div>`;
-    d.onclick=()=>{
-      const v=state.cart.get(it.name)||{item:it,qty:0};
-      v.qty++; state.cart.set(it.name,v);
-      render();
+    const state = {
+      cat: null,
+      cart: new Map(), // key: name, val:{item, qty}
+      received: 0
     };
-    itemsEl.appendChild(d);
-  });
-}
 
-function renderCart(){
-  cartEl.innerHTML="";
-  let total=0,count=0;
-  state.cart.forEach(v=>{
-    total+=v.item.price*v.qty;
-    count+=v.qty;
-    const d=document.createElement("div");
-    d.className="cart-item";
-    d.textContent=`${v.item.name} x${v.qty}`;
-    cartEl.appendChild(d);
-  });
-  document.getElementById("total").textContent=fmt(total);
-  document.getElementById("count").textContent=count;
-  document.getElementById("received").textContent=fmt(state.received);
-  document.getElementById("change").textContent=
-    fmt(Math.max(0,state.received-total));
-}
+    // 숫자 표시(천단위 콤마) + 원
+    const fmt = (n) => (n||0).toLocaleString("ko-KR") + "원";
 
-function render(){
-  renderCats();
-  renderItems();
-  renderCart();
-}
+    const catsEl = document.getElementById("cats");
+    const itemsEl = document.getElementById("items");
+    const cartEl  = document.getElementById("cart");
 
-function addMoney(v){ state.received+=v; renderCart(); }
-function resetMoney(){ state.received=0; renderCart(); }
+    function getCats(){
+      return [...new Set((window.ITEMS||[]).map(i=>i.cat))];
+    }
 
-function pay(){
-  alert("결제 완료");
-  state.cart.clear();
-  state.received=0;
-  render();
-}
+    function totals(){
+      let total=0, count=0;
+      state.cart.forEach(v=>{
+        total += v.item.price * v.qty;
+        count += v.qty;
+      });
+      return {total, count};
+    }
 
-render();
-</script>
+    function renderCats(){
+      const cats = getCats();
+      if(!cats.length){
+        catsEl.innerHTML = '<span style="color:rgba(255,255,255,.6);font-weight:900">items.js 로드 실패</span>';
+        return;
+      }
+      if(!state.cat) state.cat = cats[0];
 
+      catsEl.innerHTML = "";
+      cats.forEach(c=>{
+        const b = document.createElement("button");
+        b.className = "catbtn" + (c===state.cat ? " active" : "");
+        b.textContent = c;
+        b.onclick = ()=>{ state.cat=c; renderItems(); };
+        catsEl.appendChild(b);
+      });
+    }
+
+    function renderItems(){
+      itemsEl.innerHTML = "";
+      const list = (window.ITEMS||[]).filter(i=>i.cat===state.cat);
+      list.forEach(it=>{
+        const d = document.createElement("div");
+        d.className = "card";
+        d.innerHTML = `
+          <div class="iname">${it.name}</div>
+          <div class="iprice">${fmt(it.price)}</div>
+          <button class="add">담기</button>
+        `;
+        d.querySelector(".add").onclick = ()=>{
+          const cur = state.cart.get(it.name) || {item:it, qty:0};
+          cur.qty++;
+          state.cart.set(it.name, cur);
+          renderRight();
+        };
+        itemsEl.appendChild(d);
+      });
+      renderRight();
+    }
+
+    function renderRight(){
+      const {total, count} = totals();
+      document.getElementById("total").textContent = fmt(total);
+      document.getElementById("count").textContent = count;
+
+      document.getElementById("received").textContent = fmt(state.received);
+
+      const ch = Math.max(0, state.received - total);
+      const changeEl = document.getElementById("change");
+      changeEl.textContent = fmt(ch);
+      changeEl.classList.toggle("good", ch>0);
+      changeEl.classList.toggle("bad", ch===0);
+
+      // cart
+      if(count===0){
+        cartEl.innerHTML = '<div style="color:rgba(245,247,255,.55);font-weight:900;padding:18px 0;">(비어있음)</div>';
+        return;
+      }
+
+      cartEl.innerHTML = "";
+      state.cart.forEach((v,key)=>{
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `
+          <div>
+            <div class="rname">${v.item.name}</div>
+            <div class="rsub">${fmt(v.item.price)} · 수량 x${v.qty}</div>
+          </div>
+          <div class="ract">
+            <button class="mini" title="-1">-</button>
+            <div class="qty">${v.qty}</div>
+            <button class="mini" title="+1">+</button>
+            <button class="mini del" title="삭제">삭제</button>
+          </div>
+        `;
+
+        const [minus, plus, del] = row.querySelectorAll("button");
+        minus.onclick = ()=>{
+          v.qty--;
+          if(v.qty<=0) state.cart.delete(key);
+          else state.cart.set(key, v);
+          renderRight();
+        };
+        plus.onclick = ()=>{
+          v.qty++;
+          state.cart.set(key, v);
+          renderRight();
+        };
+        del.onclick = ()=>{
+          state.cart.delete(key);
+          renderRight();
+        };
+
+        cartEl.appendChild(row);
+      });
+    }
+
+    function addMoney(v){
+      state.received += v;
+      renderRight();
+    }
+
+    // ✅ 초기화 = 받은돈만 리셋(장바구니 유지)
+    function resetMoney(){
+      state.received = 0;
+      renderRight();
+    }
+
+    function pay(){
+      const {total} = totals();
+      if(total<=0){
+        alert("담긴 품목이 없습니다");
+        return;
+      }
+      if(state.received < total){
+        alert("받은돈이 부족합니다");
+        return;
+      }
+      // 결제 완료: 장바구니/받은돈 리셋
+      state.cart.clear();
+      state.received = 0;
+      renderRight();
+      alert("결제 완료");
+    }
+
+    // init
+    renderCats();
+    renderItems();
+  </script>
 </body>
 </html>
