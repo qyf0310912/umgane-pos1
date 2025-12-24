@@ -4,728 +4,880 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>엄가네 POS</title>
+
   <style>
     :root{
-      --bg:#0b0c10;
-      --panel:#111319;
-      --panel2:#0f1116;
-      --line:rgba(255,255,255,.08);
-      --text:#f5f7ff;
-      --muted:rgba(245,247,255,.65);
+      --bg:#0f1219;
+      --panel:#121827;
+      --card1:#1e2639;
+      --card2:#242f4a;
+      --line:rgba(255,255,255,.12);
+      --text:#f7f9ff;
+      --muted:rgba(247,249,255,.65);
       --accent:#ff9f00;
-      --accent2:#ffb84d;
       --danger:#ff4d4f;
-      --good:#29d17e;
-      --btn:#f3f4f6;
+      --good:#2fd27e;
+      --btn:#f4f5f7;
       --btnText:#111;
-      --shadow:0 12px 40px rgba(0,0,0,.35);
-      --r:18px;
+      --shadow:0 14px 44px rgba(0,0,0,.35);
+      --r:20px;
+
+      /* ✅ 핀+컬러 통일 (핀 상품 테두리/그림자) */
+      --pinBorder: rgba(255,159,0,.75);
+      --pinGlow: rgba(255,159,0,.18);
     }
-    *{box-sizing:border-box;}
-    html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Noto Sans KR",Segoe UI,Roboto,Arial;}
+
+    *{box-sizing:border-box}
+    html,body{height:100%; margin:0; background:var(--bg); color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",system-ui,Segoe UI,Roboto,sans-serif;
+    }
     button,input{font:inherit}
-    .wrap{display:grid; grid-template-columns: 1fr 420px; gap:14px; padding:14px; height:100vh;}
-    .panel{
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    button{border:none; background:none}
+
+    .app{height:100%; display:grid; grid-template-columns:3fr 1fr; gap:14px; padding:14px}
+
+    /* LEFT */
+    .left{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
       border:1px solid var(--line);
       border-radius:22px;
       box-shadow:var(--shadow);
       overflow:hidden;
-      min-height:0;
-    }
-    .left{display:flex; flex-direction:column; min-height:0;}
-    .topbar{padding:14px 14px 10px; border-bottom:1px solid var(--line); background:rgba(0,0,0,.12)}
-    .tabs{display:flex; gap:10px; flex-wrap:wrap;}
-    .tab{
-      padding:10px 16px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      color:var(--text);
-      cursor:pointer;
-      user-select:none;
-    }
-    .tab.active{
-      border-color:rgba(255,159,0,.55);
-      box-shadow:0 0 0 3px rgba(255,159,0,.12) inset;
-      background:rgba(255,159,0,.14);
+      display:flex; flex-direction:column;
+      min-width:0;
     }
 
-    .searchRow{display:flex; gap:10px; margin-top:10px; align-items:center;}
+    .topbar{
+      display:flex; gap:10px; padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      background:rgba(255,255,255,.02)
+    }
+    .tabs{display:flex; gap:8px; flex-wrap:wrap}
+    .tab{
+      padding:9px 14px; border-radius:999px; border:1px solid var(--line);
+      background:#1d2332; color:var(--text);
+      font-weight:1100; cursor:pointer;
+      touch-action:manipulation;
+    }
+    .tab.active{background:rgba(255,159,0,.18); border-color:rgba(255,159,0,.55)}
+
+    .searchwrap{padding:10px 12px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.015)}
+    .searchrow{display:flex; gap:10px; align-items:center}
     .search{
-      flex:1;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.05);
+      flex:1; display:flex; align-items:center; gap:10px;
+      background:rgba(255,255,255,.04); border:1px solid var(--line);
+      border-radius:14px; padding:10px 12px;
+      min-width:0;
     }
+    .search .icon{opacity:.7}
     .search input{
-      width:100%;
-      background:transparent;
-      border:none;
-      outline:none;
-      color:var(--text);
-      font-size:16px;
+      width:100%; border:none; outline:none; background:transparent;
+      color:var(--text); font-weight:1000; font-size:15px;
+      min-width:0;
     }
-    .sortBtn{
-      padding:10px 14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.05);
-      color:var(--text);
+
+    .cho{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap}
+    .cho button{
+      padding:8px 10px; border-radius:12px; border:1px solid var(--line);
+      background:rgba(255,255,255,.03); color:var(--text);
+      font-weight:1100; cursor:pointer; min-width:40px;
+      touch-action:manipulation;
+    }
+    /* ✅ X 대신 빗자루(🧹) + 다른 컬러 */
+    .cho button.clear{
+      background: rgba(255, 77, 79, .95) !important;
+      border-color: rgba(255, 77, 79, 1) !important;
+      color:#fff !important;
+      font-weight:1400 !important;
+      box-shadow:0 6px 18px rgba(255,77,79,.25) !important;
+      min-width:44px;
+    }
+    .cho button.clear:active{transform:scale(.98)}
+
+    /* ✅ 전체공통고정: 상단 1줄(가로 스크롤) */
+    .pinbar{
+      padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      background:rgba(255,255,255,.01);
+    }
+    .pinbarHead{
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:8px;
+      font-weight:1100;
+      color:var(--muted);
+    }
+    .pinStrip{
+      display:flex; gap:10px;
+      overflow:auto;
+      padding-bottom:6px;
+      scroll-snap-type:x mandatory;
+    }
+    .pinChip{
+      flex:0 0 auto;
+      min-width:170px;
+      scroll-snap-align:start;
+      border-radius:16px;
+      border:1px solid var(--pinBorder);
+      background:linear-gradient(180deg, rgba(255,159,0,.12), rgba(255,255,255,.02));
+      box-shadow:0 0 0 3px rgba(255,159,0,.10);
+      padding:10px 12px;
       cursor:pointer;
+      user-select:none;
+      touch-action:manipulation;
+      position:relative;
+    }
+    .pinChip .pname{font-size:16px; font-weight:1200; letter-spacing:-.2px}
+    .pinChip .pprice{margin-top:6px; font-size:13px; font-weight:1100; opacity:.95}
+    .pinChip .pinIcon{
+      position:absolute; right:10px; top:10px;
+      opacity:.95;
+    }
+
+    /* ✅ 상품목록(실무자 최적해: 카드 높이 ~92px) */
+    .products{
+      padding:12px;
+      overflow:auto;
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:12px;
+      min-width:0;
+    }
+    @media (min-width:1400px){ .products{grid-template-columns:repeat(5, minmax(0,1fr))} }
+
+    .card{
+      background:linear-gradient(180deg, var(--card2), var(--card1));
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:18px;
+      padding:14px 16px;
+      min-height:92px;
+      cursor:pointer;
+      user-select:none;
+      position:relative;
+      touch-action:manipulation;
+      overflow:hidden;
+    }
+    .card.flash{box-shadow:0 0 0 3px rgba(255,159,0,.45)}
+    .card.pinned{
+      border-color: var(--pinBorder);
+      box-shadow:0 0 0 3px var(--pinGlow);
+    }
+    .name{font-size:20px; font-weight:1200; letter-spacing:-.2px; line-height:1.2}
+    .price{margin-top:6px; font-size:16px; opacity:.95; font-weight:1100; line-height:1.15}
+    .meta{
+      position:absolute; right:10px; top:10px;
+      display:flex; gap:8px; align-items:center; opacity:.95;
+      transform:scale(.94); transform-origin:top right;
+    }
+    .badge{
+      font-size:12px; padding:4px 8px; border-radius:999px;
+      border:1px solid var(--line); background:rgba(255,255,255,.03);
+      font-weight:1100;
+    }
+    .pin{
+      width:28px; height:28px; display:grid; place-items:center;
+      border-radius:10px; border:1px solid var(--line);
+      background:rgba(0,0,0,.15);
+    }
+    .pin.on{border-color:var(--pinBorder); background:rgba(255,159,0,.18)}
+    /* ✅ 메타 클릭 가로채지 않게 */
+    .meta, .meta *{pointer-events:none}
+
+    .hint{
+      padding:8px 12px 12px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:900;
+      border-top:1px solid var(--line);
+      background:rgba(255,255,255,.01);
+    }
+
+    /* RIGHT */
+    .right{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      display:flex; flex-direction:column;
+      min-width:0;
+    }
+
+    /* ✅ 장바구니는 보기 좋게 + 스크롤 */
+    .cart{
+      padding:12px;
+      overflow:auto;
+      flex:1;
+      min-height:240px;
+    }
+    .carthead{
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:10px;
+      font-weight:1200;
+    }
+    .carthead .muted{opacity:.7; font-weight:1000}
+
+    .item{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .item .title{font-weight:1200; font-size:14px}
+    .item .sub{margin-top:4px; font-size:12px; opacity:.8; font-weight:900}
+
+    .controls{display:flex; gap:8px; align-items:center}
+    .ctrl{
+      width:38px; height:36px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      font-weight:1300;
+      cursor:pointer;
+      touch-action:manipulation;
+      white-space:nowrap;
+      line-height:1;
+    }
+    /* ✅ 삭제 버튼 줄바꿈 방지 + 눈에 띄게 */
+    .ctrl.del{
+      min-width:56px;
+      padding:10px 14px;
+      background:rgba(255,77,79,.22);
+      border-color:rgba(255,77,79,.45);
+      color:#ffecec;
+      white-space:nowrap;
+      line-height:1;
+      word-break:keep-all;
+    }
+    .count{width:26px; text-align:center; font-weight:1300}
+
+    .summary{
+      padding:12px;
+      border-top:1px solid var(--line);
+      background:rgba(255,255,255,.015);
+    }
+
+    /* ✅ 총합계(개수) 금액 한줄 */
+    .sumline{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+    }
+    .sumText{
+      font-size:14px; font-weight:1100; opacity:.75;
+    }
+    .sumValue{
+      font-size:22px; font-weight:1400;
+      letter-spacing:-.2px;
       white-space:nowrap;
     }
 
-    .choRow{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
-    .choRow button{
-      padding:10px 12px;
-      min-width:44px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.03);
-      color:var(--text);
-      cursor:pointer;
-    }
-    .hint{margin-top:10px; color:var(--muted); font-size:13px; line-height:1.3}
-    .hint b{color:var(--accent2)}
-    .list{
-      padding:14px;
-      overflow:auto;
-      flex:1;
-      min-height:0;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(180px, 1fr));
-      gap:12px;
-    }
-    .card{
-      position:relative;
-      border-radius:18px;
-      padding:14px 14px 12px;
-      border:1px solid rgba(255,255,255,.10);
-      background:linear-gradient(180deg, rgba(86,116,182,.26), rgba(50,68,120,.10));
-      cursor:pointer;
-      user-select:none;
-      min-height:84px;
-    }
-    .name{font-weight:800; font-size:20px; letter-spacing:-0.3px;}
-    .price{margin-top:8px; font-weight:700; color:rgba(245,247,255,.9)}
-    .meta{
-      position:absolute; right:12px; top:10px;
-      display:flex; gap:8px; align-items:center;
-      color:rgba(245,247,255,.7); font-size:12px;
-    }
-    .pin{
-      width:30px; height:30px;
-      border-radius:10px;
-      display:grid; place-items:center;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.18);
-      cursor:pointer;
-    }
-    .pin.on{
-      border-color:rgba(255,159,0,.55);
-      background:rgba(255,159,0,.16);
-    }
-
-    /* right panel */
-    .right{display:flex; flex-direction:column; min-height:0;}
-    .rTop{padding:14px; border-bottom:1px solid var(--line); background:rgba(0,0,0,.12); font-weight:800}
-    .cartBox{padding:12px 14px 10px; flex:1; min-height:0; overflow:hidden; display:flex; flex-direction:column;}
-    .cartList{
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;
-      background:rgba(255,255,255,.02);
-      padding:10px;
-      flex:1;
-      min-height:260px;
-      overflow:auto;
-    }
-    .row{
-      display:grid;
-      grid-template-columns: 1fr auto auto auto;
-      gap:8px;
+    /* ✅ 받은돈/거스름돈 한줄(칸 축소) */
+    .payline{
+      display:flex;
       align-items:center;
-      padding:10px 10px;
-      border-bottom:1px dashed rgba(255,255,255,.08);
-    }
-    .row:last-child{border-bottom:none;}
-    .row .title{font-weight:800}
-    .row .sub{color:rgba(245,247,255,.65); font-size:12px; margin-top:4px}
-    .qtyCtl{display:flex; gap:6px; align-items:center;}
-    .qtyCtl button{
-      width:34px; height:34px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.05);
-      color:var(--text);
-      cursor:pointer;
-      font-weight:900;
-    }
-    .qtyNum{min-width:26px; text-align:center; font-weight:900}
-    .del{
-      width:44px; height:34px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,77,79,.12);
-      color:var(--text);
-      cursor:pointer;
-      font-weight:900;
-    }
-
-    .summary{
-      display:grid;
-      grid-template-columns: 1fr auto;
+      justify-content:space-between;
       gap:10px;
-      padding:12px 14px;
+      margin-top:10px;
+      padding-top:10px;
       border-top:1px solid rgba(255,255,255,.10);
-      border-bottom:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.10);
-    }
-    .bigLine{display:flex; justify-content:space-between; align-items:baseline;}
-    .bigLine .label{color:rgba(245,247,255,.7); font-weight:700}
-    .bigLine .val{font-size:22px; font-weight:900}
-    .smallVal{font-size:18px; font-weight:900}
-
-    .payRow{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      padding:12px 14px;
-      border-bottom:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.10);
     }
     .payBox{
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:16px;
-      padding:10px 12px;
-      background:rgba(255,255,255,.02);
+      display:flex;
+      align-items:baseline;
+      gap:8px;
+      min-width:0;
+      flex:1;
     }
-    .payBox .label{color:rgba(245,247,255,.7); font-weight:800; font-size:12px}
-    .payBox .val{margin-top:6px; font-size:22px; font-weight:900}
-    .moneyInput{
-      margin-top:8px;
-      width:100%;
-      border:none;
-      outline:none;
-      background:transparent;
-      color:var(--text);
-      font-size:18px;
-      font-weight:900;
+    .payLabel{
+      font-size:12px; opacity:.7; font-weight:1100; white-space:nowrap;
     }
+    .payVal{
+      font-size:18px; font-weight:1300; white-space:nowrap;
+    }
+    .divider{width:2px; height:20px; background:rgba(255,255,255,.14); border-radius:99px}
 
-    .btns{padding:12px 14px 14px;}
-    .chgGrid{
+    /* ✅ 거스름돈 버튼 (3개씩 2줄) */
+    .money{
+      padding:12px;
+      border-top:1px solid var(--line);
       display:grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns:repeat(3,1fr);
       gap:10px;
+      background:rgba(255,255,255,.01);
     }
-    .chgGrid button{
-      padding:12px 0;
+    .money button{
+      padding:12px;
       border-radius:14px;
-      border:1px solid rgba(255,255,255,.10);
+      font-size:16px;
+      font-weight:1300;
+      cursor:pointer;
       background:var(--btn);
       color:var(--btnText);
-      cursor:pointer;
-      font-weight:900;
+      touch-action:manipulation;
     }
-    .chgGrid .reset{
-      background:rgba(255,77,79,.18);
-      color:var(--text);
+    .money button.reset{
+      background:rgba(255,77,79,.22);
+      color:#ffe2e2;
     }
-    .payBtn{
-      width:100%;
-      margin-top:12px;
-      padding:18px 0;
-      border:none;
+
+    .pay{
+      margin:12px; margin-top:0;
       border-radius:16px;
+      padding:16px;
       background:var(--accent);
-      color:#111;
-      font-weight:1000;
-      font-size:20px;
+      font-size:18px;
+      font-weight:1400;
       cursor:pointer;
+      touch-action:manipulation;
     }
+    .pay.locked{opacity:.55; pointer-events:none}
 
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom:16px;
-      transform:translateX(-50%);
-      padding:10px 14px;
-      border-radius:999px;
+    /* 팝업 */
+    .overlay{position:fixed; inset:0; background:rgba(0,0,0,.65); display:none; align-items:center; justify-content:center; z-index:9999}
+    .overlay.show{display:flex}
+    .modal{
+      width:min(520px,92vw);
+      background:#161c28;
       border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.55);
-      color:rgba(245,247,255,.9);
-      font-weight:700;
-      opacity:0;
-      pointer-events:none;
-      transition:.18s;
+      border-radius:20px; padding:18px;
+      box-shadow:var(--shadow)
     }
-    .toast.on{opacity:1; transform:translateX(-50%) translateY(-6px);}
+    .modal h3{margin:0 0 8px; font-size:18px; font-weight:1300}
+    .modal p{margin:0; opacity:.9; font-weight:1000}
+    .modal .btns{display:flex; gap:10px; justify-content:flex-end; margin-top:14px}
+    .modal button{padding:10px 14px; border-radius:14px; font-weight:1300; cursor:pointer}
+    .modal .ok{background:var(--good); color:#082010}
+    .modal .cancel{background:rgba(255,255,255,.08); color:var(--text)}
 
-    /* responsive */
-    @media (max-width: 1100px){
-      .wrap{grid-template-columns:1fr; height:auto; min-height:100vh;}
-      .right{height:520px;}
-      .grid{grid-template-columns: repeat(3, minmax(160px,1fr));}
+    /* 토스트(디버그/확인용) */
+    .toast{
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      background:rgba(0,0,0,.75);
+      border:1px solid rgba(255,255,255,.18);
+      padding:10px 12px; border-radius:14px;
+      font-weight:1100; z-index:10000;
+      display:none; max-width:92vw;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    @media (max-width: 740px){
-      .grid{grid-template-columns: repeat(2, minmax(160px,1fr));}
-      .right{height:560px;}
-    }
+    .toast.show{display:block}
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <section class="panel left">
-      <div class="topbar">
-        <div class="tabs" id="tabs"></div>
+<div class="app">
 
-        <div class="searchRow">
-          <div class="search">
-            🔎
-            <input id="q" placeholder="전카테고리 검색 (예: 감자, ㄱㅈ, ㄱㄴㄷ)" autocomplete="off" />
-          </div>
-          <button class="sortBtn" id="sortBtn">정렬: 고정 + 많이 찍힌 순</button>
-        </div>
+  <section class="left">
+    <div class="topbar">
+      <div class="tabs" id="tabs"></div>
+    </div>
 
-        <div class="choRow" id="cho"></div>
-        <div class="hint">※ <b>고정핀</b>: 길게 쓰는 품목을 “항상 위”로 올립니다. (모바일=길게누르기 / PC=우클릭)</div>
-      </div>
-
-      <div class="list">
-        <div class="grid" id="grid"></div>
-        <div id="empty" style="margin-top:14px; color:rgba(245,247,255,.65); display:none;">검색 결과가 없습니다.</div>
-      </div>
-    </section>
-
-    <aside class="panel right">
-      <div class="rTop">결제</div>
-
-      <div class="cartBox">
-        <div class="cartList" id="cartList"></div>
-      </div>
-
-      <div class="summary">
-        <div class="bigLine">
-          <div class="label">총합계</div>
-          <div class="val" id="total">0원</div>
-        </div>
-        <div class="bigLine" style="justify-content:flex-end; gap:14px;">
-          <div class="label">담긴갯수</div>
-          <div class="smallVal" id="count">0</div>
+    <div class="searchwrap">
+      <div class="searchrow">
+        <div class="search">
+          <span class="icon">🔎</span>
+          <input id="q" placeholder="전카테고리 검색 (예: 감자, ㄱㅈ, ㄱㄱ)" autocomplete="off" />
         </div>
       </div>
+      <div class="cho" id="cho"></div>
+    </div>
 
-      <div class="payRow">
+    <!-- ✅ 전체 공통 고정(상단 1줄) -->
+    <div class="pinbar" id="pinbar" style="display:none">
+      <div class="pinbarHead">
+        <div>고정(전체) — 상단 1줄</div>
+        <div style="opacity:.8">길게누르기/우클릭으로 고정</div>
+      </div>
+      <div class="pinStrip" id="pinStrip"></div>
+    </div>
+
+    <div class="products" id="products"></div>
+    <div class="hint">
+      ※ 상품 고정(전체 공통): 길게 누르기(모바일) / 우클릭(PC).<br/>
+      ※ 검색은 카테고리 무관 + 초성(ㄱㄴㄷ)도 됩니다.
+    </div>
+  </section>
+
+  <section class="right">
+    <div class="cart" id="cart"></div>
+
+    <div class="summary">
+      <div class="sumline">
+        <div class="sumText" id="sumText">총합계(0개)</div>
+        <div class="sumValue" id="sumValue">0원</div>
+      </div>
+
+      <div class="payline">
         <div class="payBox">
-          <div class="label">받은돈</div>
-          <div class="val" id="paidView">0원</div>
-          <input class="moneyInput" id="paidInput" inputmode="numeric" placeholder="(숫자 입력)" />
+          <div class="payLabel">받은돈</div>
+          <div class="payVal" id="received">0원</div>
         </div>
-        <div class="payBox">
-          <div class="label">거스름돈</div>
-          <div class="val" id="changeView">0원</div>
+        <div class="divider"></div>
+        <div class="payBox" style="justify-content:flex-end">
+          <div class="payLabel">거스름돈</div>
+          <div class="payVal" id="change">0원</div>
         </div>
       </div>
+    </div>
 
-      <div class="btns">
-        <div class="chgGrid">
-          <button data-add="500">500</button>
-          <button data-add="1000">1천</button>
-          <button data-add="5000">5천</button>
-          <button data-add="10000">1만</button>
-          <button data-add="50000">5만</button>
-          <button class="reset" data-reset="1">초기화</button>
-        </div>
-        <button class="payBtn" id="payBtn">결제완료</button>
-      </div>
-    </aside>
+    <div class="money">
+      <button data-add="500">500</button>
+      <button data-add="1000">1천</button>
+      <button data-add="5000">5천</button>
+      <button data-add="10000">1만</button>
+      <button data-add="50000">5만</button>
+      <button class="reset" id="reset">초기화</button>
+    </div>
+
+    <button class="pay" id="pay">결제완료</button>
+  </section>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3>결제 완료</h3>
+    <p id="modalText">정말 결제완료 처리할까요?</p>
+    <div class="btns">
+      <button class="cancel" id="cancelBtn">취소</button>
+      <button class="ok" id="okBtn">확인</button>
+    </div>
   </div>
+</div>
 
-  <div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
-  <!-- 데이터 로더 -->
-  <script src="items.js?v=1"></script>
+<!-- ✅ 구글시트 → items.js로 연결할 거면 이 파일을 유지 -->
+<script src="./items.js?v=1"></script>
 
-  <script>
-    /***************
-     * 상태/저장키
-     ***************/
-    const KEY_PIN = "UMGANE_PINNED_V1";
-    const KEY_USE = "UMGANE_USED_V1";
-    const KEY_CART = "UMGANE_CART_V1";
+<script>
+/* JS 에러 즉시 알림 */
+window.addEventListener("error", (e)=>{ alert("JS오류: " + (e?.message || e)); });
 
-    const CATS = ["과일","야채","봉채소","생선","기타"];
-    let activeCat = "과일";            // 기본 탭
-    let q = "";
-    let ITEMS = [];                   // {id,cat,name,unit,price,active}
-    let pinned = new Set(JSON.parse(localStorage.getItem(KEY_PIN)||"[]"));
-    let used = JSON.parse(localStorage.getItem(KEY_USE)||"{}"); // id -> count
-    let cart = JSON.parse(localStorage.getItem(KEY_CART)||"[]"); // [{id,qty}]
+/* ===== 0) 카테고리 ===== */
+const CATS = ["과일","야채","봉채소","생선","기타"];
 
-    /***************
-     * 유틸
-     ***************/
-    const $ = (id)=>document.getElementById(id);
-    const money = (n)=> (Math.max(0, n|0)).toLocaleString("ko-KR")+"원";
-    const toast = (msg)=>{
-      const t=$("toast"); t.textContent=msg; t.classList.add("on");
-      setTimeout(()=>t.classList.remove("on"), 900);
-    };
+/* ===== 1) 상품 데이터 로드 =====
+   - items.js에서 window.ITEMS = [{id,cat,name,price,active}, ...]를 넣어두면 자동 반영
+   - 없으면 아래 샘플로 동작(테스트용)
+*/
+const FALLBACK_ITEMS = [
+  {id:"banana", cat:"과일", name:"바나나", price:2500, active:1},
+  {id:"tomato", cat:"과일", name:"토마토", price:10000, active:1},
+  {id:"potato", cat:"야채", name:"감자", price:3000, active:1},
+  {id:"onion", cat:"야채", name:"양파", price:2500, active:1},
+  {id:"spinach", cat:"봉채소", name:"시금치/1봉지", price:2000, active:1},
+  {id:"mackerel", cat:"생선", name:"고등어/1마리", price:3500, active:1},
+  {id:"egg", cat:"기타", name:"계란", price:6000, active:1},
+];
 
-    // 초성 추출
-    const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
-    function getCho(str){
-      let out="";
-      for (const ch of str){
-        const code = ch.charCodeAt(0);
-        if (code >= 0xAC00 && code <= 0xD7A3){
-          const idx = Math.floor((code - 0xAC00) / 588);
-          out += CHO[idx] || "";
-        } else if (/[ㄱ-ㅎ]/.test(ch)){
-          out += ch;
-        } else if (/[0-9a-zA-Z]/.test(ch)){
-          out += ch.toLowerCase();
-        }
-      }
-      return out;
-    }
-    function norm(str){
-      return (str||"").toString().replace(/\s+/g,"").toLowerCase();
-    }
-
-    function savePinned(){ localStorage.setItem(KEY_PIN, JSON.stringify([...pinned])); }
-    function saveUsed(){ localStorage.setItem(KEY_USE, JSON.stringify(used)); }
-    function saveCart(){ localStorage.setItem(KEY_CART, JSON.stringify(cart)); }
-
-    function itemById(id){ return ITEMS.find(x=>String(x.id)===String(id)); }
-    function cartCount(){ return cart.reduce((a,r)=>a+(r.qty|0),0); }
-    function cartTotal(){
-      return cart.reduce((a,r)=>{
-        const it=itemById(r.id);
-        return a + (it ? (it.price|0)*(r.qty|0) : 0);
-      },0);
-    }
-
-    /***************
-     * 탭 렌더
-     ***************/
-    function renderTabs(){
-      const tabs = $("tabs");
-      tabs.innerHTML = "";
-      for (const c of CATS){
-        const b=document.createElement("button");
-        b.className="tab"+(activeCat===c?" active":"");
-        b.textContent=c;
-        b.onclick=()=>{ activeCat=c; renderTabs(); renderProducts(); };
-        tabs.appendChild(b);
-      }
-    }
-
-    /***************
-     * 상품 필터/정렬/렌더
-     ***************/
-    function matchQuery(it){
-      if (!q) return true;
-      const nq = norm(q);
-      const name = norm(it.name);
-      const cho = getCho(it.name);
-      // "감자" / "ㄱㅈ" / "ㄱ" 다 매칭
-      return name.includes(nq) || cho.includes(nq);
-    }
-
-    function filtered(){
-      // 카테고리 + 쿼리
-      return ITEMS
-        .filter(it=> it.active !== 0 && it.active !== "0")
-        .filter(it=> it.cat === activeCat)
-        .filter(matchQuery);
-    }
-
-    function sorted(list){
-      // 1) pinned 먼저 2) 사용횟수 desc 3) 이름 asc
-      return list.slice().sort((a,b)=>{
-        const ap = pinned.has(String(a.id)) ? 1 : 0;
-        const bp = pinned.has(String(b.id)) ? 1 : 0;
-        if (ap !== bp) return bp - ap;
-        const au = used[String(a.id)] || 0;
-        const bu = used[String(b.id)] || 0;
-        if (au !== bu) return bu - au;
-        return String(a.name).localeCompare(String(b.name),"ko");
-      });
-    }
-
-    function togglePin(id){
-      id=String(id);
-      if (pinned.has(id)) pinned.delete(id);
-      else pinned.add(id);
-      savePinned();
-      renderProducts();
-    }
-
-    function addToCart(id){
-      id=String(id);
-      const r = cart.find(x=>String(x.id)===id);
-      if (r) r.qty = (r.qty|0)+1;
-      else cart.push({id, qty:1});
-      saveCart();
-
-      used[id] = (used[id]||0)+1; // “많이 찍힌 순” 카운트
-      saveUsed();
-
-      renderProducts();
-      renderCart();
-    }
-
-    function renderProducts(){
-      const grid=$("grid");
-      const empty=$("empty");
-      const list=sorted(filtered());
-      grid.innerHTML="";
-      empty.style.display = list.length ? "none" : "block";
-
-      for (const it of list){
-        const c=document.createElement("div");
-        c.className="card";
-
-        const meta=document.createElement("div");
-        meta.className="meta";
-        const use=document.createElement("div");
-        use.textContent="사용 "+(used[String(it.id)]||0);
-        const pin=document.createElement("div");
-        pin.className="pin"+(pinned.has(String(it.id))?" on":"");
-        pin.textContent="📌";
-        pin.title="고정핀";
-        pin.onclick=(e)=>{ e.stopPropagation(); togglePin(it.id); };
-        meta.appendChild(use);
-        meta.appendChild(pin);
-
-        const name=document.createElement("div");
-        name.className="name";
-        name.textContent=it.unit ? `${it.name}/${it.unit}` : it.name;
-
-        const price=document.createElement("div");
-        price.className="price";
-        price.textContent=money(it.price|0);
-
-        c.appendChild(meta);
-        c.appendChild(name);
-        c.appendChild(price);
-
-        // PC 우클릭으로 고정 토글
-        c.addEventListener("contextmenu",(e)=>{ e.preventDefault(); togglePin(it.id); toast(pinned.has(String(it.id))?"고정 ON":"고정 OFF"); });
-
-        // 모바일 길게 누르기
-        let pressT=null;
-        c.addEventListener("touchstart",()=>{
-          pressT=setTimeout(()=>{ togglePin(it.id); toast(pinned.has(String(it.id))?"고정 ON":"고정 OFF"); }, 520);
-        }, {passive:true});
-        c.addEventListener("touchend",()=>{ clearTimeout(pressT); pressT=null; }, {passive:true});
-
-        // 클릭=담기
-        c.onclick=()=> addToCart(it.id);
-
-        grid.appendChild(c);
-      }
-    }
-
-    /***************
-     * 장바구니 렌더 (최소 7줄)
-     ***************/
-    function changeQty(id, delta){
-      id=String(id);
-      const r=cart.find(x=>String(x.id)===id);
-      if (!r) return;
-      r.qty = (r.qty|0) + delta;
-      if (r.qty <= 0) cart = cart.filter(x=>String(x.id)!==id);
-      saveCart();
-      renderCart();
-    }
-    function delItem(id){
-      id=String(id);
-      cart = cart.filter(x=>String(x.id)!==id);
-      saveCart();
-      renderCart();
-    }
-
-    function renderCart(){
-      const box=$("cartList");
-      box.innerHTML="";
-
-      const rows = cart.map(r=>{
-        const it=itemById(r.id);
-        if (!it) return null;
-        return {it, qty:r.qty|0};
-      }).filter(Boolean);
-
-      // 최소 7줄 보이게: 비어있으면 줄만 채움
-      const minRows = 7;
-      const totalRows = Math.max(minRows, rows.length);
-
-      for (let i=0;i<totalRows;i++){
-        if (i >= rows.length){
-          const ghost=document.createElement("div");
-          ghost.className="row";
-          ghost.style.opacity="0.25";
-          ghost.innerHTML = `<div class="title">—</div><div></div><div></div><div></div>`;
-          box.appendChild(ghost);
-          continue;
-        }
-
-        const {it, qty} = rows[i];
-        const row=document.createElement("div");
-        row.className="row";
-
-        const left=document.createElement("div");
-        left.innerHTML = `<div class="title">${it.unit ? `${it.name} x${qty}` : `${it.name} x${qty}`}</div>
-                          <div class="sub">${money((it.price|0)*qty)} · 단가 ${money(it.price|0)}</div>`;
-
-        const qtyCtl=document.createElement("div");
-        qtyCtl.className="qtyCtl";
-        const minus=document.createElement("button"); minus.textContent="–";
-        const num=document.createElement("div"); num.className="qtyNum"; num.textContent=qty;
-        const plus=document.createElement("button"); plus.textContent="+";
-        minus.onclick=()=>changeQty(it.id,-1);
-        plus.onclick=()=>changeQty(it.id,+1);
-        qtyCtl.appendChild(minus); qtyCtl.appendChild(num); qtyCtl.appendChild(plus);
-
-        const del=document.createElement("button");
-        del.className="del";
-        del.textContent="삭제";
-        del.onclick=()=>delItem(it.id);
-
-        const dummy=document.createElement("div"); // align grid columns
-        dummy.style.display="none";
-
-        row.appendChild(left);
-        row.appendChild(qtyCtl);
-        row.appendChild(del);
-        row.appendChild(dummy);
-        box.appendChild(row);
-      }
-
-      const total = cartTotal();
-      $("total").textContent = money(total);
-      $("count").textContent = cartCount();
-
-      // 받은돈/거스름돈
-      const paid = parseInt(($("paidInput").value||"0").replace(/[^\d]/g,""),10) || 0;
-      $("paidView").textContent = money(paid);
-      $("changeView").textContent = money(Math.max(0, paid - total));
-    }
-
-    /***************
-     * 결제/버튼/사운드
-     ***************/
-    function beep(){
-      try{
-        const ctx = new (window.AudioContext||window.webkitAudioContext)();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type="sine";
-        o.frequency.value=880;
-        g.gain.value=0.08;
-        o.connect(g); g.connect(ctx.destination);
-        o.start();
-        setTimeout(()=>{ o.stop(); ctx.close(); }, 120);
-      }catch(e){}
-    }
-
-    function resetPaidOnly(){
-      $("paidInput").value="";
-      renderCart();
-    }
-
-    $("payBtn").onclick=()=>{
-      const total = cartTotal();
-      if (total<=0){ toast("담긴 상품이 없습니다"); return; }
-      beep();
-      cart = [];
-      saveCart();
-      resetPaidOnly();
-      renderCart();
-      toast("결제완료");
-    };
-
-    // 거스름돈 버튼들
-    document.querySelectorAll("[data-add]").forEach(btn=>{
-      btn.onclick=()=>{
-        const add = parseInt(btn.getAttribute("data-add"),10)||0;
-        const cur = parseInt(($("paidInput").value||"0").replace(/[^\d]/g,""),10)||0;
-        $("paidInput").value = String(cur + add);
-        renderCart();
-      };
+function normalizeItems(raw){
+  const out = [];
+  const seen = new Set();
+  for(const it of (raw||[])){
+    if(!it) continue;
+    const id = String(it.id || "").trim();
+    if(!id) continue;
+    if(seen.has(id)) continue; // ✅ id 중복 방지
+    seen.add(id);
+    out.push({
+      id,
+      cat: String(it.cat||"기타").trim(),
+      name: String(it.name||"").trim(),
+      price: Number(it.price||0),
+      active: Number(it.active ?? 1)
     });
-    document.querySelector("[data-reset]").onclick=()=> resetPaidOnly();
+  }
+  return out;
+}
 
-    // 입력 변화 반영
-    $("paidInput").addEventListener("input", ()=>{
-      $("paidInput").value = ($("paidInput").value||"").replace(/[^\d]/g,"");
-      renderCart();
+let PRODUCTS = normalizeItems(window.ITEMS && Array.isArray(window.ITEMS) ? window.ITEMS : FALLBACK_ITEMS)
+  .filter(p => p.active === 1 && p.name && p.price >= 0);
+
+/* 카테고리 유효성 보정 */
+PRODUCTS = PRODUCTS.map(p=>{
+  if(!CATS.includes(p.cat)) p.cat="기타";
+  return p;
+});
+
+const productMap = Object.fromEntries(PRODUCTS.map(p=>[p.id,p]));
+
+/* ===== 2) 로컬 저장 =====
+   - 고정핀(전체 공통): globalPinned
+   - 사용횟수: used
+   - 마지막 카테고리: lastCat
+*/
+const LS_KEY="umgane_pos_state_v123";
+const state = (()=>{ try{
+  const s=JSON.parse(localStorage.getItem(LS_KEY)||"{}");
+  return {
+    globalPinned: Array.isArray(s.globalPinned) ? s.globalPinned : [],
+    used: s.used || {},
+    lastCat: s.lastCat || "과일",
+  };
+}catch(_){
+  return { globalPinned:[], used:{}, lastCat:"과일" };
+}})();
+const saveState=()=>localStorage.setItem(LS_KEY, JSON.stringify(state));
+
+/* ===== 3) 런타임 상태 ===== */
+const cart = {};
+let activeCat = state.lastCat;
+let q = "";
+let received = 0;
+let payLocked = false;
+
+/* ✅ 연타 방지 */
+let tapLock=false;
+function lockTap(ms=120){
+  tapLock=true;
+  setTimeout(()=>tapLock=false, ms);
+}
+
+/* ===== 4) DOM ===== */
+const tabsEl = document.getElementById("tabs");
+const productsEl = document.getElementById("products");
+const cartEl = document.getElementById("cart");
+const toastEl = document.getElementById("toast");
+const pinbarEl = document.getElementById("pinbar");
+const pinStripEl = document.getElementById("pinStrip");
+
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  clearTimeout(toastEl._t);
+  toastEl._t=setTimeout(()=>toastEl.classList.remove("show"), 900);
+}
+
+/* ===== 5) 초성 검색 ===== */
+const CHO=["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+function getChosung(str){
+  let out="";
+  for(const ch of str){
+    const code=ch.charCodeAt(0);
+    if(code>=0xAC00 && code<=0xD7A3){
+      out+=CHO[Math.floor((code-0xAC00)/588)]||"";
+    }else out+=ch;
+  }
+  return out;
+}
+function matchQuery(p, query){
+  const t=(query||"").trim();
+  if(!t) return true;
+  const name=p.name.replace(/\s/g,"");
+  const tl=t.toLowerCase().replace(/\s/g,"");
+  if(name.toLowerCase().includes(tl)) return true;
+  if(getChosung(name).includes(tl)) return true;
+  return false;
+}
+
+/* ===== 6) 고정핀(전체 공통) ===== */
+const PIN_MAX = 8; // ✅ 상단 1줄 제한 (최대 8개)
+
+function getGlobalPinned(){
+  // 존재하는 상품만 남기기
+  state.globalPinned = (state.globalPinned||[]).filter(id => !!productMap[id]);
+  // 길이 제한
+  state.globalPinned = state.globalPinned.slice(0, PIN_MAX);
+  return state.globalPinned;
+}
+function isPinned(id){
+  return getGlobalPinned().includes(id);
+}
+function togglePin(id){
+  id = String(id);
+  const arr = getGlobalPinned().slice();
+  const idx = arr.indexOf(id);
+  if(idx>=0) arr.splice(idx,1);
+  else {
+    arr.unshift(id);           // ✅ 새로 고정하면 맨 앞
+    if(arr.length > PIN_MAX) arr.length = PIN_MAX;
+  }
+  state.globalPinned = arr;
+  saveState();
+  renderPinbar();
+  renderProducts();
+}
+
+/* 길게 누르기(모바일) / 우클릭(PC) */
+function attachPinHandlers(el, id){
+  let pressTimer=null;
+  el.addEventListener("touchstart", ()=>{
+    pressTimer=setTimeout(()=>{
+      el.dataset.suppress="1";
+      togglePin(id);
+      setTimeout(()=>{delete el.dataset.suppress;}, 350);
+    }, 450);
+  }, {passive:true});
+  el.addEventListener("touchend", ()=>{ if(pressTimer) clearTimeout(pressTimer); pressTimer=null; });
+  el.addEventListener("contextmenu",(e)=>{ e.preventDefault(); togglePin(id); });
+}
+
+/* ===== 7) 상품 리스트/정렬 =====
+   ✅ 실무자 최적: 고정핀은 상단 1줄(핀바)에서 항상 노출
+   ✅ 아래 그리드에서는:
+      - 검색 중이면(카테고리 무관) 검색결과를 used 내림차순
+      - 검색 아니면 현재 카테고리 상품을 used 내림차순
+   ✅ 이름순은 마지막 tie-break만
+*/
+function sortedByUsed(list){
+  return list.slice().sort((a,b)=>{
+    const au = state.used[a.id]||0;
+    const bu = state.used[b.id]||0;
+    if(au!==bu) return bu-au;
+    return a.name.localeCompare(b.name,"ko");
+  });
+}
+
+function currentProducts(){
+  const query = q.trim();
+  if(query){
+    return sortedByUsed(PRODUCTS.filter(p=>matchQuery(p,query)));
+  }
+  return sortedByUsed(PRODUCTS.filter(p=>p.cat===activeCat));
+}
+
+/* ===== 8) 렌더 ===== */
+function renderTabs(){
+  tabsEl.innerHTML="";
+  CATS.forEach(cat=>{
+    const b=document.createElement("button");
+    b.className="tab"+(cat===activeCat?" active":"");
+    b.textContent=cat;
+    b.onclick=()=>{ activeCat=cat; state.lastCat=cat; saveState(); renderProducts(); };
+    tabsEl.appendChild(b);
+  });
+}
+
+function renderPinbar(){
+  const pins = getGlobalPinned();
+  if(!pins.length){
+    pinbarEl.style.display="none";
+    pinStripEl.innerHTML="";
+    return;
+  }
+  pinbarEl.style.display="block";
+  pinStripEl.innerHTML="";
+  pins.forEach(id=>{
+    const p = productMap[id];
+    const d = document.createElement("div");
+    d.className="pinChip";
+    d.dataset.id=id;
+    d.innerHTML=`
+      <div class="pinIcon">📌</div>
+      <div class="pname">${p.name}</div>
+      <div class="pprice">${p.price.toLocaleString()}원</div>
+    `;
+    attachPinHandlers(d, id);
+    d.addEventListener("pointerdown",(e)=>{
+      if(tapLock) return;
+      if(d.dataset.suppress==="1") return;
+      lockTap(120);
+      addToCart(id,1);
+      flash(d);
     });
+    pinStripEl.appendChild(d);
+  });
+}
 
-    // 검색/초성키
-    $("q").addEventListener("input", ()=>{
-      q = $("q").value;
-      renderProducts();
-    });
+function renderProducts(){
+  productsEl.innerHTML="";
+  const list = currentProducts();
 
-    const choKeys = ["ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ","X"];
-    const choEl = $("cho");
-    choEl.innerHTML="";
-    choKeys.forEach(k=>{
-      const b=document.createElement("button");
-      b.textContent=k;
-      b.onclick=()=>{
-        if (k==="X"){ $("q").value=""; q=""; }
-        else { $("q").value = ($("q").value||"") + k; q=$("q").value; }
-        renderProducts();
-        $("q").focus();
-      };
-      choEl.appendChild(b);
-    });
+  list.forEach(p=>{
+    const d=document.createElement("div");
+    const pinned = isPinned(p.id);
+    d.className="card" + (pinned ? " pinned" : "");
+    d.dataset.id=p.id;
 
-    /***************
-     * 데이터 로드 이벤트
-     ***************/
-    function setItems(newItems){
-      ITEMS = Array.isArray(newItems) ? newItems : [];
-      // 혹시 카테고리명이 다르게 들어오면 강제로 5개 중 하나로 정리
-      ITEMS.forEach(it=>{
-        if (!CATS.includes(it.cat)) it.cat = "기타";
-      });
-      renderTabs();
-      renderProducts();
-      renderCart();
-    }
+    const used=state.used[p.id]||0;
 
-    // items.js가 로드 완료 시 이벤트를 쏨
-    window.addEventListener("items:loaded", (e)=> setItems(e.detail||[]));
+    d.innerHTML=`
+      <div class="meta">
+        <span class="badge">사용 ${used}</span>
+        <span class="pin ${pinned?"on":""}">📌</span>
+      </div>
+      <div class="name">${p.name}</div>
+      <div class="price">${p.price.toLocaleString()}원</div>
+    `;
 
-    // items.js가 실패해도 샘플로라도 보이게
-    window.addEventListener("items:failed", ()=>{
-      const sample = [
-        {id:"S1", cat:"과일", name:"사과", unit:"", price:3000, active:1},
-        {id:"S2", cat:"과일", name:"바나나", unit:"", price:2500, active:1},
-        {id:"S3", cat:"야채", name:"감자", unit:"", price:3000, active:1},
-        {id:"S4", cat:"야채", name:"양파", unit:"", price:2500, active:1},
-        {id:"S5", cat:"봉채소", name:"깻잎", unit:"", price:2000, active:1},
-        {id:"S6", cat:"생선", name:"고등어", unit:"", price:6000, active:1},
-        {id:"S7", cat:"기타", name:"부추", unit:"", price:2000, active:1},
-      ];
-      toast("상품 데이터 로드 실패(샘플 표시). 시트 공개/CSV 확인!");
-      setItems(sample);
-    });
+    attachPinHandlers(d, p.id);
+    productsEl.appendChild(d);
+  });
+}
 
-    // 최초 렌더
-    renderTabs();
+function updateUsedBadge(id){
+  const card = productsEl.querySelector(`.card[data-id="${CSS.escape(id)}"]`);
+  if(!card) return;
+  const badge = card.querySelector(".badge");
+  if(badge) badge.textContent = "사용 " + (state.used[id]||0);
+}
+
+function flash(el){
+  el.classList.add("flash");
+  setTimeout(()=>el.classList.remove("flash"), 140);
+}
+
+/* 담기: pointerdown */
+productsEl.addEventListener("pointerdown",(e)=>{
+  if(tapLock) return;
+  const card = e.target.closest(".card");
+  if(!card) return;
+  if(card.dataset.suppress==="1") return;
+
+  const id = card.dataset.id;
+  const p = productMap[id];
+  if(!p){ alert("상품ID 오류: "+id); return; }
+
+  lockTap(120);
+  addToCart(id,1);
+  flash(card);
+});
+
+/* ===== 9) 장바구니 ===== */
+function addToCart(id,n){
+  cart[id]=(cart[id]||0)+n;
+  if(cart[id]<=0) delete cart[id];
+
+  if(n>0){
+    state.used[id]=(state.used[id]||0)+1;
+    saveState();
+    updateUsedBadge(id);
+  }
+  renderCart();
+}
+
+function sumCart(){
+  let sum=0, qty=0;
+  for(const id in cart){
+    const p=productMap[id];
+    sum += p.price*cart[id];
+    qty += cart[id];
+  }
+  return {sum,qty};
+}
+
+function renderCart(){
+  const {sum,qty}=sumCart();
+
+  // ✅ 총합계(개수) 금액 표기
+  document.getElementById("sumText").textContent = `총합계(${qty}개)`;
+  document.getElementById("sumValue").textContent = `${sum.toLocaleString()}원`;
+
+  // ✅ 받은돈/거스름돈(한줄)
+  document.getElementById("received").textContent = `${received.toLocaleString()}원`;
+  document.getElementById("change").textContent = `${Math.max(0,received-sum).toLocaleString()}원`;
+
+  cartEl.innerHTML=`
+    <div class="carthead">
+      <div>장바구니 <span class="muted">(수량 조절 + 삭제)</span></div>
+      <div class="muted">항목 ${Object.keys(cart).length}</div>
+    </div>
+  `;
+
+  Object.keys(cart).forEach(id=>{
+    const p=productMap[id], qn=cart[id];
+    const item=document.createElement("div");
+    item.className="item";
+    item.innerHTML=`
+      <div>
+        <div class="title">${p.name} <span style="opacity:.7">x${qn}</span></div>
+        <div class="sub">${p.price.toLocaleString()}원 · 합 ${(p.price*qn).toLocaleString()}원</div>
+      </div>
+      <div class="controls">
+        <button class="ctrl" data-act="minus">-</button>
+        <div class="count">${qn}</div>
+        <button class="ctrl" data-act="plus">+</button>
+        <button class="ctrl del" data-act="del">✕</button>
+      </div>
+    `;
+    item.querySelector('[data-act="minus"]').onclick=()=>addToCart(id,-1);
+    item.querySelector('[data-act="plus"]').onclick =()=>addToCart(id, 1);
+    item.querySelector('[data-act="del"]').onclick  =()=>{ delete cart[id]; renderCart(); };
+    cartEl.appendChild(item);
+  });
+}
+
+/* ===== 10) 받은돈 버튼 ===== */
+document.querySelectorAll('.money button[data-add]').forEach(b=>{
+  b.onclick=()=>{ received += Number(b.dataset.add); renderCart(); };
+});
+document.getElementById("reset").onclick=()=>{ received=0; renderCart(); };
+
+/* ✅ 새로고침/F5/재접속 시: 장바구니+받은돈만 리셋 (고정핀/사용횟수 유지) */
+function resetCartAndReceivedOnly(){
+  for (const id in cart) delete cart[id];
+  received = 0;
+}
+window.addEventListener("pageshow", () => {
+  resetCartAndReceivedOnly();
+  renderCart();
+});
+
+/* ===== 11) 결제 팝업 + 소리 + 1초 잠금 ===== */
+const overlay=document.getElementById("overlay");
+const payBtn=document.getElementById("pay");
+const okBtn=document.getElementById("okBtn");
+const cancelBtn=document.getElementById("cancelBtn");
+const modalText=document.getElementById("modalText");
+
+function beep(){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(); const g=ctx.createGain();
+    o.type="sine"; o.frequency.value=880; g.gain.value=0.06;
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); setTimeout(()=>{o.stop(); ctx.close();},120);
+  }catch(_){}
+}
+
+payBtn.onclick=()=>{
+  if(payLocked) return;
+  const {sum,qty}=sumCart();
+  modalText.textContent = qty===0 ? "장바구니가 비었습니다." : `총합계(${qty}개) ${sum.toLocaleString()}원 · 결제완료 처리할까요?`;
+  overlay.classList.add("show"); beep();
+};
+cancelBtn.onclick=()=>overlay.classList.remove("show");
+okBtn.onclick=()=>{
+  overlay.classList.remove("show"); beep();
+  payLocked=true; payBtn.classList.add("locked");
+  setTimeout(()=>{
+    resetCartAndReceivedOnly();
     renderCart();
-  </script>
+    payLocked=false; payBtn.classList.remove("locked");
+  },1000);
+};
+
+/* ===== 12) 검색/초성 버튼 ===== */
+const qEl=document.getElementById("q");
+qEl.addEventListener("input",()=>{ q=qEl.value; renderProducts(); });
+
+const choEl=document.getElementById("cho");
+const choKeys=["ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+choEl.innerHTML="";
+choKeys.forEach(k=>{
+  const b=document.createElement("button");
+  b.textContent=k;
+  b.onclick=()=>{ qEl.value=qEl.value+k; q=qEl.value; renderProducts(); qEl.focus(); };
+  choEl.appendChild(b);
+});
+const clear=document.createElement("button");
+clear.className="clear";
+clear.textContent="🧹";
+clear.title="검색 지우기";
+clear.onclick=()=>{ qEl.value=""; q=""; renderProducts(); qEl.focus(); };
+choEl.appendChild(clear);
+
+/* ===== 13) 초기 렌더 ===== */
+renderTabs();
+renderPinbar();
+renderProducts();
+renderCart();
+</script>
+
 </body>
 </html>
