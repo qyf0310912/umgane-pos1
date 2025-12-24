@@ -15,13 +15,10 @@ html,body{height:100%;margin:0;background:#0b0c10;color:#f5f7ff;font-family:-app
   --good:#29d17e; --bad:#ff3b30; --r:16px;
 }
 button{cursor:pointer;border:0;border-radius:12px}
-button:active{transform:translateY(1px)}
-::-webkit-scrollbar{height:10px;width:10px}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:999px}
 
 /* ===== 레이아웃 ===== */
 .app{display:grid;grid-template-columns:1.25fr .9fr;gap:12px;padding:12px;height:100%}
-.left,.right{background:var(--panel);border-radius:18px;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.left,.right{background:var(--panel);border-radius:18px;display:flex;flex-direction:column;overflow:hidden}
 
 /* ===== 왼쪽 ===== */
 .topbar{padding:8px;border-bottom:1px solid var(--line)}
@@ -30,70 +27,46 @@ button:active{transform:translateY(1px)}
 .tab.active{background:#fff;color:#111;opacity:1}
 
 .search{display:flex;gap:6px;margin-top:6px}
-.search input{
-  flex:1;padding:10px 12px;border-radius:12px;border:1px solid var(--line);
-  background:#0f1116;color:#fff;font-size:14px;outline:none;
-}
-.search input::placeholder{color:rgba(245,247,255,.45)}
+.search input{flex:1;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:#0f1116;color:#fff}
 
 .pinStrip{display:flex;gap:6px;overflow:auto;padding:6px;border-bottom:1px solid var(--line)}
 .pinCard{min-width:120px;background:#1a1c23;color:#fff;padding:8px;border-radius:14px;text-align:left}
-.pinCard .name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pinCard .price{font-size:12px;opacity:.7;margin-top:2px}
+.pinCard .price{font-size:12px;opacity:.7}
 
-.products{flex:1;overflow:auto;padding:8px;min-height:0;
+.products{flex:1;overflow:auto;padding:8px;
   display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
 @media(max-width:1100px){.products{grid-template-columns:repeat(5,1fr)}}
 @media(max-width:900px){.products{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:700px){.app{grid-template-columns:1fr;gap:10px}.products{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.products{grid-template-columns:repeat(3,1fr)}}
 
-.card{
-  background:#1a1c23;border-radius:14px;padding:8px;text-align:left;min-height:62px;
-  display:flex;flex-direction:column;justify-content:center
-}
-.card .name{font-size:14px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card .price{font-size:12px;opacity:.75;margin-top:2px}
+.card{background:#1a1c23;border-radius:14px;padding:8px;text-align:left;min-height:64px}
+.card .name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .price{font-size:12px;opacity:.7}
 .card.pinned{outline:2px solid var(--accent)}
 
 /* ===== 오른쪽(장바구니) ===== */
 .cartHead{display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid var(--line)}
-.cartHead .title{font-weight:800}
-.cartHead .meta{opacity:.75;font-size:13px}
-
-/* 7줄 이상 보이게 "최소 높이" */
-.cart{
-  flex:1;overflow:auto;padding:8px;min-height:0;
-  /* 대략 1줄 44px 기준으로 7줄=308px */
-  min-height:308px;
-}
+.cart{flex:1;overflow:auto;padding:8px}
 .item{border-bottom:1px dashed var(--line);padding:6px 0}
-.itemRow{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.itemLeft{min-width:0}
-.itemName{font-size:14px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.itemSub{font-size:12px;opacity:.7;margin-top:2px}
-
-.itemCtrls{display:flex;gap:6px;flex-shrink:0}
-.ctrl{width:34px;height:34px;border-radius:10px;background:#222;color:#fff;font-size:18px;line-height:34px}
+.itemRow{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.itemName{font-size:14px}
+.itemSub{font-size:12px;opacity:.7}
+.itemCtrls{display:flex;gap:6px}
+.ctrl{width:34px;height:34px;border-radius:10px;background:#222;color:#fff}
 .del{background:#3a1a1a}
 
 /* ===== 합계/받은돈/거스름돈 ===== */
 .summary{padding:10px;border-top:1px solid var(--line)}
-.sumBlock{display:flex;flex-direction:column;gap:10px}
-.sumRow{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
-.sumCol{flex:1}
-.sumLabel{font-size:12px;opacity:.72}
-.sumValue{font-size:34px;font-weight:900;letter-spacing:-.3px;line-height:1.05}
-.moneyRow{display:flex;justify-content:space-between;gap:14px}
-.moneyCol{flex:1}
-.moneyCol .sumValue{font-size:32px}
+.sumRow{display:flex;justify-content:space-between;align-items:flex-end}
+.sumLabel{font-size:12px;opacity:.7}
+.sumValue{font-size:28px;font-weight:800}
 
-/* 거스름돈/받은돈 버튼 */
-.money{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
-.money button{padding:14px;background:#fff;color:#111;border-radius:14px;font-size:16px;font-weight:800}
+.money{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.money button{padding:12px;background:#fff;color:#111;border-radius:14px;font-size:16px}
 .money .reset{background:#3a1a1a;color:#fff}
 
-.pay{margin-top:10px}
-.pay button{width:100%;padding:16px;background:var(--accent);color:#111;font-size:20px;font-weight:900;border-radius:16px}
+.pay{margin-top:8px}
+.pay button{width:100%;padding:14px;background:var(--accent);color:#111;font-size:18px;border-radius:16px}
 </style>
 </head>
 
@@ -105,7 +78,7 @@ button:active{transform:translateY(1px)}
     <div class="topbar">
       <div class="tabs" id="tabs"></div>
       <div class="search">
-        <input id="q" placeholder="검색 / 초성 ㄱㄴㄷ 가능" />
+        <input id="q" placeholder="검색 / 초성 ㄱㄴㄷ" />
       </div>
     </div>
     <div class="pinStrip" id="pinStrip"></div>
@@ -115,21 +88,218 @@ button:active{transform:translateY(1px)}
   <!-- RIGHT -->
   <div class="right">
     <div class="cartHead">
-      <div class="title">장바구니</div>
-      <div class="meta" id="cartCount">0종 / 0개</div>
+      <div>장바구니</div>
+      <div id="cartCount">항목 0</div>
     </div>
     <div class="cart" id="cart"></div>
 
     <div class="summary">
-      <div class="sumBlock">
-        <div class="sumRow">
-          <div class="sumCol">
-            <div class="sumLabel" id="sumText">총합계(0개)</div>
-            <div class="sumValue" id="sumValue">0원</div>
-          </div>
+      <div class="sumRow">
+        <div>
+          <div class="sumLabel" id="sumText">총합계(0개)</div>
+          <div class="sumValue" id="sumValue">0원</div>
         </div>
+      </div>
 
-        <div class="moneyRow">
-          <div class="moneyCol">
-            <div class="sumLabel">받은돈</div>
-            <div class=
+      <div class="sumRow" style="margin-top:8px">
+        <div>
+          <div class="sumLabel">받은돈</div>
+          <div class="sumValue" id="received">0원</div>
+        </div>
+        <div>
+          <div class="sumLabel">거스름돈</div>
+          <div class="sumValue" id="change">0원</div>
+        </div>
+      </div>
+
+      <div class="money">
+        <button data-add="500">500</button>
+        <button data-add="1000">1천</button>
+        <button data-add="5000">5천</button>
+        <button data-add="10000">1만</button>
+        <button data-add="50000">5만</button>
+        <button class="reset" id="reset">초기화</button>
+      </div>
+
+      <div class="pay">
+        <button id="pay">결제완료</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===========================
+   저장키
+=========================== */
+const LS_ITEMS="umgane_items_v3", LS_CART="umgane_cart_v3", LS_REC="umgane_received_v3";
+
+/* ===========================
+   구글시트 설정
+=========================== */
+const SHEET_ID="1MK7TvyILEJ4_YKw1TmY1Au4Z_ZkGbF7LeRMsI89sIbw";
+const GID="0";
+const CSV_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
+
+/* ===========================
+   상태
+=========================== */
+let ITEMS=loadJSON(LS_ITEMS,[]);
+let cart=loadJSON(LS_CART,{});
+let received=Number(localStorage.getItem(LS_REC)||0);
+let activeCat="전체";
+
+/* ===========================
+   유틸
+=========================== */
+function loadJSON(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}
+function saveItems(){localStorage.setItem(LS_ITEMS,JSON.stringify(ITEMS))}
+function saveCart(){localStorage.setItem(LS_CART,JSON.stringify(cart))}
+function saveReceived(){localStorage.setItem(LS_REC,received)}
+function itemMap(){const m={};ITEMS.forEach(p=>m[p.id]=p);return m}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+/* ===== CSV 안전 파서 (콤마 OK) ===== */
+function parseCSV(text){
+  const rows=[]; let cur="", inQ=false, row=[];
+  const pushCell=()=>{row.push(cur);cur=""}
+  const pushRow=()=>{rows.push(row);row=[]}
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(ch=='"'){ if(inQ && text[i+1]=='"'){cur+='"';i++} else inQ=!inQ; }
+    else if(ch=="," && !inQ){ pushCell(); }
+    else if((ch=="\n"||ch=="\r") && !inQ){
+      if(ch=="\r"&&text[i+1]=="\n") i++;
+      pushCell(); if(row.length>1||(row[0]&&row[0].trim())) pushRow();
+    } else cur+=ch;
+  }
+  if(cur.length||row.length){ pushCell(); pushRow(); }
+  return rows;
+}
+
+async function loadSheet(){
+  const res=await fetch(CSV_URL+"&t="+Date.now(),{cache:"no-store"});
+  const txt=await res.text();
+  const t=parseCSV(txt);
+  if(!t||t.length<2) return [];
+  const head=t[0].map(h=>(h||"").trim().toLowerCase());
+  const idx=k=>head.indexOf(k);
+  const out=[];
+  for(let i=1;i<t.length;i++){
+    const r=t[i]; if(!r||!r.length) continue;
+    if((r[idx("active")]??"1").trim()=="0") continue;
+    const id=(r[idx("id")]??"").trim();
+    const name=(r[idx("name")]??"").trim();
+    if(!id||!name) continue;
+    out.push({
+      id,
+      cat:(r[idx("cat")]??"기타").trim(),
+      name,
+      price:Number((r[idx("price")]??"0").replace(/[^\d]/g,""))||0,
+      pinned:false, used:0
+    });
+  }
+  return out;
+}
+
+async function applySheet(){
+  const sheet=await loadSheet();
+  const local=itemMap();
+  ITEMS=sheet.map(p=>({...p, pinned:local[p.id]?.pinned||false, used:local[p.id]?.used||0}));
+  saveItems();
+}
+
+/* ===========================
+   렌더
+=========================== */
+function renderTabs(){
+  const el=document.getElementById("tabs"); el.innerHTML="";
+  ["전체",...new Set(ITEMS.map(p=>p.cat))].forEach(c=>{
+    const b=document.createElement("button");
+    b.className="tab"+(c===activeCat?" active":"");
+    b.textContent=c; b.onclick=()=>{activeCat=c; renderProducts()};
+    el.appendChild(b);
+  });
+}
+function renderPin(){
+  const el=document.getElementById("pinStrip"); el.innerHTML="";
+  ITEMS.filter(p=>p.pinned).sort((a,b)=>b.used-a.used).forEach(p=>{
+    const b=document.createElement("button");
+    b.className="pinCard";
+    b.innerHTML=`<div>${esc(p.name)}</div><div class="price">${p.price.toLocaleString()}원</div>`;
+    b.onclick=()=>add(p.id,1,true);
+    b.oncontextmenu=e=>{e.preventDefault();togglePin(p.id)};
+    el.appendChild(b);
+  });
+}
+function renderProducts(){
+  const q=document.getElementById("q").value.trim();
+  const el=document.getElementById("products"); el.innerHTML="";
+  let list=[...ITEMS];
+  if(activeCat!="전체") list=list.filter(p=>p.cat===activeCat);
+  if(q) list=list.filter(p=>p.name.includes(q));
+  list.sort((a,b)=>(b.pinned-a.pinned)||(b.used-a.used));
+  list.forEach(p=>{
+    const c=document.createElement("button");
+    c.className="card"+(p.pinned?" pinned":"");
+    c.innerHTML=`<div class="name">${esc(p.name)}</div><div class="price">${p.price.toLocaleString()}원</div>`;
+    c.onclick=()=>add(p.id,1,true);
+    c.oncontextmenu=e=>{e.preventDefault();togglePin(p.id)};
+    el.appendChild(c);
+  });
+  renderPin();
+}
+function renderCart(){
+  const map=itemMap(); const el=document.getElementById("cart"); el.innerHTML="";
+  let sum=0, qty=0;
+  Object.keys(cart).forEach(id=>{
+    const q=cart[id], p=map[id]; if(!p) return;
+    sum+=p.price*q; qty+=q;
+    const d=document.createElement("div"); d.className="item";
+    d.innerHTML=`<div class="itemRow">
+      <div><div class="itemName">${esc(p.name)} x${q}</div>
+      <div class="itemSub">${(p.price*q).toLocaleString()}원</div></div>
+      <div class="itemCtrls">
+        <button class="ctrl">−</button>
+        <button class="ctrl">+</button>
+        <button class="ctrl del">×</button>
+      </div></div>`;
+    d.querySelectorAll(".ctrl")[0].onclick=()=>add(id,-1,false);
+    d.querySelectorAll(".ctrl")[1].onclick=()=>add(id,1,false);
+    d.querySelectorAll(".del")[0].onclick=()=>{delete cart[id]; saveCart(); renderCart()};
+    el.appendChild(d);
+  });
+  document.getElementById("cartCount").textContent=`항목 ${Object.keys(cart).length}`;
+  document.getElementById("sumText").textContent=`총합계(${qty}개)`;
+  document.getElementById("sumValue").textContent=sum.toLocaleString()+"원";
+  document.getElementById("received").textContent=received.toLocaleString()+"원";
+  document.getElementById("change").textContent=Math.max(0,received-sum).toLocaleString()+"원";
+}
+
+/* ===========================
+   액션
+=========================== */
+function add(id,d,cnt){
+  cart[id]=(cart[id]||0)+d; if(cart[id]<=0) delete cart[id];
+  saveCart();
+  if(cnt){ const p=itemMap()[id]; p.used++; saveItems(); }
+  renderProducts(); renderCart();
+}
+function togglePin(id){
+  const p=itemMap()[id]; p.pinned=!p.pinned; saveItems(); renderProducts();
+}
+document.getElementById("q").oninput=renderProducts;
+document.querySelectorAll(".money button[data-add]").forEach(b=>{
+  b.onclick=()=>{received+=Number(b.dataset.add); saveReceived(); renderCart()}
+});
+document.getElementById("reset").onclick=()=>{received=0; saveReceived(); renderCart()};
+
+/* ===========================
+   시작
+=========================== */
+window.addEventListener("pageshow",()=>{cart={}; received=0; saveCart(); saveReceived()});
+(async()=>{ try{await applySheet()}catch(e){console.warn(e)}; renderTabs(); renderProducts(); renderCart(); })();
+</script>
+</body>
+</html>
