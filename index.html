@@ -7,205 +7,154 @@
 
 <style>
 :root{
- --bg:#0f1219;
- --panel:#121827;
- --card1:#1e2639;
- --card2:#242f4a;
- --line:rgba(255,255,255,.12);
- --text:#f7f9ff;
- --muted:rgba(247,249,255,.65);
- --accent:#ff9f00;
- --danger:#ff4d4f;
- --good:#2fd27e;
- --shadow:0 14px 44px rgba(0,0,0,.35);
+  --bg:#0f1219;
+  --card:#1e2639;
+  --line:rgba(255,255,255,.12);
+  --text:#f7f9ff;
+  --muted:rgba(247,249,255,.65);
+  --accent:#ff9f00;
 }
 
-*{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
- font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif}
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;}
+button{font:inherit;cursor:pointer;border:none}
 
-.app{height:100%;display:grid;grid-template-columns:3fr 1fr;gap:14px;padding:14px}
+/* LAYOUT */
+.app{display:grid;grid-template-columns:3fr 1fr;height:100vh;gap:10px;padding:10px}
+.left{border:1px solid var(--line);border-radius:12px;padding:10px;overflow:auto}
+.right{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column}
 
-/* LEFT */
-.left{
- border:1px solid var(--line);
- border-radius:22px;
- overflow:hidden;
- display:flex;
- flex-direction:column;
- background:linear-gradient(180deg,rgba(255,255,255,.03),transparent)
-}
+/* CATEGORIES */
+.cats{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.cat{padding:8px 14px;border-radius:999px;background:#1f2739;opacity:.8}
+.cat.active{background:var(--accent);color:#000;opacity:1}
 
-.tabs{display:flex;gap:8px;padding:10px;border-bottom:1px solid var(--line)}
-.tab{
- padding:8px 14px;border-radius:999px;
- border:1px solid var(--line);
- background:#1d2332;color:white;font-weight:900;cursor:pointer
-}
-.tab.active{background:rgba(255,159,0,.2);border-color:var(--accent)}
-
-.products{
- padding:12px;
- display:grid;
- grid-template-columns:repeat(4,1fr);
- gap:12px;
- overflow:auto
-}
-
+/* PRODUCTS */
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .card{
- background:linear-gradient(180deg,var(--card2),var(--card1));
- border:1px solid rgba(255,255,255,.15);
- border-radius:18px;
- padding:14px;
- cursor:pointer;
- position:relative;
- min-height:90px
+  background:var(--card);padding:12px;border-radius:12px;
+  display:flex;flex-direction:column;justify-content:space-between;
 }
-.card.flash{box-shadow:0 0 0 3px rgba(255,159,0,.5)}
+.card:hover{opacity:0.9}
+.name{font-weight:900;font-size:16px}
+.price{font-size:14px;color:var(--muted)}
 
-.name{font-size:18px;font-weight:900}
-.price{margin-top:6px;font-weight:800}
-
-.pin{
- position:absolute;top:10px;right:10px;
- width:26px;height:26px;
- border-radius:8px;
- border:1px solid var(--line);
- display:grid;place-items:center;
- background:rgba(0,0,0,.2)
-}
-.pin.on{background:rgba(255,159,0,.25);border-color:var(--accent)}
-
-/* RIGHT (캐셔) */
-.right{
- border:1px solid var(--line);
- border-radius:22px;
- display:flex;
- flex-direction:column;
- overflow:hidden;
- background:linear-gradient(180deg,rgba(255,255,255,.03),transparent)
-}
-
-.cart{flex:1;padding:12px;overflow:auto}
-.cartItem{
- border:1px solid var(--line);
- border-radius:14px;
- padding:10px;
- margin-bottom:8px;
- display:flex;
- justify-content:space-between;
- align-items:center;
- background:rgba(255,255,255,.03)
-}
-
-.summary{
- border-top:1px solid var(--line);
- padding:12px;
- font-weight:900
-}
-
-.pay{
- border-top:1px solid var(--line);
- padding:12px
-}
-.pay button{
- width:100%;
- padding:16px;
- font-size:20px;
- font-weight:900;
- border-radius:16px;
- border:none;
- background:var(--accent);
- cursor:pointer
-}
+/* CART */
+.cartItem{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.cartItem b{font-weight:900}
+.total{margin-top:auto;font-size:18px;font-weight:900;text-align:right;padding:8px 0}
+.payBtn{margin-top:10px;padding:12px;background:var(--accent);color:#000;font-size:18px;font-weight:900;border-radius:10px}
 </style>
 </head>
 
 <body>
+
 <div class="app">
 
-<div class="left">
- <div class="tabs" id="tabs"></div>
- <div class="products" id="products"></div>
-</div>
+  <div class="left">
+    <div class="cats" id="cats"></div>
+    <div class="products" id="products"></div>
+  </div>
 
-<div class="right">
- <div class="cart" id="cart"></div>
- <div class="summary">
-  총합: <span id="total">0</span>원
- </div>
- <div class="pay">
-  <button>결제완료</button>
- </div>
-</div>
+  <div class="right">
+    <div class="cartList" id="cartList"></div>
+    <div class="total">총합계: <span id="total">0</span>원</div>
+    <button class="payBtn" id="payBtn">결제완료</button>
+  </div>
 
 </div>
 
 <script>
 const categories=["전체","과일","야채","봉채소","생선","기타"];
-const items=[
- {name:"사과",price:3000,cat:"과일"},
- {name:"바나나",price:2500,cat:"과일"},
- {name:"감자",price:3000,cat:"야채"},
- {name:"고구마",price:3000,cat:"야채"},
- {name:"깻잎",price:2000,cat:"봉채소"},
- {name:"고등어",price:6000,cat:"생선"},
+const ITEMS=[
+  {name:"사과",price:3000,cat:"과일"},
+  {name:"바나나",price:2500,cat:"과일"},
+  {name:"토마토",price:10000,cat:"과일"},
+  {name:"감자",price:3000,cat:"야채"},
+  {name:"고구마",price:3000,cat:"야채"},
+  {name:"깻잎",price:2000,cat:"봉채소"},
+  {name:"상추",price:1500,cat:"봉채소"},
+  {name:"고등어",price:6000,cat:"생선"},
+  {name:"굴비",price:10000,cat:"생선"},
+  {name:"기타상품",price:5000,cat:"기타"}
 ];
 
 let activeCat="전체";
 let cart=[];
-const tabs=document.getElementById("tabs");
-const products=document.getElementById("products");
-const cartEl=document.getElementById("cart");
-const totalEl=document.getElementById("total");
 
+/* 카테고리 */
+const catsEl=document.getElementById("cats");
 categories.forEach(c=>{
  const b=document.createElement("div");
- b.className="tab"+(c===activeCat?" active":"");
+ b.className="cat"+(c===activeCat?" active":"");
  b.innerText=c;
- b.onclick=()=>{activeCat=c;render()};
- tabs.appendChild(b);
+ b.onclick=()=>{
+   activeCat=c;
+   renderAll();
+ };
+ catsEl.appendChild(b);
 });
 
-function render(){
- tabs.querySelectorAll(".tab").forEach(t=>{
-  t.classList.toggle("active",t.innerText===activeCat);
+/* 렌더 상품 & 필터 */
+const productsEl=document.getElementById("products");
+function renderProducts(){
+ productsEl.innerHTML="";
+ const list=ITEMS
+   .filter(i=>activeCat==="전체"||i.cat===activeCat)
+   .sort((a,b)=>(b.count||0)-(a.count||0));
+ list.forEach(i=>{
+   const d=document.createElement("div");
+   d.className="card";
+   d.innerHTML=`<div class="name">${i.name}</div>
+                <div class="price">${i.price.toLocaleString()}원</div>`;
+   d.onclick=()=>addCart(i);
+   productsEl.appendChild(d);
  });
- products.innerHTML="";
- items.filter(i=>activeCat==="전체"||i.cat===activeCat)
- .forEach(i=>{
-  const d=document.createElement("div");
-  d.className="card";
-  d.innerHTML=`<div class="name">${i.name}</div>
-               <div class="price">${i.price.toLocaleString()}원</div>`;
-  d.onclick=()=>addCart(i);
-  products.appendChild(d);
- });
- renderCart();
 }
 
-function addCart(i){
- const f=cart.find(c=>c.name===i.name);
- if(f)f.qty++;
- else cart.push({name:i.name,price:i.price,qty:1});
+/* 장바구니 */
+const cartListEl=document.getElementById("cartList");
+const totalEl=document.getElementById("total");
+
+function addCart(item){
+ const found=cart.find(c=>c.name===item.name);
+ if(found) found.qty++;
+ else cart.push({name:item.name,price:item.price,qty:1});
  renderCart();
 }
 
 function renderCart(){
- cartEl.innerHTML="";
+ cartListEl.innerHTML="";
  let sum=0;
  cart.forEach(c=>{
-  sum+=c.price*c.qty;
-  const d=document.createElement("div");
-  d.className="cartItem";
-  d.innerHTML=`${c.name} x${c.qty}
-               <b>${(c.price*c.qty).toLocaleString()}원</b>`;
-  cartEl.appendChild(d);
+   sum+=c.price*c.qty;
+   const div=document.createElement("div");
+   div.className="cartItem";
+   div.innerHTML=`${c.name} x${c.qty} <b>${(c.price*c.qty).toLocaleString()}원</b>`;
+   cartListEl.appendChild(div);
  });
  totalEl.innerText=sum.toLocaleString();
 }
 
-render();
+/* 결제 */
+document.getElementById("payBtn").onclick=()=>{
+ if(cart.length===0){ alert("장바구니가 비었습니다."); return; }
+ alert("총 "+totalEl.innerText+"원 결제완료!");
+ cart=[];
+ renderCart();
+};
+
+/* 전체 렌더 */
+function renderAll(){
+ document.querySelectorAll(".cat").forEach(el=>{
+   el.classList.toggle("active",el.innerText===activeCat);
+ });
+ renderProducts();
+ renderCart();
+}
+
+renderAll();
 </script>
+
 </body>
 </html>
