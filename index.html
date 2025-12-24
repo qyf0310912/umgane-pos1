@@ -15,35 +15,58 @@
   --accent:#ff9f00;
 }
 
+*{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;}
-button{font:inherit;cursor:pointer;border:none}
+button,input{font:inherit;border:none}
+button{cursor:pointer}
 
 /* LAYOUT */
-.app{display:grid;grid-template-columns:3fr 1fr;height:100vh;gap:10px;padding:10px}
-.left{border:1px solid var(--line);border-radius:12px;padding:10px;overflow:auto}
-.right{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column}
+.app{display:grid;grid-template-columns:3fr 1.3fr;height:100vh;gap:10px;padding:10px}
+.left,.right{border:1px solid var(--line);border-radius:14px;padding:10px}
+.left{overflow:auto}
+.right{display:flex;flex-direction:column}
 
-/* CATEGORIES */
-.cats{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.cat{padding:8px 14px;border-radius:999px;background:#1f2739;opacity:.8}
+/* CATEGORY */
+.cats{display:flex;gap:8px;margin-bottom:10px}
+.cat{padding:8px 14px;border-radius:999px;background:#1f2739;opacity:.6}
 .cat.active{background:var(--accent);color:#000;opacity:1}
 
-/* PRODUCTS */
-.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-.card{
-  background:var(--card);padding:12px;border-radius:12px;
-  display:flex;flex-direction:column;justify-content:space-between;
+/* SEARCH */
+.search{margin-bottom:10px}
+.search input{
+  width:100%;padding:10px 12px;border-radius:10px;
+  background:#1a2235;color:var(--text)
 }
-.card:hover{opacity:0.9}
-.name{font-weight:900;font-size:16px}
-.price{font-size:14px;color:var(--muted)}
+
+/* PRODUCTS */
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.card{
+  background:var(--card);padding:14px;border-radius:14px;
+}
+.card:active{transform:scale(.98)}
+.name{font-weight:900;font-size:17px}
+.price{margin-top:4px;font-size:14px;color:var(--muted)}
+.used{margin-top:6px;font-size:12px;color:var(--muted)}
 
 /* CART */
-.cartItem{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.cartList{flex:1;overflow:auto}
+.cartItem{display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;border-bottom:1px solid var(--line)}
 .cartItem b{font-weight:900}
-.total{margin-top:auto;font-size:18px;font-weight:900;text-align:right;padding:8px 0}
-.payBtn{margin-top:10px;padding:12px;background:var(--accent);color:#000;font-size:18px;font-weight:900;border-radius:10px}
+
+/* CASHIER */
+.cashier{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.row{display:flex;justify-content:space-between;margin-bottom:6px}
+.total{font-size:20px;font-weight:900}
+input.money{
+  width:100%;padding:10px;border-radius:10px;
+  background:#1a2235;color:var(--text);margin-top:6px
+}
+.payBtn{
+  margin-top:10px;padding:14px;border-radius:12px;
+  background:var(--accent);color:#000;font-size:20px;font-weight:900
+}
 </style>
 </head>
 
@@ -51,106 +74,147 @@ button{font:inherit;cursor:pointer;border:none}
 
 <div class="app">
 
+  <!-- LEFT -->
   <div class="left">
     <div class="cats" id="cats"></div>
+
+    <div class="search">
+      <input id="search" placeholder="상품 검색 (예: 감자, 사과)">
+    </div>
+
     <div class="products" id="products"></div>
   </div>
 
+  <!-- RIGHT -->
   <div class="right">
     <div class="cartList" id="cartList"></div>
-    <div class="total">총합계: <span id="total">0</span>원</div>
-    <button class="payBtn" id="payBtn">결제완료</button>
+
+    <div class="cashier">
+      <div class="row total">총합 <span id="sum">0</span>원</div>
+
+      <input class="money" id="paid" placeholder="받은 돈 입력">
+
+      <div class="row">
+        <span>거스름돈</span>
+        <b id="change">0원</b>
+      </div>
+
+      <button class="payBtn" id="payBtn">결제완료</button>
+    </div>
   </div>
 
 </div>
 
 <script>
-const categories=["전체","과일","야채","봉채소","생선","기타"];
+/* DATA */
+const categories=["기타","과일","야채","봉채소","생선"];
 const ITEMS=[
-  {name:"사과",price:3000,cat:"과일"},
-  {name:"바나나",price:2500,cat:"과일"},
-  {name:"토마토",price:10000,cat:"과일"},
-  {name:"감자",price:3000,cat:"야채"},
-  {name:"고구마",price:3000,cat:"야채"},
-  {name:"깻잎",price:2000,cat:"봉채소"},
-  {name:"상추",price:1500,cat:"봉채소"},
-  {name:"고등어",price:6000,cat:"생선"},
-  {name:"굴비",price:10000,cat:"생선"},
-  {name:"기타상품",price:5000,cat:"기타"}
+  {name:"사과",price:3000,cat:"과일",used:0},
+  {name:"바나나",price:2500,cat:"과일",used:0},
+  {name:"토마토",price:10000,cat:"과일",used:0},
+  {name:"감자",price:3000,cat:"야채",used:0},
+  {name:"고구마",price:3000,cat:"야채",used:0},
+  {name:"양파",price:2500,cat:"야채",used:0},
+  {name:"깻잎",price:2000,cat:"봉채소",used:0},
+  {name:"상추",price:1500,cat:"봉채소",used:0},
+  {name:"고등어",price:6000,cat:"생선",used:0},
+  {name:"기타상품",price:5000,cat:"기타",used:0}
 ];
 
-let activeCat="전체";
+let activeCat="기타";
 let cart=[];
+let keyword="";
 
-/* 카테고리 */
+/* CATEGORY */
 const catsEl=document.getElementById("cats");
 categories.forEach(c=>{
- const b=document.createElement("div");
- b.className="cat"+(c===activeCat?" active":"");
- b.innerText=c;
- b.onclick=()=>{
-   activeCat=c;
-   renderAll();
- };
- catsEl.appendChild(b);
+  const b=document.createElement("div");
+  b.className="cat"+(c===activeCat?" active":"");
+  b.innerText=c;
+  b.onclick=()=>{activeCat=c;renderAll()};
+  catsEl.appendChild(b);
 });
 
-/* 렌더 상품 & 필터 */
+/* SEARCH */
+document.getElementById("search").oninput=e=>{
+  keyword=e.target.value.trim();
+  renderProducts();
+};
+
+/* PRODUCTS */
 const productsEl=document.getElementById("products");
 function renderProducts(){
- productsEl.innerHTML="";
- const list=ITEMS
-   .filter(i=>activeCat==="전체"||i.cat===activeCat)
-   .sort((a,b)=>(b.count||0)-(a.count||0));
- list.forEach(i=>{
-   const d=document.createElement("div");
-   d.className="card";
-   d.innerHTML=`<div class="name">${i.name}</div>
-                <div class="price">${i.price.toLocaleString()}원</div>`;
-   d.onclick=()=>addCart(i);
-   productsEl.appendChild(d);
- });
+  productsEl.innerHTML="";
+  ITEMS
+    .filter(i=>i.cat===activeCat)
+    .filter(i=>!keyword||i.name.includes(keyword))
+    .sort((a,b)=>b.used-a.used) // 많이 클릭된 순
+    .forEach(i=>{
+      const d=document.createElement("div");
+      d.className="card";
+      d.innerHTML=`
+        <div class="name">${i.name}</div>
+        <div class="price">${i.price.toLocaleString()}원</div>
+        <div class="used">사용 ${i.used}</div>`;
+      d.onclick=()=>addCart(i);
+      productsEl.appendChild(d);
+    });
 }
 
-/* 장바구니 */
+/* CART */
 const cartListEl=document.getElementById("cartList");
-const totalEl=document.getElementById("total");
+const sumEl=document.getElementById("sum");
 
 function addCart(item){
- const found=cart.find(c=>c.name===item.name);
- if(found) found.qty++;
- else cart.push({name:item.name,price:item.price,qty:1});
- renderCart();
+  item.used++;
+  const f=cart.find(c=>c.name===item.name);
+  if(f) f.qty++;
+  else cart.push({name:item.name,price:item.price,qty:1});
+  renderAll();
 }
 
 function renderCart(){
- cartListEl.innerHTML="";
- let sum=0;
- cart.forEach(c=>{
-   sum+=c.price*c.qty;
-   const div=document.createElement("div");
-   div.className="cartItem";
-   div.innerHTML=`${c.name} x${c.qty} <b>${(c.price*c.qty).toLocaleString()}원</b>`;
-   cartListEl.appendChild(div);
- });
- totalEl.innerText=sum.toLocaleString();
+  cartListEl.innerHTML="";
+  let sum=0;
+  cart.forEach(c=>{
+    sum+=c.price*c.qty;
+    const div=document.createElement("div");
+    div.className="cartItem";
+    div.innerHTML=`${c.name} x${c.qty} <b>${(c.price*c.qty).toLocaleString()}원</b>`;
+    cartListEl.appendChild(div);
+  });
+  sumEl.innerText=sum.toLocaleString();
+  calcChange();
 }
 
-/* 결제 */
+/* CASHIER */
+const paidEl=document.getElementById("paid");
+const changeEl=document.getElementById("change");
+
+paidEl.oninput=calcChange;
+
+function calcChange(){
+  const paid=Number(paidEl.value.replace(/[^0-9]/g,""))||0;
+  const sum=Number(sumEl.innerText.replace(/,/g,""))||0;
+  const ch=paid-sum;
+  changeEl.innerText=(ch>0?ch:0).toLocaleString()+"원";
+}
+
 document.getElementById("payBtn").onclick=()=>{
- if(cart.length===0){ alert("장바구니가 비었습니다."); return; }
- alert("총 "+totalEl.innerText+"원 결제완료!");
- cart=[];
- renderCart();
+  if(cart.length===0){alert("장바구니 비어있음");return;}
+  cart=[];
+  paidEl.value="";
+  renderAll();
+  alert("결제 완료");
 };
 
-/* 전체 렌더 */
+/* RENDER */
 function renderAll(){
- document.querySelectorAll(".cat").forEach(el=>{
-   el.classList.toggle("active",el.innerText===activeCat);
- });
- renderProducts();
- renderCart();
+  document.querySelectorAll(".cat").forEach(el=>{
+    el.classList.toggle("active",el.innerText===activeCat);
+  });
+  renderProducts();
+  renderCart();
 }
 
 renderAll();
