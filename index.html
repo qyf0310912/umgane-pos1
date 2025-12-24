@@ -7,21 +7,17 @@
   <style>
     :root{
       --bg:#0b0c10;
-      --panel:#111319;
-      --panel2:#0f1116;
       --line:rgba(255,255,255,.10);
       --line2:rgba(255,255,255,.07);
       --text:#f5f7ff;
       --muted:rgba(245,247,255,.68);
-      --muted2:rgba(245,247,255,.55);
       --accent:#ff9f00;
-      --pin:#ff4d4d;
       --shadow:0 12px 40px rgba(0,0,0,.38);
-      --r:18px;
     }
     *{box-sizing:border-box;}
     html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif;}
     button{font:inherit; cursor:pointer; border:0; background:transparent; color:inherit;}
+
     .app{
       height:100%;
       display:grid;
@@ -43,25 +39,28 @@
       overflow:hidden;
       display:flex;
       flex-direction:column;
-      min-height:620px;
+      min-height:0;
     }
+
+    /* ✅ 상단(탭/검색/초성) 높이 다이어트 */
     .topbar{
-      padding:14px 14px 10px;
+      padding:10px 12px 8px;
       border-bottom:1px solid var(--line2);
       background:rgba(255,255,255,.02);
     }
     .tabs{
       display:flex;
-      gap:8px;
+      gap:6px;
       flex-wrap:wrap;
-      margin-bottom:10px;
+      margin-bottom:8px;
     }
     .tab{
-      padding:10px 14px;
+      padding:8px 10px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.03);
       font-weight:900;
+      font-size:13px;
       opacity:.92;
     }
     .tab.active{
@@ -80,8 +79,8 @@
       display:flex;
       align-items:center;
       gap:10px;
-      padding:10px 12px;
-      border-radius:14px;
+      padding:8px 10px;
+      border-radius:12px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.20);
     }
@@ -92,46 +91,48 @@
       outline:0;
       background:transparent;
       color:var(--text);
-      font-size:16px;
+      font-size:15px;
       font-weight:900;
     }
     .sortBtn{
-      padding:10px 12px;
-      border-radius:14px;
+      padding:8px 10px;
+      border-radius:12px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.03);
       font-weight:900;
+      font-size:13px;
       white-space:nowrap;
     }
 
-    /* 초성 버튼 */
+    /* 초성 버튼 (작게) */
     .chos{
-      margin-top:10px;
+      margin-top:8px;
       display:flex;
-      gap:8px;
+      gap:6px;
       align-items:center;
       flex-wrap:wrap;
     }
     .chos button{
-      width:36px;
-      height:36px;
-      border-radius:12px;
+      width:32px;
+      height:32px;
+      border-radius:10px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.03);
       font-weight:1100;
+      font-size:13px;
       opacity:.92;
     }
     .chos .clear{
-      width:40px;
+      width:36px;
       background:rgba(255,77,77,.22);
       border-color:rgba(255,77,77,.35);
       font-weight:1400;
       color:#fff;
     }
 
-    /* 고정(전체 공통) 1줄 */
+    /* 고정(전체 공통) 1줄 (컴팩트) */
     .pinWrap{
-      padding:12px 14px 10px;
+      padding:10px 12px 8px;
       border-bottom:1px solid var(--line2);
       background:rgba(255,255,255,.015);
     }
@@ -139,10 +140,10 @@
       display:flex;
       align-items:flex-end;
       justify-content:space-between;
-      margin-bottom:8px;
+      margin-bottom:6px;
     }
     .pinHead .t1{font-weight:1200; opacity:.92;}
-    .pinHead .t2{font-size:12px; opacity:.65;}
+    .pinHead .t2{font-size:11px; opacity:.65;}
     .pinStrip{
       display:flex;
       gap:8px;
@@ -155,54 +156,57 @@
     }
     .pinCard{
       flex:0 0 auto;
-      width:108px;                 /* ✅ 한 줄에 10개급 사이즈 */
-      height:56px;
-      border-radius:14px;
+      width:96px;
+      height:48px;
+      border-radius:12px;
       border:1px solid rgba(255,159,0,.25);
       background:rgba(255,159,0,.08);
-      padding:8px 10px;
+      padding:7px 8px;
       display:flex;
       flex-direction:column;
       justify-content:center;
       position:relative;
     }
-    .pinCard .name{font-weight:1200; font-size:14px; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-    .pinCard .price{font-size:12px; opacity:.70; font-weight:900; margin-top:4px;}
+    .pinCard .name{font-weight:1200; font-size:13px; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .pinCard .price{font-size:11px; opacity:.70; font-weight:900; margin-top:3px;}
     .pinCard .pinI{
-      position:absolute; right:8px; top:8px;
-      width:20px; height:20px;
-      border-radius:8px;
+      position:absolute; right:6px; top:6px;
+      width:18px; height:18px;
+      border-radius:7px;
       display:grid; place-items:center;
       background:rgba(255,77,77,.25);
       border:1px solid rgba(255,77,77,.35);
       color:#fff;
-      font-size:12px;
+      font-size:11px;
     }
 
-    /* 상품 리스트 */
+    /* ✅ 상품 리스트: 4열 → 6열(기본) + 카드 축소 */
     .products{
-      padding:12px 14px 14px;
+      padding:10px 12px 12px;
       display:grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap:10px;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap:8px;
       align-content:start;
       overflow:auto;
       flex:1;
     }
+    @media (max-width: 1200px){
+      .products{ grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    }
     @media (max-width: 980px){
-      .products{grid-template-columns: repeat(3, minmax(0, 1fr));}
-      .pinCard{width:102px;}
+      .products{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
     @media (max-width: 520px){
-      .products{grid-template-columns: repeat(2, minmax(0, 1fr));}
+      .products{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
+
     .card{
-      border-radius:16px;
+      border-radius:14px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.03);
-      padding:12px 12px 10px;
+      padding:10px 10px 8px;
       position:relative;
-      min-height:84px;
+      min-height:64px;
       display:flex;
       flex-direction:column;
       justify-content:space-between;
@@ -213,46 +217,55 @@
       box-shadow:0 0 0 2px rgba(255,77,77,.18) inset;
     }
     .card .name{
-      font-size:18px;
-      font-weight:1300;
+      font-size:16px;
+      font-weight:1400;
       letter-spacing:-.2px;
-      line-height:1.12;
+      line-height:1.05;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .card .price{
-      font-size:14px;
-      font-weight:900;
-      opacity:.70;                 /* ✅ 가격은 흐리게 */
-      margin-top:6px;
+      font-size:12px;
+      font-weight:1000;
+      opacity:.60;
+      margin-top:5px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .card .meta{
       display:flex;
       gap:8px;
       align-items:center;
       justify-content:space-between;
-      margin-top:8px;
+      margin-top:6px;
     }
     .badge{
-      font-size:12px;
+      font-size:11px;
       font-weight:1100;
       opacity:.7;
-      padding:5px 8px;
+      padding:4px 7px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.18);
+      white-space:nowrap;
     }
     .pinBtn{
-      width:34px; height:34px;
-      border-radius:12px;
+      width:30px; height:30px;
+      border-radius:10px;
       display:grid; place-items:center;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.04);
+      flex:0 0 auto;
     }
     .card.pinned .pinBtn{
       background:rgba(255,77,77,.22);
       border-color:rgba(255,77,77,.35);
     }
+
     .hint{
-      padding:0 14px 14px;
+      padding:0 12px 12px;
       font-size:12px;
       opacity:.70;
       line-height:1.35;
@@ -267,11 +280,11 @@
       overflow:hidden;
       display:flex;
       flex-direction:column;
-      min-height:620px;
+      min-height:0;
     }
 
     .cartHead{
-      padding:14px 14px 10px;
+      padding:12px 14px 10px;
       border-bottom:1px solid var(--line2);
       display:flex;
       align-items:center;
@@ -285,137 +298,135 @@
     .cartHead .n{
       font-weight:1100;
       opacity:.65;
+      font-size:12px;
     }
 
     .cart{
-      padding:8px 10px;
+      padding:6px 10px;
       flex:1;
       overflow:auto;
     }
 
-    /* 장바구니 1줄 압축 */
+    /* 장바구니 1줄 압축 + 더 많이 보이게 */
     .item{
-      padding:10px 10px;
+      padding:8px 10px;
       border-bottom:1px solid rgba(255,255,255,.06);
     }
     .itemRow{
       display:grid;
-      grid-template-columns: 1fr auto auto;
+      grid-template-columns: 1fr auto;
       align-items:center;
       gap:10px;
     }
+    .itemLeft{
+      display:flex;
+      align-items:baseline;
+      gap:10px;
+      min-width:0;
+    }
     .itemName{
-      font-size:16px;
+      font-size:15px;
       font-weight:1200;
       line-height:1.1;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
+      min-width:0;
+      flex:1;
     }
     .itemSub{
       font-size:14px;
       font-weight:900;
       opacity:.70;
       white-space:nowrap;
+      flex:0 0 auto;
     }
     .itemCtrls{
       display:flex;
       align-items:center;
       gap:8px;
+      flex:0 0 auto;
     }
     .itemCtrls .ctrl{
-      width:36px;
-      height:36px;
+      width:34px;
+      height:34px;
       border-radius:10px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.04);
       font-size:18px;
       font-weight:1200;
     }
-    .itemCtrls .count{
-      width:28px;
-      text-align:center;
-      font-size:16px;
-      font-weight:1200;
-      opacity:.92;
-    }
     .itemCtrls .del{
       width:40px;
-      height:36px;
+      height:34px;
       border-radius:10px;
       font-size:18px;
       font-weight:1400;
       background:rgba(255,77,77,.18);
-      border-color:rgba(255,77,77,.30);
+      border:1px solid rgba(255,77,77,.30);
     }
 
-    /* 요약영역 */
+    /* ✅ 요약영역: 총합계/받은돈/거스름돈 모두 "라벨 위 / 금액 아래" */
     .summary{
-      padding:14px 14px 12px;
+      padding:12px 14px 12px;
       border-top:1px solid var(--line2);
       background:rgba(255,255,255,.015);
     }
-    .sumline{
+    .sumBlock{
+      display:flex;
+      flex-direction:column;
+      gap:12px; /* ✅ 총합계 ↔ 받은돈/거스름돈 간격 동일 */
+    }
+    .blk{
       display:flex;
       flex-direction:column;
       align-items:flex-start;
       gap:6px;
-      padding-bottom:12px;
-      border-bottom:1px solid rgba(255,255,255,.10);
+      min-width:0;
     }
-    .sumText{
-      font-size:14px;
+    .blkLabel{
+      font-size:13px;  /* ✅ 작은글씨(위) */
       font-weight:1100;
       opacity:.78;
+      letter-spacing:-.1px;
     }
-    .sumValue{
-      font-size:30px;      /* ✅ 총합계 금액 크게 */
+    .blkValue{
+      font-size:30px;  /* ✅ 총합계 크게 */
       font-weight:1500;
       letter-spacing:-.3px;
       line-height:1.05;
+      white-space:nowrap;
     }
-
-    .payline{
-      display:flex;
-      flex-direction:column;
-      align-items:flex-start;
-      gap:10px;            /* ✅ 받은돈/거스름돈 위아래 간격 동일 */
-      padding-top:12px;
+    .blkRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr; /* ✅ 받은돈(왼) / 거스름돈(오) 한줄 */
+      gap:18px;
+      align-items:start;
     }
-    .payRow{
-      width:100%;
-      display:flex;
-      align-items:baseline;
-      justify-content:flex-start; /* ✅ 둘 다 왼쪽정렬 */
-      gap:12px;
+    .blkRow .blkValue{
+      font-size:26px; /* ✅ 받은돈 기본 크게 */
+      font-weight:1450;
     }
-    .payLabel{
-      font-size:13px;
-      font-weight:1000;
-      opacity:.70;
-      min-width:64px;
-    }
-    .payVal{
-      font-size:26px;      /* ✅ 받은돈/거스름돈 크게 */
+    .blkValueChange{
+      font-size:22px; /* ✅ 거스름돈은 조금 더 작게(실수 방지/공간확보) */
       font-weight:1400;
-      letter-spacing:-.2px;
-      line-height:1.05;
+      opacity:.95;
     }
 
-    /* 받은돈 버튼 */
+    /* 받은돈 버튼: 살짝 줄여 공간 확보 + 결제완료 오클릭 방지 */
     .money{
       display:grid;
       grid-template-columns:repeat(3, 1fr);
       gap:10px;
-      margin-top:12px;
+      margin-top:10px;
     }
     .money button{
-      height:54px;         /* ✅ 버튼 더 큼 */
+      height:50px;
       border-radius:14px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.92);
       color:#111;
-      font-size:18px;
+      font-size:17px;
       font-weight:1200;
     }
     .money button#reset{
@@ -430,9 +441,9 @@
     }
 
     #pay{
-      margin-top:12px;
+      margin-top:14px; /* ✅ 단위버튼과 결제완료 간격 확보 */
       width:100%;
-      height:64px;
+      height:62px;
       border-radius:16px;
       background:var(--accent);
       color:#111;
@@ -507,7 +518,7 @@
 
       <div class="hint">
         ※ 상품 고정(전체 공통): <b>길게 누르기(모바일)</b> / <b>우클릭(PC)</b><br/>
-        ※ 검색은 카테고리 무관 + 초성(ㄱㄴㄷ)도 됩니다. (X 버튼은 빨간색)
+        ※ 검색은 카테고리 무관 + 초성(ㄱㄴㄷ)도 됩니다.
       </div>
     </section>
 
@@ -521,19 +532,23 @@
       <div class="cart" id="cart"></div>
 
       <div class="summary">
-        <div class="sumline">
-          <div class="sumText" id="sumText">총합계(0개)</div>
-          <div class="sumValue" id="sumValue">0원</div>
-        </div>
-
-        <div class="payline">
-          <div class="payRow">
-            <div class="payLabel">받은돈</div>
-            <div class="payVal" id="received">0원</div>
+        <div class="sumBlock">
+          <!-- 총합계 -->
+          <div class="blk">
+            <div class="blkLabel" id="sumText">총합계(0개)</div>
+            <div class="blkValue" id="sumValue">0원</div>
           </div>
-          <div class="payRow">
-            <div class="payLabel">거스름돈</div>
-            <div class="payVal" id="change">0원</div>
+
+          <!-- ✅ 받은돈 / 거스름돈 한줄 -->
+          <div class="blkRow">
+            <div class="blk">
+              <div class="blkLabel">받은돈</div>
+              <div class="blkValue" id="received">0원</div>
+            </div>
+            <div class="blk">
+              <div class="blkLabel">거스름돈</div>
+              <div class="blkValue blkValueChange" id="change">0원</div>
+            </div>
           </div>
         </div>
 
@@ -573,14 +588,13 @@
 
     /* ===========================
        1) 기본 상품(테스트용)
-       - 실제론 엑셀/시트 연동 전에 여기만 바꿔도 됨
     =========================== */
     const DEFAULT_ITEMS = [
       {id:"p1",  cat:"과일", name:"바나나", price:2500, pinned:true,  used:2},
       {id:"p2",  cat:"과일", name:"토마토", price:10000,pinned:true,  used:3},
       {id:"p3",  cat:"야채", name:"감자",   price:3000, pinned:false, used:1},
       {id:"p4",  cat:"야채", name:"양파",   price:2500, pinned:false, used:1},
-      {id:"p5",  cat:"야채", name:"고등어/1마리", price:3500, pinned:false, used:0},
+      {id:"p5",  cat:"생선", name:"고등어/1마리", price:3500, pinned:false, used:0},
       {id:"p6",  cat:"야채", name:"대파",   price:1800, pinned:false, used:0},
       {id:"p7",  cat:"야채", name:"마늘",   price:4000, pinned:false, used:0},
       {id:"p8",  cat:"야채", name:"당근",   price:2000, pinned:false, used:0},
@@ -621,7 +635,6 @@
       return normalizeItems(DEFAULT_ITEMS);
     }
     function normalizeItems(list){
-      // 필수필드 보정
       return list.map(x=>({
         id: String(x.id),
         cat: x.cat || "기타",
@@ -670,17 +683,11 @@
       if(!q) return true;
       const name = p.name || "";
       const q2 = q.trim();
-      // 일반 포함
       if(name.includes(q2)) return true;
-
-      // 초성 포함(연속)
       const nCho = toChoString(name);
       if(nCho.includes(q2)) return true;
-
-      // 공백 제거도 한 번
       if(name.replace(/\s+/g,"").includes(q2.replace(/\s+/g,""))) return true;
       if(nCho.replace(/\s+/g,"").includes(q2.replace(/\s+/g,""))) return true;
-
       return false;
     }
 
@@ -757,13 +764,12 @@
     }
 
     function renderPinStrip(){
-      // 전체 공통 고정(핀)만: 상단 1줄 + 최대 10개 노출(스크롤은 가능)
       pinStripEl.innerHTML="";
-      const pins = ITEMS.filter(p=>p.pinned).sort((a,b)=>(b.used||0)-(a.used||0)).slice(0, 30); // 데이터 많아도 OK
+      const pins = ITEMS.filter(p=>p.pinned).sort((a,b)=>(b.used||0)-(a.used||0)).slice(0, 60);
       if(!pins.length){
         const d=document.createElement("div");
         d.style.opacity=.6;
-        d.style.padding="8px 2px";
+        d.style.padding="6px 2px";
         d.textContent="고정 상품이 없습니다. (상품카드 길게 눌러 고정)";
         pinStripEl.appendChild(d);
         return;
@@ -799,6 +805,7 @@
         empty.style.padding="12px";
         empty.textContent="검색 결과가 없습니다.";
         productsEl.appendChild(empty);
+        renderPinStrip();
         return;
       }
 
@@ -852,19 +859,15 @@
       const map = itemMap();
       const keys = Object.keys(cart).filter(id=>cart[id]>0 && map[id]);
 
-      // 헤더 항목 수
       cartCountEl.textContent = `항목 ${keys.length}`;
 
-      // 총합계
       const {sum, qty} = sumCart();
       document.getElementById("sumText").textContent = `총합계(${qty}개)`;
       document.getElementById("sumValue").textContent = `${sum.toLocaleString()}원`;
 
-      // 받은돈/거스름돈
       document.getElementById("received").textContent = `${received.toLocaleString()}원`;
       document.getElementById("change").textContent   = `${Math.max(0, received - sum).toLocaleString()}원`;
 
-      // 장바구니 목록
       cartEl.innerHTML="";
       if(!keys.length){
         const d=document.createElement("div");
@@ -881,13 +884,14 @@
         item.className="item";
         item.innerHTML = `
           <div class="itemRow" title="단가 ${p.price.toLocaleString()}원">
-            <div class="itemName">${escapeHtml(p.name)} <span style="opacity:.75">x${qn}</span></div>
-            <div class="itemSub">${(p.price*qn).toLocaleString()}원</div>
+            <div class="itemLeft">
+              <div class="itemName">${escapeHtml(p.name)} <span style="opacity:.75">x${qn}</span></div>
+              <div class="itemSub">${(p.price*qn).toLocaleString()}원</div>
+            </div>
             <div class="itemCtrls">
               <button class="ctrl" data-act="minus">−</button>
-              <div class="count">${qn}</div>
               <button class="ctrl" data-act="plus">+</button>
-              <button class="ctrl del" data-act="del">×</button>
+              <button class="del" data-act="del">×</button>
             </div>
           </div>
         `;
@@ -928,7 +932,6 @@
       renderProducts();
     }
 
-    // 정렬 버튼
     document.getElementById("sortBtn").onclick=()=>{
       if(sortMode==="pin_used"){ sortMode="name";  document.getElementById("sortBtn").textContent="정렬: 이름 순"; }
       else if(sortMode==="name"){ sortMode="price"; document.getElementById("sortBtn").textContent="정렬: 가격 낮은 순"; }
@@ -936,10 +939,8 @@
       renderProducts();
     };
 
-    // 검색 입력
     document.getElementById("q").addEventListener("input", ()=>renderProducts());
 
-    // 받은돈 버튼들
     document.querySelectorAll('.money button[data-add]').forEach(b=>{
       b.onclick=()=>{
         received += Number(b.dataset.add||0);
@@ -948,14 +949,12 @@
       };
     });
 
-    // 초기화(🧹): 받은돈만 리셋
     document.getElementById("reset").onclick=()=>{
       received = 0;
       saveReceived();
       renderCart();
     };
 
-    // 결제완료 모달
     const overlay=document.getElementById("overlay");
     const payBtn=document.getElementById("pay");
     const okBtn=document.getElementById("okBtn");
@@ -976,11 +975,9 @@
       overlay.classList.remove("show");
       beep();
 
-      // 결제 잠깐 락
       payLocked=true;
       payBtn.classList.add("locked");
 
-      // ✅ 결제완료 후: 장바구니 + 받은돈만 리셋 (핀/사용횟수 유지)
       setTimeout(()=>{
         cart = {};
         received = 0;
@@ -994,9 +991,7 @@
     };
 
     /* ===========================
-       7) 새로고침(F5) / 새탭 로드 시 정책
-       - "장바구니 + 받은돈만" 자동 리셋
-       - 핀/사용횟수(상품상태) 유지
+       7) 새로고침(F5)/새탭 로드시: 장바구니+받은돈만 리셋(핀/사용횟수 유지)
     =========================== */
     function resetCartAndReceivedOnly(){
       cart = {};
