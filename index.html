@@ -1,867 +1,166 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>엄가네 POS</title>
-  <style>
-    :root{
-      --bg:#0b0c10;
-      --panel:#121827;
-      --panel2:#0f131e;
-      --card:#1a2338;
-      --card2:#152032;
-      --line:rgba(255,255,255,.10);
-      --text:#f3f6ff;
-      --muted:rgba(243,246,255,.65);
-      --accent:#ff9f00;
-      --btn:#f4f5f7;
-      --btnText:#111;
-      --danger:#ff4d4f;
-      --good:#29d17e;
-      --shadow:0 14px 44px rgba(0,0,0,.42);
-      --r:18px;
-      --r2:22px;
-    }
-    *{box-sizing:border-box;}
-    html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Noto Sans KR",Segoe UI,Roboto,sans-serif;}
-    button,input{font:inherit}
-    .app{
-      height:100%;
-      display:grid;
-      grid-template-columns: minmax(520px, 1fr) 420px;
-      gap:14px;
-      padding:14px;
-    }
-    .left,.right{
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius:var(--r2);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-    .left{display:flex; flex-direction:column;}
-    .topbar{
-      padding:12px 12px 10px;
-      border-bottom:1px solid var(--line);
-      background:rgba(255,255,255,.02);
-    }
-    .tabs{
-      display:flex; gap:8px; flex-wrap:wrap;
-      margin-bottom:10px;
-    }
-    .tab{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      color:var(--text);
-      padding:10px 14px;
-      border-radius:999px;
-      cursor:pointer;
-      font-weight:800;
-      letter-spacing:-.2px;
-      user-select:none;
-    }
-    .tab.active{
-      border-color:rgba(255,159,0,.6);
-      box-shadow:0 0 0 2px rgba(255,159,0,.12) inset;
-      color:var(--accent);
-    }
-    .searchRow{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-    .search{
-      flex:1;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-    }
-    .search .icon{opacity:.8}
-    .search input{
-      width:100%;
-      border:none;
-      outline:none;
-      background:transparent;
-      color:var(--text);
-      font-weight:700;
-    }
-    .sortBtn{
-      white-space:nowrap;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius:14px;
-      cursor:pointer;
-      font-weight:800;
-    }
-    .choRow{
-      margin-top:10px;
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-    .choRow button{
-      min-width:44px;
-      padding:10px 0;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.02);
-      color:var(--text);
-      font-weight:900;
-      cursor:pointer;
-      user-select:none;
-    }
-    .hint{
-      margin-top:10px;
-      font-size:12px;
-      color:var(--muted);
-      font-weight:700;
-    }
-    .grid{
-      padding:12px;
-      display:grid;
-      grid-template-columns: repeat(4, minmax(160px, 1fr));
-      gap:12px;
-      overflow:auto;
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      border:1px solid var(--line);
-      border-radius:22px;
-      padding:14px 14px 12px;
-      cursor:pointer;
-      user-select:none;
-      position:relative;
-    }
-    .card:active{transform:translateY(1px);}
-    .name{
-      font-weight:900;
-      font-size:22px;
-      letter-spacing:-.4px;
-      line-height:1.1;
-      margin-bottom:8px;
-    }
-    .price{
-      font-weight:900;
-      font-size:16px;
-      opacity:.95;
-    }
-    .meta{
-      position:absolute;
-      right:12px;
-      top:10px;
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-    .usePill{
-      font-weight:900;
-      font-size:12px;
-      color:var(--muted);
-      border:1px solid var(--line);
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(0,0,0,.15);
-    }
-    .pinBtn{
-      width:34px; height:34px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:rgba(0,0,0,.18);
-      cursor:pointer;
-      display:grid; place-items:center;
-      user-select:none;
-    }
-    .pinBtn.pinned{
-      border-color:rgba(255,159,0,.65);
-      box-shadow:0 0 0 2px rgba(255,159,0,.12) inset;
-    }
-
-    /* RIGHT */
-    .right{display:flex; flex-direction:column;}
-    .rTop{
-      padding:12px;
-      border-bottom:1px solid var(--line);
-      background:rgba(255,255,255,.02);
-      font-weight:900;
-      letter-spacing:-.2px;
-    }
-    .cart{
-      padding:12px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      overflow:auto;
-      flex:1;
-    }
-    .cartList{
-      border:1px solid var(--line);
-      border-radius:18px;
-      overflow:hidden;
-      background:rgba(255,255,255,.02);
-    }
-    .cartRow{
-      display:grid;
-      grid-template-columns: 1fr auto auto auto;
-      gap:8px;
-      align-items:center;
-      padding:10px 10px;
-      border-bottom:1px solid rgba(255,255,255,.06);
-      min-height:46px;
-    }
-    .cartRow:last-child{border-bottom:none;}
-    .cName{font-weight:900; letter-spacing:-.2px;}
-    .cSub{font-weight:800; color:var(--muted); font-size:12px;}
-    .qtyCtl{
-      display:flex;
-      gap:6px;
-      align-items:center;
-      font-weight:900;
-    }
-    .qtyCtl button{
-      width:34px; height:34px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:rgba(0,0,0,.18);
-      color:var(--text);
-      cursor:pointer;
-      font-weight:1000;
-    }
-    .qtyNum{
-      min-width:34px;
-      text-align:center;
-      font-weight:1000;
-    }
-    .delBtn{
-      width:42px; height:34px;
-      border-radius:12px;
-      border:1px solid rgba(255,77,79,.45);
-      background:rgba(255,77,79,.12);
-      color:#ffd7d7;
-      cursor:pointer;
-      font-weight:1000;
-    }
-    .rowLine{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.02);
-      border-radius:18px;
-      padding:10px 12px;
-      font-weight:1000;
-    }
-    .rowLine .big{font-size:20px;}
-    .rowLine .muted{color:var(--muted); font-weight:900;}
-    .moneyPad{
-      border:1px solid var(--line);
-      border-radius:18px;
-      background:rgba(255,255,255,.02);
-      padding:10px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-    }
-    .moneyPad button{
-      height:46px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:var(--btn);
-      color:var(--btnText);
-      cursor:pointer;
-      font-weight:1000;
-      letter-spacing:-.2px;
-    }
-    .moneyPad .reset{
-      background:rgba(255,77,79,.18);
-      border-color:rgba(255,77,79,.45);
-      color:#ffd7d7;
-    }
-    .payBtn{
-      margin-top:10px;
-      height:64px;
-      border-radius:16px;
-      border:none;
-      cursor:pointer;
-      font-weight:1000;
-      font-size:20px;
-      background:var(--accent);
-      color:#111;
-      box-shadow:0 10px 28px rgba(255,159,0,.25);
-    }
-    .payBtn:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-    }
-
-    /* Responsive: 작은 화면 */
-    @media (max-width: 980px){
-      .app{grid-template-columns:1fr; grid-template-rows:auto auto;}
-      .right{min-height:520px;}
-      .grid{grid-template-columns: repeat(2, minmax(160px, 1fr));}
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <section class="left">
-      <div class="topbar">
-        <div class="tabs" id="tabs"></div>
-
-        <div class="searchRow">
-          <div class="search">
-            <span class="icon">🔎</span>
-            <input id="q" placeholder="전카테고리 검색 (예: 감자, ㄱㅈ, ㄱㄴㄷ)" autocomplete="off" />
-          </div>
-          <button class="sortBtn" id="sortBtn">정렬: 고정 + 많이 찍힌 순</button>
-        </div>
-
-        <div class="choRow" id="cho"></div>
-        <div class="hint">※ 고정핀: 길게 쓰는 품목을 “항상 위”로 올립니다. (모바일=길게누르기 / PC=우클릭)</div>
-      </div>
-
-      <div class="grid" id="grid"></div>
-    </section>
-
-    <aside class="right">
-      <div class="rTop">결제</div>
-      <div class="cart">
-        <!-- 장바구니 -->
-        <div class="cartList" id="cartList"></div>
-
-        <!-- 총합계/담긴갯수 한줄 -->
-        <div class="rowLine">
-          <div>
-            <div class="muted">총합계</div>
-            <div class="big" id="sum">0원</div>
-          </div>
-          <div style="text-align:right">
-            <div class="muted">담긴갯수</div>
-            <div class="big" id="count">0</div>
-          </div>
-        </div>
-
-        <!-- 받은돈/거스름돈 한줄 -->
-        <div class="rowLine">
-          <div>
-            <div class="muted">받은돈</div>
-            <div class="big" id="paid">0원</div>
-          </div>
-          <div style="text-align:right">
-            <div class="muted">거스름돈</div>
-            <div class="big" id="change">0원</div>
-          </div>
-        </div>
-
-        <!-- 거스름돈 버튼 3개씩 2줄 -->
-        <div class="moneyPad">
-          <button data-add="500">500</button>
-          <button data-add="1000">1천</button>
-          <button data-add="5000">5천</button>
-          <button data-add="10000">1만</button>
-          <button data-add="50000">5만</button>
-          <button class="reset" id="resetPaid">초기화</button>
-        </div>
-
-        <button class="payBtn" id="payBtn" disabled>결제완료</button>
-      </div>
-    </aside>
-  </div>
-
-  <!-- 구글시트 연동 items.js (window.ITEMS를 채우는 파일) -->
-  <script src="./items.js?v=1"></script>
-
-  <script>
-    /**********************
-     * 상태/저장 키
-     **********************/
-    const LS_PIN = "UMGANE_PIN_V1";
-    const LS_USE = "UMGANE_USE_V1";
-
-    const state = {
-      cat: "과일",             // 기본 탭
-      q: "",
-      sort: "pin_use",         // 고정+사용순
-      cart: new Map(),         // id -> {item, qty}
-      paid: 0
-    };
-
-    const CATS = ["과일","야채","봉채소","생선","기타"];
-
-    /**********************
-     * 유틸
-     **********************/
-    const fmt = (n)=> (Number(n||0)).toLocaleString("ko-KR") + "원";
-
-    function safeItems(){
-      const arr = (window.ITEMS && Array.isArray(window.ITEMS)) ? window.ITEMS : [];
-      // 기대 포맷: {id, cat, name, unit, price, active}
-      return arr
-        .filter(x => x && (x.active === undefined ? true : !!x.active))
-        .map(x => ({
-          id: String(x.id ?? ""),
-          cat: String(x.cat ?? "기타"),
-          name: String(x.name ?? ""),
-          unit: String(x.unit ?? ""),
-          price: Number(x.price ?? 0)
-        }))
-        .filter(x => x.id && x.name);
-    }
-
-    function loadJSON(key, fallback){
-      try{
-        const v = localStorage.getItem(key);
-        if(!v) return fallback;
-        return JSON.parse(v);
-      }catch(e){ return fallback; }
-    }
-    function saveJSON(key, val){
-      try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
-    }
-
-    const pinMap = loadJSON(LS_PIN, {}); // id -> true
-    const useMap = loadJSON(LS_USE, {}); // id -> number
-
-    function isPinned(id){ return !!pinMap[String(id)]; }
-    function togglePin(id){
-      id = String(id);
-      pinMap[id] = !pinMap[id];
-      saveJSON(LS_PIN, pinMap);
-      renderProducts();
-    }
-    function incUse(id){
-      id = String(id);
-      useMap[id] = (useMap[id] || 0) + 1;
-      saveJSON(LS_USE, useMap);
-    }
-    function getUse(id){ return Number(useMap[String(id)] || 0); }
-
-    // 초성 매칭
-    const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
-    function toChosung(str){
-      let out = "";
-      for(const ch of str){
-        const code = ch.charCodeAt(0);
-        if(code >= 0xAC00 && code <= 0xD7A3){
-          const idx = Math.floor((code - 0xAC00) / 588);
-          out += CHO[idx] || "";
-        }else{
-          out += ch;
-        }
-      }
-      return out;
-    }
-    function isOnlyChosung(q){
-      if(!q) return false;
-      // ㄱ-ㅎ, ㅏ-ㅣ 제외하고 초성만 허용
-      return /^[ㄱ-ㅎ\s]+$/.test(q);
-    }
-    function matchQuery(name, q){
-      if(!q) return true;
-      const nq = q.replace(/\s+/g,"");
-      const nn = name.replace(/\s+/g,"");
-      if(!nq) return true;
-
-      // 초성만 들어오면 초성 문자열로 비교
-      if(isOnlyChosung(nq)){
-        return toChosung(nn).includes(nq);
-      }
-      // 일반 문자열 포함
-      return nn.includes(nq) || toChosung(nn).includes(nq);
-    }
-
-    /**********************
-     * UI 엘리먼트
-     **********************/
-    const elTabs = document.getElementById("tabs");
-    const elGrid = document.getElementById("grid");
-    const elQ = document.getElementById("q");
-    const elCho = document.getElementById("cho");
-    const elSortBtn = document.getElementById("sortBtn");
-
-    const elCartList = document.getElementById("cartList");
-    const elSum = document.getElementById("sum");
-    const elCount = document.getElementById("count");
-    const elPaid = document.getElementById("paid");
-    const elChange = document.getElementById("change");
-    const elPayBtn = document.getElementById("payBtn");
-    const elResetPaid = document.getElementById("resetPaid");
-
-    /**********************
-     * 렌더: 탭
-     **********************/
-    function renderTabs(){
-      elTabs.innerHTML = "";
-      CATS.forEach(cat=>{
-        const b = document.createElement("button");
-        b.className = "tab" + (state.cat===cat ? " active" : "");
-        b.textContent = cat;
-        b.onclick = ()=>{
-          state.cat = cat;
-          renderTabs();
-          renderProducts();
-        };
-        elTabs.appendChild(b);
-      });
-    }
-
-    /**********************
-     * 렌더: 상품
-     **********************/
-    function getFilteredItems(){
-      const items = safeItems();
-      const q = state.q;
-      return items.filter(it=>{
-        const catOk = (state.cat === "기타") ? true : (it.cat === state.cat); // "기타"를 전체처럼 쓰지 않음
-        const qOk = matchQuery(it.name, q);
-        return catOk && qOk;
-      });
-    }
-
-    function sortItems(list){
-      // 고정 먼저, 그 다음 사용많은순, 그 다음 이름
-      return [...list].sort((a,b)=>{
-        const ap = isPinned(a.id) ? 1 : 0;
-        const bp = isPinned(b.id) ? 1 : 0;
-        if(bp !== ap) return bp - ap;
-
-        const au = getUse(a.id);
-        const bu = getUse(b.id);
-        if(bu !== au) return bu - au;
-
-        return a.name.localeCompare(b.name, "ko");
-      });
-    }
-
-    function renderProducts(){
-      const list = sortItems(getFilteredItems());
-      elGrid.innerHTML = "";
-
-      if(list.length === 0){
-        const empty = document.createElement("div");
-        empty.style.color = "rgba(243,246,255,.6)";
-        empty.style.fontWeight = "900";
-        empty.style.padding = "10px";
-        empty.textContent = "검색 결과가 없습니다.";
-        elGrid.appendChild(empty);
-        return;
-      }
-
-      for(const it of list){
-        const card = document.createElement("div");
-        card.className = "card";
-
-        // 클릭: 담기
-        card.onclick = ()=>{
-          addToCart(it);
-        };
-
-        // PC 우클릭: 고정 토글
-        card.oncontextmenu = (e)=>{
-          e.preventDefault();
-          togglePin(it.id);
-        };
-
-        // 모바일 길게 누르기: 고정 토글
-        let pressT = null;
-        card.addEventListener("touchstart", ()=>{
-          pressT = setTimeout(()=> togglePin(it.id), 520);
-        }, {passive:true});
-        card.addEventListener("touchend", ()=>{
-          if(pressT) clearTimeout(pressT);
-          pressT = null;
-        }, {passive:true});
-
-        const meta = document.createElement("div");
-        meta.className = "meta";
-
-        const use = document.createElement("div");
-        use.className = "usePill";
-        use.textContent = "사용 " + getUse(it.id);
-
-        const pin = document.createElement("button");
-        pin.className = "pinBtn" + (isPinned(it.id) ? " pinned" : "");
-        pin.title = "고정";
-        pin.textContent = "📌";
-        pin.onclick = (e)=>{
-          e.stopPropagation();
-          togglePin(it.id);
-        };
-
-        meta.appendChild(use);
-        meta.appendChild(pin);
-
-        const name = document.createElement("div");
-        name.className = "name";
-        name.textContent = it.unit ? `${it.name}/${it.unit}` : it.name;
-
-        const price = document.createElement("div");
-        price.className = "price";
-        price.textContent = fmt(it.price);
-
-        card.appendChild(meta);
-        card.appendChild(name);
-        card.appendChild(price);
-
-        elGrid.appendChild(card);
-      }
-    }
-
-    /**********************
-     * 장바구니
-     **********************/
-    function addToCart(item){
-      const id = String(item.id);
-      const cur = state.cart.get(id);
-      if(cur) cur.qty += 1;
-      else state.cart.set(id, { item, qty: 1 });
-
-      incUse(id);
-      renderProducts();
-      renderCart();
-    }
-
-    function decQty(id){
-      const cur = state.cart.get(id);
-      if(!cur) return;
-      cur.qty -= 1;
-      if(cur.qty <= 0) state.cart.delete(id);
-      renderCart();
-    }
-    function incQty(id){
-      const cur = state.cart.get(id);
-      if(!cur) return;
-      cur.qty += 1;
-      incUse(id);
-      renderProducts();
-      renderCart();
-    }
-    function delItem(id){
-      state.cart.delete(id);
-      renderCart();
-    }
-
-    function calcSum(){
-      let s = 0, c = 0;
-      for(const {item, qty} of state.cart.values()){
-        s += item.price * qty;
-        c += qty;
-      }
-      return {sum:s, count:c};
-    }
-
-    function renderCart(){
-      const entries = [...state.cart.values()];
-      const {sum, count} = calcSum();
-      const change = Math.max(0, state.paid - sum);
-
-      elSum.textContent = fmt(sum);
-      elCount.textContent = String(count);
-      elPaid.textContent = fmt(state.paid);
-      elChange.textContent = fmt(change);
-
-      // 결제버튼 활성 조건: 장바구니 있고, 받은돈 >= 합계(0도 결제 허용하면 여기 변경)
-      elPayBtn.disabled = !(count > 0);
-
-      // 장바구니 리스트 + 최소 7줄 보이게 빈 줄 채우기
-      elCartList.innerHTML = "";
-      const MIN_ROWS = 7;
-
-      const rows = [];
-
-      for(const row of entries){
-        const {item, qty} = row;
-        const r = document.createElement("div");
-        r.className = "cartRow";
-
-        const left = document.createElement("div");
-        const nm = document.createElement("div");
-        nm.className = "cName";
-        nm.textContent = item.unit ? `${item.name}/${item.unit}` : item.name;
-
-        const sub = document.createElement("div");
-        sub.className = "cSub";
-        sub.textContent = `${fmt(item.price)} × ${qty} = ${fmt(item.price * qty)}`;
-
-        left.appendChild(nm);
-        left.appendChild(sub);
-
-        const qtyCtl = document.createElement("div");
-        qtyCtl.className = "qtyCtl";
-
-        const bMinus = document.createElement("button");
-        bMinus.textContent = "−";
-        bMinus.onclick = ()=> decQty(String(item.id));
-
-        const num = document.createElement("div");
-        num.className = "qtyNum";
-        num.textContent = String(qty);
-
-        const bPlus = document.createElement("button");
-        bPlus.textContent = "+";
-        bPlus.onclick = ()=> incQty(String(item.id));
-
-        qtyCtl.appendChild(bMinus);
-        qtyCtl.appendChild(num);
-        qtyCtl.appendChild(bPlus);
-
-        const del = document.createElement("button");
-        del.className = "delBtn";
-        del.textContent = "삭제";
-        del.onclick = ()=> delItem(String(item.id));
-
-        // 빈 칸 하나 더 두고 싶으면 여기 추가 가능
-        r.appendChild(left);
-        r.appendChild(qtyCtl);
-        r.appendChild(del);
-
-        // grid가 4칸인데 3개만 넣었으니 마지막 칸 맞추기
-        const spacer = document.createElement("div");
-        spacer.style.width = "1px";
-        spacer.style.height = "1px";
-        r.appendChild(spacer);
-
-        rows.push(r);
-      }
-
-      // 빈 줄 채우기
-      const need = Math.max(0, MIN_ROWS - rows.length);
-      for(let i=0;i<need;i++){
-        const r = document.createElement("div");
-        r.className = "cartRow";
-        r.style.opacity = ".35";
-        r.innerHTML = `<div class="cName">—</div><div></div><div></div><div></div>`;
-        rows.push(r);
-      }
-
-      rows.forEach(r => elCartList.appendChild(r));
-    }
-
-    /**********************
-     * 받은돈 / 결제완료 / 소리
-     **********************/
-    function addPaid(v){
-      state.paid = Math.max(0, state.paid + v);
-      renderCart();
-    }
-    function resetPaid(){
-      state.paid = 0; // 요구사항: 초기화는 받은돈만 리셋
-      renderCart();
-    }
-
-    // “삑” 소리 (파일 없이 WebAudio)
-    function playBeep(){
-      try{
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const ctx = new AudioContext();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = "square";
-        o.frequency.value = 880;     // 톤
-        g.gain.value = 0.06;         // 볼륨
-        o.connect(g);
-        g.connect(ctx.destination);
-        o.start();
-        setTimeout(()=>{
-          o.stop();
-          ctx.close();
-        }, 140); // 짧게
-      }catch(e){
-        // 조용히 무시
-      }
-    }
-
-    function payComplete(){
-      if(state.cart.size === 0) return;
-
-      // 결제완료 시: 장바구니 비우고 받은돈도 0으로
-      state.cart.clear();
-      state.paid = 0;
-
-      playBeep();       // ✅ 여기서 소리
-      renderCart();
-    }
-
-    /**********************
-     * 이벤트 바인딩
-     **********************/
-    elQ.addEventListener("input", ()=>{
-      state.q = elQ.value;
-      renderProducts();
-    });
-
-    // 초성 버튼
-    const choKeys = ["ㄱ","ㄴ","ㄷ","ㄹ","ㅁ","ㅂ","ㅅ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
-    elCho.innerHTML = "";
-    choKeys.forEach(k=>{
-      const b = document.createElement("button");
-      b.textContent = k;
-      b.onclick = ()=>{
-        elQ.value = (elQ.value || "") + k;
-        state.q = elQ.value;
-        elQ.focus();
-        renderProducts();
-      };
-      elCho.appendChild(b);
-    });
-    // X(지우기)
-    const clear = document.createElement("button");
-    clear.textContent = "X";
-    clear.onclick = ()=>{
-      elQ.value = "";
-      state.q = "";
-      elQ.focus();
-      renderProducts();
-    };
-    elCho.appendChild(clear);
-
-    // 정렬 버튼 (지금은 고정+사용순 고정 유지. 버튼은 UI용)
-    elSortBtn.onclick = ()=>{
-      // 혹시 나중에 정렬 모드 추가할 거면 여기서 토글
-      // 지금은 요구대로 고정+사용순 고정
-      alert("정렬은 '고정 + 많이 찍힌 순' 고정입니다.");
-    };
-
-    // 돈 버튼들
-    document.querySelectorAll(".moneyPad button[data-add]").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        addPaid(Number(b.getAttribute("data-add")||0));
-      });
-    });
-    elResetPaid.onclick = resetPaid;
-
-    elPayBtn.onclick = payComplete;
-
-    /**********************
-     * 초기 렌더
-     **********************/
-    function boot(){
-      renderTabs();
-      renderProducts();
-      renderCart();
-    }
-
-    // items.js가 늦게 오는 경우 대비
-    // 0.3초 간격으로 최대 3초만 기다렸다가 부팅
-    (function waitItems(){
-      const start = Date.now();
-      const timer = setInterval(()=>{
-        const items = safeItems();
-        if(items.length > 0 || (Date.now() - start) > 3000){
-          clearInterval(timer);
-          boot();
-        }
-      }, 300);
-    })();
-
-    // 외부에서 강제 새로고침(시트 갱신) 하고 싶으면 콘솔에서:
-    // window.reloadItemsFromSheet && window.reloadItemsFromSheet()
-  </script>
-</body>
-</html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>엄가네 POS</title>
+
+<style>
+:root{
+  --bg:#0f1219;
+  --panel:#121827;
+  --card1:#1e2639;
+  --card2:#242f4a;
+  --line:rgba(255,255,255,.12);
+  --text:#f7f9ff;
+  --muted:rgba(247,249,255,.65);
+  --accent:#ff9f00;
+  --danger:#ff4d4f;
+  --good:#2fd27e;
+  --btn:#f4f5f7;
+  --btnText:#111;
+  --shadow:0 14px 44px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%; margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",system-ui,Segoe UI,Roboto,sans-serif;
+}
+button,input{font:inherit}
+button{border:none; background:none}
+
+.app{height:100%; display:grid; grid-template-columns:3fr 1fr; gap:14px; padding:14px}
+
+/* LEFT */
+.left{
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.topbar{
+  display:flex; gap:10px; padding:10px 12px;
+  border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.02)
+}
+.tabs{display:flex; gap:8px; flex-wrap:wrap}
+.tab{
+  padding:8px 14px; border-radius:999px; border:1px solid var(--line);
+  background:#1d2332; color:var(--text); font-weight:1000; cursor:pointer;
+}
+.tab.active{background:rgba(255,159,0,.18); border-color:rgba(255,159,0,.45)}
+
+.searchwrap{padding:10px 12px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.015)}
+.searchrow{display:flex; gap:10px; align-items:center}
+.search{
+  flex:1; display:flex; align-items:center; gap:10px;
+  background:rgba(255,255,255,.04); border:1px solid var(--line);
+  border-radius:14px; padding:10px 12px;
+}
+.search .icon{opacity:.7}
+.search input{
+  width:100%; border:none; outline:none; background:transparent;
+  color:var(--text); font-weight:900; font-size:15px;
+}
+.sort{
+  display:flex; align-items:center; gap:8px; padding:10px 12px;
+  border:1px solid var(--line); border-radius:14px;
+  background:rgba(255,255,255,.03); font-weight:1000;
+  white-space:nowrap;
+}
+.sort small{opacity:.7; font-weight:900}
+
+.cho{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap}
+.cho button{
+  padding:8px 10px; border-radius:12px; border:1px solid var(--line);
+  background:rgba(255,255,255,.03); color:var(--text);
+  font-weight:1100; cursor:pointer; min-width:40px;
+}
+.cho button.clear{background:rgba(255,77,79,.18); border-color:rgba(255,77,79,.35)}
+
+.products{
+  padding:12px; overflow:auto;
+  display:grid; grid-template-columns:repeat(4, minmax(0,1fr));
+  gap:12px;
+}
+@media (min-width:1500px){ .products{grid-template-columns:repeat(5, minmax(0,1fr))} }
+
+.card{
+  background:linear-gradient(180deg, var(--card2), var(--card1));
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:18px; padding:14px;
+  cursor:pointer; user-select:none;
+  position:relative; min-height:90px;
+  touch-action:manipulation;
+}
+.card.flash{box-shadow:0 0 0 3px rgba(255,159,0,.45)}
+.name{font-size:18px; font-weight:1200; letter-spacing:-.2px}
+.price{margin-top:6px; font-size:14px; opacity:.95; font-weight:1000}
+.meta{
+  position:absolute; right:10px; top:10px;
+  display:flex; gap:8px; align-items:center; opacity:.9
+}
+.badge{
+  font-size:12px; padding:4px 8px; border-radius:999px;
+  border:1px solid var(--line); background:rgba(255,255,255,.03);
+  font-weight:1100
+}
+.pin{
+  width:28px; height:28px; display:grid; place-items:center;
+  border-radius:10px; border:1px solid var(--line);
+  background:rgba(0,0,0,.15)
+}
+.pin.on{border-color:rgba(255,159,0,.55); background:rgba(255,159,0,.18)}
+/* 메타 영역 클릭 가로채지 않게 */
+.meta, .meta * { pointer-events:none; }
+
+.hint{
+  padding:8px 12px 12px;
+  color:var(--muted); font-size:12px; font-weight:900;
+  border-top:1px solid var(--line); background:rgba(255,255,255,.01)
+}
+
+/* RIGHT (캐셔) */
+.right{
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.cart{padding:12px; overflow:auto; flex:1; min-height:240px}
+.carthead{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-weight:1200}
+.carthead .muted{opacity:.7; font-weight:1000}
+.item{
+  background:rgba(255,255,255,.03); border:1px solid var(--line);
+  border-radius:14px; padding:10px;
+  display:grid; grid-template-columns:1fr auto; gap:10px; margin-bottom:8px;
+}
+.item .title{font-weight:1200; font-size:14px}
+.item .sub{margin-top:4px; font-size:12px; opacity:.8; font-weight:900}
+.controls{display:flex; gap:8px; align-items:center}
+.ctrl{
+  width:38px; height:36px; border-radius:12px; border:1px solid var(--line);
+  background:rgba(255,255,255,.03); color:var(--text); font-weight:1300; cursor:pointer;
+}
+.ctrl.del{background:rgba(255,77,79,.18); border-color:rgba(255,77,79,.35)}
+.count{width:26px; text-align:center; font-weight:1300}
+
+.summary{padding:12px; border-top:1px solid var(--line); background:rgba(255,255,255,.015)}
+.row{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-bottom:8px}
+.label{font-size:12px; opacity:.7; font-weight:1100}
+.val{font-size:20px; font-weight:1300}
+.smallval{font-size:14px; font-weight:1200; opacity:.95}
+
+.payline{display:flex; align-items:flex-end; gap:12px; margin-top:10px}
+.payline .block{flex:1}
+.payline .divider{width:2px; height:26px; background:rgba(255,255,255,.14); border-radius:99px; align-self:center}
+.payline .leftAlign{text-align:left}
+.payline .rightAlign{text-align:right}
+
+.money{
+  padding:12px; border-top:1px solid var(--line);
+  display
